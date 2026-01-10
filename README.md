@@ -4,8 +4,10 @@
 
 - **[📖 Setup Guide](SETUP.md)** - Guía completa de instalación y configuración
 - **[🔄 Flow Diagrams](FLOW.md)** - Diagramas de flujo del servicio y arquitectura
+- **[🚀 User Journey](USER_JOURNEY.md)** - Flujo completo del proceso de usuario (Landing → Compra → Post-Compra)
 - **[📝 Sprint 4 Documentation](SPRINT4.md)** - CEO Dashboard & Analytics
 - **[📊 Sprint 5 Documentation](SPRINT5.md)** - Event Tracking & User Segmentation
+- **[🎯 Sprint 8 Documentation](SPRINT8.md)** - Dashboard CEO con LTV, Proyecciones y Seguridad
 
 ## 🚀 Sprint 5: Arquitectura Base y Analytics Avanzados ✅ COMPLETED
 
