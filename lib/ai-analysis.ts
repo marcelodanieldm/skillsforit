@@ -1,5 +1,6 @@
 import OpenAI from 'openai'
 import { AnalysisResult } from './database'
+import { buildAdvancedCVPrompt } from './cv-auditor'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -8,46 +9,11 @@ const openai = new OpenAI({
 export async function analyzeCVWithAI(
   cvText: string,
   profession: string,
-  country: string
+  country: string,
+  purpose?: string
 ): Promise<AnalysisResult> {
-  const prompt = `
-Eres un experto en reclutamiento IT y optimización de CVs. Analiza el siguiente CV de un profesional de ${profession} ubicado en ${country}.
-
-CV:
-${cvText}
-
-Proporciona un análisis completo en formato JSON con la siguiente estructura:
-
-{
-  "score": <número del 0-100 basado en la calidad general>,
-  "atsScore": <número del 0-100 basado en compatibilidad con ATS>,
-  "problems": [
-    {
-      "category": "<categoría del problema>",
-      "severity": "<high|medium|low>",
-      "description": "<descripción del problema>",
-      "impact": "<impacto en la búsqueda laboral>"
-    }
-  ],
-  "improvements": [
-    {
-      "category": "<categoría de la mejora>",
-      "before": "<texto actual del CV>",
-      "after": "<texto mejorado>",
-      "explanation": "<por qué esta mejora es importante>",
-      "impact": "<cómo mejora las posibilidades>"
-    }
-  ],
-  "strengths": [
-    "<fortalezas identificadas>"
-  ],
-  "recommendations": [
-    "<recomendaciones específicas>"
-  ]
-}
-
-Criterios de evaluación:
-1. Keywords relevantes para ATS
+  // Use advanced 50-criteria prompt system
+  const prompt = buildAdvancedCVPrompt(cvText, profession, country, purpose)
 2. Formato y estructura
 3. Cuantificación de logros
 4. Skills técnicas específicas
@@ -65,11 +31,11 @@ Asegúrate de:
 
   try {
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
+      model: 'gpt-4o', // Use GPT-4o for advanced analysis
       messages: [
         {
           role: 'system',
-          content: 'Eres un experto en reclutamiento IT y optimización de CVs. Siempre respondes en JSON válido.'
+          content: 'You are an expert IT recruiter with 15+ years of experience evaluating CVs for technical roles. You perform comprehensive audits based on 50+ professional criteria.'
         },
         {
           role: 'user',
@@ -77,8 +43,8 @@ Asegúrate de:
         }
       ],
       response_format: { type: 'json_object' },
-      temperature: 0.7,
-      max_tokens: 3000,
+      temperature: 0.3, // Lower temperature for more consistent, analytical responses
+      max_tokens: 4000, // Increased for comprehensive 50-criteria analysis
     })
 
     const result = completion.choices[0].message.content

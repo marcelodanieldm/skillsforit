@@ -5,8 +5,10 @@ import { db, revenueDb } from '@/lib/database'
 import { extractTextFromPDF, analyzeCVWithAI } from '@/lib/ai-analysis'
 import { generatePDFReport } from '@/lib/pdf-generator'
 import { sendAnalysisReport } from '@/lib/email'
+import { buildEbookContent } from '@/lib/cv-auditor'
 import { v4 as uuidv4 } from 'uuid'
 import path from 'path'
+import fs from 'fs/promises'
 
 // Disable body parser for Stripe webhooks
 export const config = {
@@ -59,12 +61,16 @@ export async function POST(request: NextRequest) {
           analysisStatus: 'processing',
         })
 
+        // Check if E-book was included
+        const includeEbook = metadata?.includeEbook === 'true'
+        const totalAmount = includeEbook ? 12 : 7
+
         // Track revenue for analytics
         const revenueId = uuidv4()
         revenueDb.create({
           id: revenueId,
           type: 'cv_analysis',
-          amount: 7, // $7 USD for CV analysis
+          amount: totalAmount,
           currency: 'usd',
           userEmail: analysis.email,
           userName: analysis.name,
@@ -74,8 +80,8 @@ export async function POST(request: NextRequest) {
           createdAt: new Date()
         })
 
-        // Process analysis asynchronously
-        processAnalysis(analysisId).catch(error => {
+        // Process analysis asynchronously (includes E-book delivery if purchased)
+        processAnalysis(analysisId, includeEbook).catch(error => {
           console.error('Error processing analysis:', error)
           db.update(analysisId, {
             analysisStatus: 'failed',
@@ -132,7 +138,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function processAnalysis(analysisId: string) {
+async function processAnalysis(analysisId: string, includeEbook: boolean = false) {
   try {
     const analysis = db.findById(analysisId)
     if (!analysis) return
@@ -141,7 +147,7 @@ async function processAnalysis(analysisId: string) {
     const cvPath = path.join(process.cwd(), 'public', analysis.cvFilePath)
     const cvText = await extractTextFromPDF(cvPath)
 
-    // Analyze with AI
+    // Analyze with AI using advanced 50-criteria prompt
     const analysisResult = await analyzeCVWithAI(
       cvText,
       analysis.profession,
@@ -165,15 +171,42 @@ async function processAnalysis(analysisId: string) {
 
     // Send email with report
     const fullReportPath = path.join(process.cwd(), 'public', reportPath)
+    
+    // If E-book was purchased, include it in the email
+    let ebookPath: string | undefined
+    if (includeEbook) {
+      ebookPath = await generateEbookFile()
+    }
+
     await sendAnalysisReport(
       analysis.email,
       analysis.name,
-      fullReportPath
+      fullReportPath,
+      ebookPath
     )
 
-    console.log(`Analysis completed and sent for: ${analysis.email}`)
+    console.log(`Analysis completed and sent for: ${analysis.email}${includeEbook ? ' (with E-book)' : ''}`)
   } catch (error) {
     console.error('Error in processAnalysis:', error)
+    throw error
+  }
+}
+
+async function generateEbookFile(): Promise<string> {
+  try {
+    const ebookContent = buildEbookContent()
+    const ebookFileName = `ebook-cv-perfecto-${Date.now()}.txt`
+    const ebookPath = path.join(process.cwd(), 'public', 'ebooks', ebookFileName)
+    
+    // Ensure directory exists
+    await fs.mkdir(path.dirname(ebookPath), { recursive: true })
+    
+    // Write E-book content
+    await fs.writeFile(ebookPath, ebookContent, 'utf-8')
+    
+    return ebookPath
+  } catch (error) {
+    console.error('Error generating E-book:', error)
     throw error
   }
 }

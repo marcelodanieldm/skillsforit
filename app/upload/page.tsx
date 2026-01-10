@@ -85,8 +85,17 @@ export default function UploadPage() {
         throw new Error(data.error || 'Error al subir el CV')
       }
 
-      // Redirect to checkout
-      router.push(`/checkout?id=${data.analysisId}`)
+      // Store cart data in sessionStorage
+      sessionStorage.setItem('cartData', JSON.stringify({
+        cvId: data.analysisId,
+        name: formData.name,
+        email: formData.email,
+        country: formData.country,
+        profession: formData.profession
+      }))
+
+      // Redirect to cart page with order bump
+      router.push('/cart')
     } catch (error: any) {
       console.error('Error:', error)
       alert(error.message || 'Error al procesar tu CV')
