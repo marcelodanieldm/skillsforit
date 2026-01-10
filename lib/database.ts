@@ -87,13 +87,6 @@ export interface SessionNote {
   content: string
   topics: string[]
   actionItems: string[]
-export interface SessionNote {
-  id: string
-  sessionId: string
-  mentorId: string
-  content: string
-  topics: string[]
-  actionItems: string[]
   nextSteps: string[]
   createdAt: Date
 }

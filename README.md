@@ -1,6 +1,12 @@
 # SkillsForIT - SaaS Platform
 
-## 🚀 Sprint 4: CEO Dashboard & Analytics ✅ COMPLETED
+## � Documentación Completa
+
+- **[📖 Setup Guide](SETUP.md)** - Guía completa de instalación y configuración
+- **[🔄 Flow Diagrams](FLOW.md)** - Diagramas de flujo del servicio y arquitectura
+- **[📝 Sprint Documentation](SPRINT4.md)** - Detalles de implementación por sprint
+
+## �🚀 Sprint 4: CEO Dashboard & Analytics ✅ COMPLETED
 
 Comprehensive analytics dashboard with revenue insights and profession-based filtering.
 
