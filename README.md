@@ -4,7 +4,43 @@
 
 - **[📖 Setup Guide](SETUP.md)** - Guía completa de instalación y configuración
 - **[🔄 Flow Diagrams](FLOW.md)** - Diagramas de flujo del servicio y arquitectura
-- **[📝 Sprint Documentation](SPRINT4.md)** - Detalles de implementación por sprint
+- **[📝 Sprint 4 Documentation](SPRINT4.md)** - CEO Dashboard & Analytics
+- **[📊 Sprint 5 Documentation](SPRINT5.md)** - Event Tracking & User Segmentation
+
+## 🚀 Sprint 5: Arquitectura Base y Analytics Avanzados ✅ COMPLETED
+
+Event tracking system, automatic user segmentation, and conversion funnel analytics.
+
+### 🆕 New Features (Sprint 5)
+
+#### Event Tracking System ✅
+- **10+ Event Types**: page_view, form_start, form_complete, checkout, payment events
+- **Session Tracking**: Automatic session ID generation and management
+- **Metadata Capture**: Device type, referrer, page, service, user segment
+- **Analytics API**: `/api/events` for tracking and metrics retrieval
+
+#### User Segmentation ✅
+- **Automatic Clustering**: Users categorized into Junior, Transition, Leadership
+- **Smart Algorithm**: Based on profession keywords + years of experience
+- **Personalized Recommendations**: Different services suggested per segment
+- **Segment Distribution**: Real-time metrics on user distribution
+
+#### Conversion Funnel Analytics ✅
+- **5-Stage Funnel**: Landing → Form → Checkout → Payment → Completion
+- **Drop-off Analysis**: Calculate abandonment rates at each stage
+- **Conversion Rates**: Per-stage and global conversion metrics
+- **Time in Stage**: Average time users spend in each funnel stage
+- **Segment Performance**: Conversion rates compared across segments
+
+#### Analytics Dashboard ✅
+- **Route**: `/analytics`
+- **KPI Cards**: Total users, visitors, checkouts, conversion rate
+- **Funnel Visualization**: Bar charts showing visitor flow and drop-offs
+- **Segment Distribution**: Pie chart with percentage breakdown
+- **Conversion by Segment**: Comparative bar chart with progress bars
+- **Insights & Recommendations**: Automated strategy suggestions
+
+### Previous Sprints
 
 ## �🚀 Sprint 4: CEO Dashboard & Analytics ✅ COMPLETED
 
