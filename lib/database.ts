@@ -78,6 +78,10 @@ export interface MentorshipSession {
   stripeSessionId?: string
   paymentStatus?: 'pending' | 'completed' | 'refunded'
   notes?: SessionNote[]
+  // Sprint 7: Nuevos campos para preparación del mentor
+  userPain?: string // El "dolor" o necesidad principal del usuario
+  userProfession?: string
+  userCountry?: string
 }
 
 export interface SessionNote {
