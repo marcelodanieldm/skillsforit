@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 import { constructWebhookEvent } from '@/lib/stripe'
-import { db } from '@/lib/database'
+import { db, revenueDb } from '@/lib/database'
 import { extractTextFromPDF, analyzeCVWithAI } from '@/lib/ai-analysis'
 import { generatePDFReport } from '@/lib/pdf-generator'
 import { sendAnalysisReport } from '@/lib/email'
+import { v4 as uuidv4 } from 'uuid'
 import path from 'path'
 
 // Disable body parser for Stripe webhooks
@@ -33,34 +34,90 @@ export async function POST(request: NextRequest) {
     // Handle the event
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object
-      const analysisId = session.metadata?.analysisId
+      const metadata = session.metadata
 
-      if (!analysisId) {
-        console.error('No analysisId in session metadata')
-        return NextResponse.json({ error: 'No analysisId' }, { status: 400 })
-      }
+      // Handle CV Analysis Payment
+      if (!metadata?.type || metadata.type === 'cv_analysis') {
+        const analysisId = metadata?.analysisId
 
-      // Get analysis from database
-      const analysis = db.findById(analysisId)
+        if (!analysisId) {
+          console.error('No analysisId in session metadata')
+          return NextResponse.json({ error: 'No analysisId' }, { status: 400 })
+        }
 
-      if (!analysis) {
-        console.error('Analysis not found:', analysisId)
-        return NextResponse.json({ error: 'Analysis not found' }, { status: 404 })
-      }
+        // Get analysis from database
+        const analysis = db.findById(analysisId)
 
-      // Update payment status
-      db.update(analysisId, {
-        paymentStatus: 'completed',
-        analysisStatus: 'processing',
-      })
+        if (!analysis) {
+          console.error('Analysis not found:', analysisId)
+          return NextResponse.json({ error: 'Analysis not found' }, { status: 404 })
+        }
 
-      // Process analysis asynchronously
-      processAnalysis(analysisId).catch(error => {
-        console.error('Error processing analysis:', error)
+        // Update payment status
         db.update(analysisId, {
-          analysisStatus: 'failed',
+          paymentStatus: 'completed',
+          analysisStatus: 'processing',
         })
-      })
+
+        // Track revenue for analytics
+        const revenueId = uuidv4()
+        revenueDb.create({
+          id: revenueId,
+          type: 'cv_analysis',
+          amount: 7, // $7 USD for CV analysis
+          currency: 'usd',
+          userEmail: analysis.email,
+          userName: analysis.name,
+          profession: analysis.profession,
+          country: analysis.country,
+          stripeSessionId: session.id,
+          createdAt: new Date()
+        })
+
+        // Process analysis asynchronously
+        processAnalysis(analysisId).catch(error => {
+          console.error('Error processing analysis:', error)
+          db.update(analysisId, {
+            analysisStatus: 'failed',
+          })
+        })
+      }
+
+      // Handle Mentorship Payment
+      if (metadata?.type === 'mentorship') {
+        const { sessionsDb } = require('@/lib/database')
+        const sessionId = metadata.sessionId
+        const mentorId = metadata.mentorId
+        const menteeEmail = metadata.menteeEmail
+        const menteeName = metadata.menteeName
+
+        if (!sessionId) {
+          console.error('No sessionId in session metadata')
+          return NextResponse.json({ error: 'No sessionId' }, { status: 400 })
+        }
+
+        // Update session payment status
+        sessionsDb.update(sessionId, {
+          paymentStatus: 'completed'
+        })
+
+        // Track revenue for analytics
+        const revenueId = uuidv4()
+        const amount = session.amount_total ? session.amount_total / 100 : 0
+        
+        revenueDb.create({
+          id: revenueId,
+          type: 'mentorship',
+          amount,
+          currency: 'usd',
+          userEmail: menteeEmail,
+          userName: menteeName,
+          stripeSessionId: session.id,
+          createdAt: new Date()
+        })
+
+        console.log(`Mentorship payment completed for session: ${sessionId}`)
+      }
 
       return NextResponse.json({ received: true })
     }

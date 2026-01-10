@@ -103,7 +103,22 @@ export interface User {
   name: string
   email: string
   password: string
-  role: 'mentee' | 'mentor'
+  role: 'mentee' | 'mentor' | 'admin'
+  createdAt: Date
+}
+
+// Analytics Models
+export interface RevenueRecord {
+  id: string
+  type: 'cv_analysis' | 'mentorship'
+  amount: number
+  currency: 'usd'
+  userId?: string
+  userEmail: string
+  userName: string
+  profession?: string
+  country?: string
+  stripeSessionId: string
   createdAt: Date
 }
 
@@ -113,6 +128,7 @@ const mentorsDB: Map<string, Mentor> = new Map()
 const sessionsDB: Map<string, MentorshipSession> = new Map()
 const notesDB: Map<string, SessionNote> = new Map()
 const usersDB: Map<string, User> = new Map()
+const revenueDB: Map<string, RevenueRecord> = new Map()
 
 export const db = {
   create: (analysis: CVAnalysis) => {
@@ -303,5 +319,125 @@ export const usersDb = {
 
   findById: (id: string) => {
     return usersDB.get(id)
+  }
+}
+
+// Revenue Database Operations for Analytics
+export const revenueDb = {
+  create: (record: RevenueRecord) => {
+    revenueDB.set(record.id, record)
+    return record
+  },
+
+  findAll: () => {
+    return Array.from(revenueDB.values()).sort((a, b) => 
+      b.createdAt.getTime() - a.createdAt.getTime()
+    )
+  },
+
+  findByType: (type: 'cv_analysis' | 'mentorship') => {
+    return Array.from(revenueDB.values())
+      .filter(r => r.type === type)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+  },
+
+  findByProfession: (profession: string) => {
+    return Array.from(revenueDB.values())
+      .filter(r => r.profession?.toLowerCase() === profession.toLowerCase())
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+  },
+
+  getTotalRevenue: () => {
+    return Array.from(revenueDB.values()).reduce((sum, r) => sum + r.amount, 0)
+  },
+
+  getRevenueByProfession: () => {
+    const byProfession: Record<string, { count: number; revenue: number }> = {}
+    
+    Array.from(revenueDB.values()).forEach(record => {
+      const profession = record.profession || 'Unknown'
+      if (!byProfession[profession]) {
+        byProfession[profession] = { count: 0, revenue: 0 }
+      }
+      byProfession[profession].count++
+      byProfession[profession].revenue += record.amount
+    })
+
+    return Object.entries(byProfession).map(([profession, data]) => ({
+      profession,
+      count: data.count,
+      revenue: data.revenue,
+      avgRevenuePerUser: data.revenue / data.count
+    })).sort((a, b) => b.revenue - a.revenue)
+  },
+
+  getRevenueByType: () => {
+    const cvAnalysis = Array.from(revenueDB.values()).filter(r => r.type === 'cv_analysis')
+    const mentorship = Array.from(revenueDB.values()).filter(r => r.type === 'mentorship')
+
+    return {
+      cv_analysis: {
+        count: cvAnalysis.length,
+        revenue: cvAnalysis.reduce((sum, r) => sum + r.amount, 0)
+      },
+      mentorship: {
+        count: mentorship.length,
+        revenue: mentorship.reduce((sum, r) => sum + r.amount, 0)
+      }
+    }
+  },
+
+  getRevenueByCountry: () => {
+    const byCountry: Record<string, { count: number; revenue: number }> = {}
+    
+    Array.from(revenueDB.values()).forEach(record => {
+      const country = record.country || 'Unknown'
+      if (!byCountry[country]) {
+        byCountry[country] = { count: 0, revenue: 0 }
+      }
+      byCountry[country].count++
+      byCountry[country].revenue += record.amount
+    })
+
+    return Object.entries(byCountry).map(([country, data]) => ({
+      country,
+      count: data.count,
+      revenue: data.revenue
+    })).sort((a, b) => b.revenue - a.revenue)
+  },
+
+  getRevenueByDateRange: (startDate: Date, endDate: Date) => {
+    return Array.from(revenueDB.values())
+      .filter(r => r.createdAt >= startDate && r.createdAt <= endDate)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+  },
+
+  getDailyRevenue: (days: number = 30) => {
+    const now = new Date()
+    const startDate = new Date(now)
+    startDate.setDate(now.getDate() - days)
+
+    const dailyData: Record<string, number> = {}
+
+    // Initialize all days with 0
+    for (let i = 0; i < days; i++) {
+      const date = new Date(startDate)
+      date.setDate(startDate.getDate() + i)
+      const dateKey = date.toISOString().split('T')[0]
+      dailyData[dateKey] = 0
+    }
+
+    // Sum revenue by day
+    Array.from(revenueDB.values()).forEach(record => {
+      const dateKey = record.createdAt.toISOString().split('T')[0]
+      if (dailyData[dateKey] !== undefined) {
+        dailyData[dateKey] += record.amount
+      }
+    })
+
+    return Object.entries(dailyData).map(([date, revenue]) => ({
+      date,
+      revenue
+    }))
   }
 }
