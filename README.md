@@ -1,18 +1,18 @@
 # SkillsForIT - SaaS Platform
 
-## 🚀 Sprint 2: Core SaaS - CV Auditor & Checkout ✅ COMPLETED
+## 🚀 Sprint 3: Mentorship System ✅ COMPLETED
 
-Full SaaS implementation with Stripe payments, AI analysis, and automated email delivery.
+Full mentorship platform with booking calendar, session notes, and previous session history.
 
 ### ✨ Features Implemented
 
-#### Sprint 1: MVP & Landing Page
+#### Sprint 1: MVP & Landing Page ✅
 - **Hero Section with AIDA Framework**
 - **Before/After CV Comparison** (Interactive toggle)
 - **Benefits, How It Works, Pricing, Testimonials**
 - **Responsive Design with Framer Motion animations**
 
-#### Sprint 2: Core SaaS Features
+#### Sprint 2: Core SaaS Features ✅
 
 **🔄 Complete User Flow:**
 1. **Landing Page** → User sees value proposition
@@ -48,6 +48,46 @@ Full SaaS implementation with Stripe payments, AI analysis, and automated email 
 - ✅ Professional PDF layout with jsPDF
 - ✅ Includes scores, problems, improvements
 - ✅ Before/after examples
+
+#### Sprint 3: Mentorship System ✅
+
+**👨‍🏫 Mentor Features:**
+- ✅ Mentor registration with bio, expertise, and hourly rate
+- ✅ Availability calendar (day/time slots configuration)
+- ✅ Rating and review system
+- ✅ LinkedIn profile integration
+- ✅ Mentor dashboard with upcoming/completed sessions
+- ✅ **Session notes system** - Add notes after each session
+- ✅ **Previous session history** - View mentee's last session notes before new meeting
+- ✅ Session status tracking (scheduled/completed/cancelled/no-show)
+
+**📅 Booking System (Calendly-like):**
+- ✅ Browse mentors by expertise
+- ✅ Filter mentors by skills
+- ✅ View mentor ratings and reviews
+- ✅ 7-day calendar view
+- ✅ 10-minute time slot selection
+- ✅ Availability validation
+- ✅ Booking form with mentee details
+- ✅ Stripe payment for mentorship sessions
+- ✅ Google Meet link generation
+- ✅ Confirmation page with meeting details
+
+**📝 Session Notes (Core User Story):**
+- ✅ **View previous session notes** before new meeting
+- ✅ Add session notes with:
+  - Content summary
+  - Topics discussed
+  - Action items
+  - Next steps
+- ✅ Notes displayed to mentor before next session with same mentee
+- ✅ Full session history tracking
+
+**💰 Mentorship Pricing:**
+- Flexible pricing: $10-$100 per 10-min session
+- Default rate slider in registration
+- Separate Stripe checkout for mentorships
+- Payment required before booking confirmation
 - ✅ Branded design with SkillsForIT colors
 - ✅ Downloadable from dashboard
 
@@ -203,6 +243,7 @@ stripe listen --forward-to localhost:3000/api/webhook
 
 ### 📊 Data Flow
 
+**CV Analysis Flow:**
 1. **User uploads CV** → Stored in `/public/uploads/`
 2. **Payment confirmed** → Webhook triggers analysis
 3. **AI analyzes CV** → OpenAI processes content
@@ -210,37 +251,96 @@ stripe listen --forward-to localhost:3000/api/webhook
 5. **Email sent** → PDF attached automatically
 6. **Dashboard updated** → User can download report
 
-### 🎯 Next Steps (Sprint 3)
+**Mentorship Flow:**
+1. **Mentor registers** → Profile created with availability
+2. **User browses mentors** → Filters by expertise
+3. **User selects time slot** → From mentor's availability
+4. **Payment processed** → Stripe checkout for mentorship
+5. **Session booked** → Google Meet link generated
+6. **Before session** → Mentor views previous session notes
+7. **After session** → Mentor adds notes for next time
 
+### 🎯 Next Steps (Sprint 4 - Future Enhancements)
+
+**Authentication & Security:**
 - [ ] Implement proper authentication (JWT/NextAuth)
+- [ ] Password hashing with bcrypt
+- [ ] Email verification
+- [ ] OAuth integration (Google/LinkedIn)
+
+**Database & Storage:**
 - [ ] Migrate to PostgreSQL database
-- [ ] Add payment history and invoices
-- [ ] Implement refund system
-- [ ] Add analytics dashboard for admin
+- [ ] Move files to S3/Cloud Storage
+- [ ] Database backups and recovery
+
+**Mentorship Enhancements:**
+- [ ] Mentee session history dashboard
+- [ ] Video call integration (Zoom API)
+- [ ] Calendar sync (Google Calendar)
+- [ ] Automated reminder emails
+- [ ] Rescheduling functionality
+- [ ] Mentor availability bulk update
+- [ ] Group mentorship sessions
+
+**Payment & Billing:**
+- [ ] Payment history and invoices
+- [ ] Refund system
+- [ ] Subscription model for unlimited mentorships
+- [ ] Multiple payment methods (PayPal, etc.)
+- [ ] Mentor payout system
+
+**Analytics & Admin:**
+- [ ] Admin dashboard
+- [ ] Analytics for CV analysis
+- [ ] Mentorship session analytics
+- [ ] Revenue tracking
+- [ ] User behavior tracking
+
+**Additional Features:**
 - [ ] A/B testing for landing page
-- [ ] Add more payment methods (PayPal, etc.)
-- [ ] Implement subscription model option
-- [ ] Add CV templates download
+- [ ] CV templates download
 - [ ] LinkedIn profile optimization service
+- [ ] Interview preparation module
+- [ ] Career path recommendations
 
 ### 🐛 Known Limitations (MVP)
 
+**General:**
 - In-memory database (resets on server restart)
-- Simple email-based auth (no password)
-- Mock PDF extraction (needs proper PDF parsing)
-- No admin panel yet
 - Files stored locally (should use S3/Cloud Storage)
+- Simple auth system (no password hashing yet)
+
+**CV Analysis:**
+- Mock PDF extraction (needs proper PDF parsing in production)
+- No admin panel yet
+
+**Mentorship:**
+- No real video integration (using mock Google Meet links)
+- Availability doesn't check for time zone conflicts
+- No notification system for upcoming sessions
+- No cancellation/rescheduling feature yet
+- No mentor verification process
 
 ### 📝 Notes
 
-- All CTAs on landing page now redirect to `/upload`
+**CV Analysis:**
+- All CTAs on landing page redirect to `/upload`
 - Email delivery requires valid SMTP credentials
 - OpenAI API key required for AI analysis
 - Stripe webhook must be configured for production
 - PDF reports are automatically attached to emails
 
+**Mentorship:**
+- Mentors can set custom hourly rates ($10-$100)
+- Sessions are fixed at 10 minutes
+- **Previous session notes** automatically shown to mentor before new session with same mentee
+- Session notes include: content, topics, action items, next steps
+- All bookings require Stripe payment confirmation
+- Meeting links are generated automatically
+
 ---
 
-**MVP Status**: ✅ Fully Functional SaaS
-**Revenue Ready**: ✅ Yes - Can process real payments
+**MVP Status**: ✅ Fully Functional SaaS with Mentorship
+**Revenue Ready**: ✅ Yes - Can process CV analysis ($7) and mentorship payments ($10-$100)
 **Automated**: ✅ Complete automation from payment to delivery
+**Mentorship Ready**: ✅ Full booking, payment, and session notes system
