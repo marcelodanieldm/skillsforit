@@ -320,7 +320,7 @@ export default function BeforeAfterComparison() {
           className="text-center mt-12"
         >
           <button
-            onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+            onClick={() => window.location.href = '/upload'}
             className="group px-10 py-5 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold text-xl rounded-full transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl inline-flex items-center gap-3"
           >
             Quiero mi CV optimizado ahora

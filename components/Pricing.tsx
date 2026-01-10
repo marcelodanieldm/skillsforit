@@ -80,7 +80,10 @@ export default function Pricing() {
               </div>
 
               {/* CTA Button */}
-              <button className="w-full group px-8 py-6 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold text-2xl rounded-full transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl flex items-center justify-center gap-3">
+              <button
+                onClick={() => window.location.href = '/upload'}
+                className="w-full group px-8 py-6 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold text-2xl rounded-full transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl flex items-center justify-center gap-3"
+              >
                 Optimizar mi CV ahora
                 <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
               </button>

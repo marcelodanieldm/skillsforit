@@ -32,7 +32,10 @@ export default function CTA() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
-            <button className="group px-10 py-6 bg-white hover:bg-gray-100 text-slate-900 font-bold text-2xl rounded-full transition-all duration-300 transform hover:scale-105 shadow-2xl inline-flex items-center gap-3">
+            <button
+              onClick={() => window.location.href = '/upload'}
+              className="group px-10 py-6 bg-white hover:bg-gray-100 text-slate-900 font-bold text-2xl rounded-full transition-all duration-300 transform hover:scale-105 shadow-2xl inline-flex items-center gap-3"
+            >
               Optimizar mi CV por USD 7
               <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
             </button>

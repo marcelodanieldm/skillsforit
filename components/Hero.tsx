@@ -12,6 +12,10 @@ export default function Hero() {
     document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  const goToUpload = () => {
+    window.location.href = '/upload'
+  }
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
       {/* Animated background elements */}
@@ -89,7 +93,7 @@ export default function Hero() {
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
             <button
-              onClick={scrollToPricing}
+              onClick={goToUpload}
               className="group px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold text-lg rounded-full transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl flex items-center gap-2"
             >
               Optimizar mi CV por USD 7
