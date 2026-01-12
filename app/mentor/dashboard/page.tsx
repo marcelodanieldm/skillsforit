@@ -14,6 +14,7 @@ import {
   FaHistory,
   FaEdit
 } from 'react-icons/fa'
+import QuickFeedbackEditor from '@/components/QuickFeedbackEditor'
 
 interface SessionNote {
   id: string
@@ -58,13 +59,7 @@ function DashboardContent() {
   const [sessions, setSessions] = useState<MentorshipSession[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedSession, setSelectedSession] = useState<MentorshipSession | null>(null)
-  const [showNotesModal, setShowNotesModal] = useState(false)
-  const [noteForm, setNoteForm] = useState({
-    content: '',
-    topics: '',
-    actionItems: '',
-    nextSteps: ''
-  })
+  const [showQuickFeedback, setShowQuickFeedback] = useState(false)
 
   useEffect(() => {
     if (mentorId) {
@@ -88,35 +83,35 @@ function DashboardContent() {
     }
   }
 
-  const openNotesModal = (session: MentorshipSession) => {
+  const openQuickFeedback = (session: MentorshipSession) => {
     setSelectedSession(session)
-    setShowNotesModal(true)
+    setShowQuickFeedback(true)
   }
 
-  const saveNotes = async () => {
+  const saveQuickFeedback = async (data: {
+    topics: string[]
+    actionItems: string[]
+    nextSteps: string[]
+    content: string
+  }) => {
     if (!selectedSession) return
 
-    try {
-      const response = await fetch('/api/mentors/notes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId: selectedSession.id,
-          mentorId,
-          content: noteForm.content,
-          topics: noteForm.topics.split(',').map(t => t.trim()).filter(t => t),
-          actionItems: noteForm.actionItems.split('\n').filter(a => a.trim()),
-          nextSteps: noteForm.nextSteps.split('\n').filter(n => n.trim())
-        })
+    const response = await fetch('/api/mentors/notes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId: selectedSession.id,
+        mentorId,
+        ...data
       })
+    })
 
-      if (response.ok) {
-        setShowNotesModal(false)
-        setNoteForm({ content: '', topics: '', actionItems: '', nextSteps: '' })
-        fetchDashboardData()
-      }
-    } catch (error) {
-      console.error('Error saving notes:', error)
+    if (response.ok) {
+      setShowQuickFeedback(false)
+      setSelectedSession(null)
+      fetchDashboardData()
+    } else {
+      throw new Error('Failed to save notes')
     }
   }
 
@@ -290,11 +285,11 @@ function DashboardContent() {
                         Unirse a la Reunión
                       </a>
                       <button
-                        onClick={() => openNotesModal(session)}
+                        onClick={() => openQuickFeedback(session)}
                         className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2"
                       >
                         <FaNotesMedical />
-                        Agregar Notas
+                        ⚡ Quick Feedback
                       </button>
                     </div>
                   </div>
@@ -346,7 +341,7 @@ function DashboardContent() {
                       )}
                     </div>
                     <button
-                      onClick={() => openNotesModal(session)}
+                      onClick={() => openQuickFeedback(session)}
                       className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all flex items-center gap-2"
                     >
                       <FaEdit />
@@ -360,87 +355,34 @@ function DashboardContent() {
         </motion.div>
       </div>
 
-      {/* Notes Modal */}
-      {showNotesModal && selectedSession && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+      {/* Quick Feedback Editor Modal */}
+      {showQuickFeedback && selectedSession && (
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-purple-500"
+            className="w-full max-w-7xl my-8"
           >
-            <h3 className="text-2xl font-bold text-white mb-6">
-              Notas de Sesión - {selectedSession.menteeName || selectedSession.menteeEmail}
-            </h3>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-white font-semibold mb-2">Resumen de la sesión</label>
-                <textarea
-                  rows={4}
-                  value={noteForm.content}
-                  onChange={(e) => setNoteForm({ ...noteForm, content: e.target.value })}
-                  className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-purple-500"
-                  placeholder="¿Qué se discutió en la sesión?"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-white font-semibold mb-2">
-                  Topics (separados por coma)
-                </label>
-                <input
-                  type="text"
-                  value={noteForm.topics}
-                  onChange={(e) => setNoteForm({ ...noteForm, topics: e.target.value })}
-                  className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-purple-500"
-                  placeholder="React Hooks, API Design, Performance"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-white font-semibold mb-2">
-                  Action Items (uno por línea)
-                </label>
-                <textarea
-                  rows={3}
-                  value={noteForm.actionItems}
-                  onChange={(e) => setNoteForm({ ...noteForm, actionItems: e.target.value })}
-                  className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-purple-500"
-                  placeholder="Refactorizar componente UserProfile&#10;Revisar documentación de Next.js"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-white font-semibold mb-2">
-                  Próximos Pasos (uno por línea)
-                </label>
-                <textarea
-                  rows={3}
-                  value={noteForm.nextSteps}
-                  onChange={(e) => setNoteForm({ ...noteForm, nextSteps: e.target.value })}
-                  className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-purple-500"
-                  placeholder="Practicar TypeScript genéricos&#10;Preparar preguntas sobre arquitectura"
-                />
-              </div>
-              
-              <div className="flex gap-4 pt-4">
-                <button
-                  onClick={saveNotes}
-                  className="flex-1 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg transition-all"
-                >
-                  Guardar Notas
-                </button>
-                <button
-                  onClick={() => {
-                    setShowNotesModal(false)
-                    setNoteForm({ content: '', topics: '', actionItems: '', nextSteps: '' })
-                  }}
-                  className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-all"
-                >
-                  Cancelar
-                </button>
-              </div>
+            <div className="mb-4 flex justify-end">
+              <button
+                onClick={() => {
+                  setShowQuickFeedback(false)
+                  setSelectedSession(null)
+                }}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all"
+              >
+                ✕ Cerrar
+              </button>
             </div>
+            <QuickFeedbackEditor
+              sessionId={selectedSession.id}
+              mentorId={mentorId!}
+              onSave={saveQuickFeedback}
+              initialTopics={selectedSession.notes?.[0]?.topics || []}
+              initialActionItems={selectedSession.notes?.[0]?.actionItems || []}
+              initialNextSteps={selectedSession.notes?.[0]?.nextSteps || []}
+              initialContent={selectedSession.notes?.[0]?.content || ''}
+            />
           </motion.div>
         </div>
       )}

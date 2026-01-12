@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { SessionCreditsManager } from '@/lib/session-credits'
-import { mentorshipDb } from '@/lib/database'
+import { mentorshipDb, getMentorById } from '@/lib/database'
+import { createMeeting, formatMeetingDetailsForEmail } from '@/lib/zoom-integration'
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,10 +30,42 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 2. Crear sesión de mentoría (10 minutos)
-    const sessionId = `session_${Date.now()}_${userId.substring(0, 8)}`
+    // 2. Obtener información del mentor
+    const mentor = getMentorById(mentorId)
     
+    if (!mentor) {
+      return NextResponse.json(
+        { success: false, error: 'Mentor no encontrado' },
+        { status: 404 }
+      )
+    }
+
+    // 3. Crear reunión de Zoom automáticamente
     const scheduledAt = new Date(`${date}T${time}:00`)
+    
+    let meetingLink = `https://meet.skillsforit.com/${Date.now()}` // Fallback
+    let meetingDetails = null
+
+    try {
+      const meeting = await createMeeting({
+        topic: `Mentoría: ${mentor.name} ↔ ${userName || email}`,
+        startTime: scheduledAt,
+        duration: 10,
+        hostEmail: mentor.email,
+        attendeeEmail: email,
+        attendeeName: userName
+      })
+
+      meetingLink = meeting.joinUrl
+      meetingDetails = meeting
+      
+      console.log(`✅ Meeting created successfully: ${meeting.meetingId}`)
+    } catch (error) {
+      console.error('Failed to create meeting, using fallback link:', error)
+    }
+
+    // 4. Crear sesión de mentoría (10 minutos)
+    const sessionId = `session_${Date.now()}_${userId.substring(0, 8)}`
     
     const session = mentorshipDb.create({
       id: sessionId,
@@ -42,14 +75,14 @@ export async function POST(request: NextRequest) {
       scheduledAt,
       duration: 10, // 10 minutos
       status: 'scheduled',
-      meetingLink: `https://meet.skillsforit.com/${sessionId}`,
+      meetingLink,
       // Datos adicionales del usuario
       userPain,
       userProfession,
       userCountry
     })
 
-    // 3. Usar un crédito
+    // 5. Usar un crédito
     const creditResult = SessionCreditsManager.useCredit(userId, sessionId)
 
     if (!creditResult.success) {
@@ -62,14 +95,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 4. Enviar email de confirmación (implementar)
+    // 6. Enviar email de confirmación con detalles del meeting
     await sendBookingConfirmation({
       email,
       userName,
-      date: scheduledAt.toLocaleDateString('es'),
+      mentorName: mentor.name,
+      date: scheduledAt.toLocaleDateString('es', { dateStyle: 'full' }),
       time,
       meetingLink: session.meetingLink,
-      creditsRemaining: creditResult.credits!.creditsRemaining
+      creditsRemaining: creditResult.credits!.creditsRemaining,
+      meetingDetails
     })
 
     return NextResponse.json({
@@ -166,15 +201,41 @@ export async function DELETE(request: NextRequest) {
 async function sendBookingConfirmation(data: {
   email: string
   userName: string
+  mentorName: string
   date: string
   time: string
   meetingLink: string
   creditsRemaining: number
+  meetingDetails: any
 }) {
+  console.log('📧 Sending booking confirmation to:', data.email)
+  console.log('👤 Mentor:', data.mentorName)
+  console.log('📅 Date:', data.date, 'at', data.time)
+  console.log('🔗 Meeting link:', data.meetingLink)
+  console.log('💳 Credits remaining:', data.creditsRemaining)
+  
+  if (data.meetingDetails) {
+    console.log('\n' + formatMeetingDetailsForEmail(data.meetingDetails))
+  }
+
   // TODO: Implementar con Nodemailer
-  console.log('Sending booking confirmation to:', data.email)
-  console.log('Meeting link:', data.meetingLink)
-  console.log('Credits remaining:', data.creditsRemaining)
+  // const mailOptions = {
+  //   to: data.email,
+  //   subject: `✅ Sesión confirmada con ${data.mentorName}`,
+  //   html: `
+  //     <h2>¡Tu sesión ha sido reservada exitosamente!</h2>
+  //     <p>Hola ${data.userName},</p>
+  //     <p><strong>Mentor:</strong> ${data.mentorName}</p>
+  //     <p><strong>Fecha:</strong> ${data.date} a las ${data.time}</p>
+  //     <p><strong>Duración:</strong> 10 minutos</p>
+  //     <br>
+  //     <a href="${data.meetingLink}" style="background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px;">
+  //       Unirse a la Reunión
+  //     </a>
+  //     ${data.meetingDetails ? `<br><br>${formatMeetingDetailsForEmail(data.meetingDetails).replace(/\n/g, '<br>')}` : ''}
+  //     <p><em>Te quedan ${data.creditsRemaining} créditos este mes.</em></p>
+  //   `
+  // }
 }
 
 async function sendCancellationEmail(data: {
