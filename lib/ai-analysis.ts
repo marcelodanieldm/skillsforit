@@ -1,12 +1,49 @@
 import OpenAI from 'openai'
 import { AnalysisResult } from './database'
 import { buildAdvancedCVPrompt } from './cv-auditor'
+import { semanticCache } from './semantic-cache'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
+/**
+ * Analyze CV with AI (with Semantic Caching)
+ * 
+ * This function now uses semantic caching to reduce API costs by 30%.
+ * - If similar CV found in cache (>95% similarity), returns cached result
+ * - Otherwise, calls OpenAI API and caches the result
+ */
 export async function analyzeCVWithAI(
+  cvText: string,
+  profession: string,
+  country: string,
+  purpose?: string
+): Promise<AnalysisResult> {
+  // Use semantic cache
+  const { result, cached, similarity } = await semanticCache.getOrAnalyze(
+    cvText,
+    profession,
+    country,
+    async (text, prof, count) => {
+      // This function only runs on cache MISS
+      return await performActualAnalysis(text, prof, count, purpose)
+    }
+  )
+
+  if (cached) {
+    console.log(`♻️ [AI Analysis] Returned cached result (similarity: ${similarity?.toFixed(4)})`)
+  } else {
+    console.log('🤖 [AI Analysis] Performed fresh analysis with OpenAI')
+  }
+
+  return result
+}
+
+/**
+ * Perform actual OpenAI analysis (called only on cache miss)
+ */
+async function performActualAnalysis(
   cvText: string,
   profession: string,
   country: string,

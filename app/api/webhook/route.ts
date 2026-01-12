@@ -2,13 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 import { constructWebhookEvent } from '@/lib/stripe'
 import { db, revenueDb } from '@/lib/database'
-import { extractTextFromPDF, analyzeCVWithAI } from '@/lib/ai-analysis'
-import { generatePDFReport } from '@/lib/pdf-generator'
-import { sendAnalysisReport } from '@/lib/email'
-import { buildEbookContent } from '@/lib/cv-auditor'
+import { extractTextFromPDF } from '@/lib/ai-analysis'
+import { queueManager } from '@/lib/queue-manager'
+import type { CVAnalysisJobData } from '@/lib/queue-manager'
 import { v4 as uuidv4 } from 'uuid'
 import path from 'path'
-import fs from 'fs/promises'
 
 // Disable body parser for Stripe webhooks
 export const config = {
@@ -58,7 +56,7 @@ export async function POST(request: NextRequest) {
         // Update payment status
         db.update(analysisId, {
           paymentStatus: 'completed',
-          analysisStatus: 'processing',
+          analysisStatus: 'queued', // Changed from 'processing' to 'queued'
         })
 
         // Check if E-book was included
@@ -80,13 +78,32 @@ export async function POST(request: NextRequest) {
           createdAt: new Date()
         })
 
-        // Process analysis asynchronously (includes E-book delivery if purchased)
-        processAnalysis(analysisId, includeEbook).catch(error => {
-          console.error('Error processing analysis:', error)
-          db.update(analysisId, {
-            analysisStatus: 'failed',
-          })
+        // Extract CV text
+        const cvPath = path.join(process.cwd(), 'public', analysis.cvFilePath)
+        const cvText = await extractTextFromPDF(cvPath)
+
+        // Enqueue analysis job (returns immediately with job ID)
+        const jobId = queueManager.enqueue<CVAnalysisJobData>(
+          'cv_analysis',
+          {
+            analysisId,
+            cvText,
+            profession: analysis.profession,
+            country: analysis.country,
+            email: analysis.email,
+            name: analysis.name,
+            includeEbook,
+          },
+          'high', // High priority for paid customers
+          3 // Max 3 retries
+        )
+
+        // Store job ID for tracking
+        db.update(analysisId, {
+          jobId, // Store job ID for polling
         })
+
+        console.log(`✅ CV Analysis enqueued: ${analysisId} → Job: ${jobId}`)
       }
 
       // Handle Mentorship Payment
@@ -135,78 +152,5 @@ export async function POST(request: NextRequest) {
       { error: 'Webhook handler failed', details: error.message },
       { status: 400 }
     )
-  }
-}
-
-async function processAnalysis(analysisId: string, includeEbook: boolean = false) {
-  try {
-    const analysis = db.findById(analysisId)
-    if (!analysis) return
-
-    // Extract text from CV
-    const cvPath = path.join(process.cwd(), 'public', analysis.cvFilePath)
-    const cvText = await extractTextFromPDF(cvPath)
-
-    // Analyze with AI using advanced 50-criteria prompt
-    const analysisResult = await analyzeCVWithAI(
-      cvText,
-      analysis.profession,
-      analysis.country
-    )
-
-    // Update analysis with results
-    db.update(analysisId, {
-      analysisResult,
-      analysisStatus: 'completed',
-    })
-
-    // Generate PDF report
-    const updatedAnalysis = db.findById(analysisId)!
-    const reportPath = await generatePDFReport(updatedAnalysis, analysisResult)
-
-    // Update with report URL
-    db.update(analysisId, {
-      reportUrl: reportPath,
-    })
-
-    // Send email with report
-    const fullReportPath = path.join(process.cwd(), 'public', reportPath)
-    
-    // If E-book was purchased, include it in the email
-    let ebookPath: string | undefined
-    if (includeEbook) {
-      ebookPath = await generateEbookFile()
-    }
-
-    await sendAnalysisReport(
-      analysis.email,
-      analysis.name,
-      fullReportPath,
-      ebookPath
-    )
-
-    console.log(`Analysis completed and sent for: ${analysis.email}${includeEbook ? ' (with E-book)' : ''}`)
-  } catch (error) {
-    console.error('Error in processAnalysis:', error)
-    throw error
-  }
-}
-
-async function generateEbookFile(): Promise<string> {
-  try {
-    const ebookContent = buildEbookContent()
-    const ebookFileName = `ebook-cv-perfecto-${Date.now()}.txt`
-    const ebookPath = path.join(process.cwd(), 'public', 'ebooks', ebookFileName)
-    
-    // Ensure directory exists
-    await fs.mkdir(path.dirname(ebookPath), { recursive: true })
-    
-    // Write E-book content
-    await fs.writeFile(ebookPath, ebookContent, 'utf-8')
-    
-    return ebookPath
-  } catch (error) {
-    console.error('Error generating E-book:', error)
-    throw error
   }
 }
