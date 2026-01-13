@@ -44,6 +44,32 @@
 
 ---
 
+## 🏁 Ciclo de Feedback: El "Círculo Virtuoso"
+
+**Objetivo:** Crear un ciclo de engagement que impulse la retención y renovación de usuarios mediante feedback continuo y gamificación.
+
+### Flujo del Usuario:
+1. **🏪 Compra e ingresa al portal** - Usuario adquiere servicio y accede por primera vez
+2. **🤖 IA da feedback de CV** - Análisis automático identifica fortalezas y áreas de mejora
+3. **📚 Usuario estudia el E-book** - Recomendaciones de la IA guían hacia capítulos específicos
+4. **👨‍🏫 Mentor valida progreso** - Sesiones de 10 min donde el mentor deja tareas personalizadas
+5. **✅ Usuario completa tareas** - Ve subir su Career Score en tiempo real
+6. **🔄 Usuario renueva** - Motivado por llegar al 100% y continuar mejorando
+
+### Career Score - Motor de Engagement:
+- **CV Score (40%)**: Calificación de la IA en el análisis del CV
+- **Soft Skills Score (35%)**: Progreso en completar tareas de mentores
+- **Interview Readiness (25%)**: Sesiones de mentoría completadas
+- **Total**: Promedio ponderado que impulsa la gamificación
+
+### Implementación Técnica:
+- ✅ **API actualizada** - `/api/user/roadmap` incluye cálculo de Career Score
+- ✅ **Dashboard gamificado** - Barra de progreso prominente con breakdown por componente
+- ✅ **Actualización en tiempo real** - Score se recalcula al completar tareas
+- ✅ **Motivación visual** - Gradiente azul-índigo con animaciones de progreso
+
+---
+
 ---
 
 ## 🖥️ Arquitectura del Portal del Usuario IT
