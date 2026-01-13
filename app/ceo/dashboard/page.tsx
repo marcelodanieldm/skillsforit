@@ -648,6 +648,13 @@ export default function CEODashboard() {
         >
           {token && <UserManagement token={token} />}
         </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8"
+        >
+          {[
             { 
               label: 'Revenue Actual', 
               value: `$${projections?.historical[projections.historical.length - 1]?.actual?.toLocaleString() || 0}`,
@@ -682,8 +689,8 @@ export default function CEODashboard() {
             </div>
           ))}
         </motion.div>
-        </div>
       </div>
+    </div>
     </div>
   )
 }

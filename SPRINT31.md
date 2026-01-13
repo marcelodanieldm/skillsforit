@@ -44,37 +44,40 @@
 
 ---
 
-## 🎯 Objetivos Originales del Sprint (Experiencia del Alumno)
+---
 
-### 1. Dashboard del Alumno "Mi Progreso"
-- **Career Score:** Métrica principal que agrega:
-  - CV Score (último audit)
-  - Soft Skills Score (action items completados)
-  - Interview Readiness (sesiones de mentoría completadas)
-- **Secciones:**
-  - 🤖 Auditoría IA de CV
-  - 📚 Biblioteca de Activos (E-books)
-  - 🗺️ Hoja de Ruta (Action Items de mentores)
-  - 📅 Agendamiento (próximas sesiones)
+## 🖥️ Arquitectura del Portal del Usuario IT
 
-### 2. Backend: API de Roadmap Unificada
-- **GET /api/user/roadmap**
-  - Combina cv_audits + mentorship_notes
-  - Devuelve Career Score + lista de action items
-  - Soporte para demo fallback sin token
-- **POST /api/user/roadmap/checklist**
-  - Toggle de completion para action items {id, completed}
-  - Persistencia en memoria (userChecklistDB)
+### 1. El "Career Score" (Gamificación)
+Ubicado en la parte superior. Es una barra de progreso que promedia:
 
-### 3. Data Science: Recommender
-- **lib/recommender.ts**
-  - Mapea action items completados → siguiente capítulo de E-book o perfil de mentor
-  - Lógica simple para MVP (if/else basado en items)
+- **CV Score:** Calificación de la IA.
+- **Soft Skills Score:** Basado en el autodiagnóstico del E-book.
+- **Interview Readiness:** Calificación otorgada por el Mentor.
 
-### 4. CEO: Métricas de Engagement del Alumno
-- **Task Completion Rate:** % de tareas de mentores que los alumnos marcan como hechas
-- **Daily Active Users (DAU):** ¿Entran los alumnos a revisar su progreso o solo el día de la mentoría?
-- **Time to Download:** ¿Cuánto tardan en descargar el E-book tras la compra?
+**Objetivo:** Que el usuario quiera llegar al 100% (esto impulsa la retención).
+
+### 2. Secciones Principales
+- **Mi Auditoría IA:** Botón para re-subir el CV (si tiene créditos) y ver el historial de reportes.
+- **Biblioteca de Activos:** Acceso al E-book "Guía de Soft Skills" (PDF/EPUB) y materiales extra que el mentor le asigne.
+- **Hoja de Ruta (Action Items):** Una lista de tareas tipo "Checklist" que el mentor marcó durante la sesión (ej: "Rehacer sección de experiencia", "Practicar el Elevator Pitch").
+- **Agendamiento y Sesiones:** Calendario visual para elegir horarios de mentoría y acceso a la sala de video.
+
+---
+
+## 🚀 Sprint 31: Implementación de la Experiencia del Alumno
+**Objetivo:** Crear una interfaz que reduzca la ansiedad del buscador de empleo y centralice su estrategia de carrera.
+
+### Prompts por Rol
+
+#### Frontend (Prompt - Dashboard Evolutivo):
+Como Usuario IT, quiero una vista de 'Mi Progreso' que muestre los 'Action Items' pendientes dejados por mi mentor como tareas interactivas, para sentir que estoy avanzando sistemáticamente hacia mi próximo empleo. Aplicar un diseño limpio con Tailwind CSS y estados de carga tipo Skeletons.
+
+#### Backend (Prompt - Gestión de Estados):
+Como Backend Developer, quiero implementar un endpoint GET /user/roadmap que combine datos de la tabla cv_audits y mentorship_notes, para entregar al frontend una visión unificada de la evolución del candidato.
+
+#### Data Scientist (Prompt - Recomendador):
+Como Data Scientist, quiero que la IA analice los 'Action Items' completados por el usuario, para sugerirle automáticamente el siguiente capítulo del E-book que debe leer o el perfil de mentor más adecuado para su siguiente nivel.
 
 ---
 
