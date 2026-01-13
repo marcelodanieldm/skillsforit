@@ -128,6 +128,8 @@ const usersDB: Map<string, User> = new Map()
 const revenueDB: Map<string, RevenueRecord> = new Map()
 // User roadmap completion store: email -> set of completed item IDs
 const userChecklistDB: Map<string, Set<string>> = new Map()
+// User previous career score store: email -> previous score
+const userPreviousScoreDB: Map<string, number> = new Map()
 
 export const db = {
   create: (analysis: CVAnalysis) => {
@@ -452,5 +454,11 @@ export const roadmapDb = {
     else current.delete(itemId)
     userChecklistDB.set(email, current)
     return current
+  },
+  getPreviousScore(email: string): number {
+    return userPreviousScoreDB.get(email) || 0
+  },
+  setPreviousScore(email: string, score: number) {
+    userPreviousScoreDB.set(email, score)
   }
 }

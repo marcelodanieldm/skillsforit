@@ -1,14 +1,9 @@
-import nodemailer from 'nodemailer'
+import * as sgMail from '@sendgrid/mail'
 
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: parseInt(process.env.EMAIL_PORT || '587'),
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD,
-  },
-})
+// Initialize SendGrid
+if (process.env.SENDGRID_API_KEY) {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+}
 
 export interface EmailOptions {
   to: string
@@ -22,13 +17,42 @@ export interface EmailOptions {
 
 export const sendEmail = async (options: EmailOptions) => {
   try {
-    const info = await transporter.sendMail({
-      from: `"SkillsForIT" <${process.env.EMAIL_USER}>`,
-      ...options,
-    })
+    // Use SendGrid if API key is available, fallback to nodemailer
+    if (process.env.SENDGRID_API_KEY) {
+      const msg = {
+        to: options.to,
+        from: {
+          email: process.env.EMAIL_FROM || 'noreply@skillsforit.com',
+          name: 'SkillsForIT'
+        },
+        subject: options.subject,
+        html: options.html,
+      }
 
-    console.log('Email sent:', info.messageId)
-    return { success: true, messageId: info.messageId }
+      const result = await sgMail.send(msg)
+      console.log('Email sent via SendGrid:', result[0]?.headers?.['x-message-id'])
+      return { success: true, messageId: result[0]?.headers?.['x-message-id'] }
+    } else {
+      // Fallback to nodemailer (existing implementation)
+      const nodemailer = await import('nodemailer')
+      const transporter = nodemailer.default.createTransport({
+        host: process.env.EMAIL_HOST,
+        port: parseInt(process.env.EMAIL_PORT || '587'),
+        secure: false,
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      })
+
+      const info = await transporter.sendMail({
+        from: `"SkillsForIT" <${process.env.EMAIL_USER}>`,
+        ...options,
+      })
+
+      console.log('Email sent via nodemailer:', info.messageId)
+      return { success: true, messageId: info.messageId }
+    }
   } catch (error) {
     console.error('Error sending email:', error)
     return { success: false, error }

@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { db, notesDb, sessionsDb, roadmapDb } from '@/lib/database'
 import { AuthService } from '@/lib/auth'
+import { queueNotification } from '@/lib/notifications'
 
 type MentorTask = {
   id: number
@@ -27,14 +28,23 @@ export async function GET(req: NextRequest) {
     const auth = AuthService.requireRole(token, ['user', 'mentor', 'admin', 'ceo'])
     // Fallback a modo demo si no hay token válido
     const email = auth.authorized && auth.user ? auth.user.email : 'user@example.com'
+    const userName = auth.authorized && auth.user ? auth.user.name || auth.user.email : 'Usuario'
+
+    // Obtener score anterior para comparación (solo para usuarios autenticados)
+    let previousScore = 0
+    if (auth.authorized && auth.user) {
+      // En un sistema real, esto vendría de la base de datos
+      // Por ahora, usamos un valor almacenado en memoria o localStorage simulado
+      previousScore = roadmapDb.getPreviousScore?.(email) || 0
+    }
 
     // Build mentor_tasks from mentor notes' actionItems for this user
-    const userSessions = sessionsDb.findByMentee(email)
+    const sessionsForTasks = sessionsDb.findByMentee(email)
     const mentorTasks: MentorTask[] = []
     const completedSet = roadmapDb.getCompleted(email)
     let taskId = 1
 
-    for (const s of userSessions) {
+    for (const s of sessionsForTasks) {
       const sessionNotes = notesDb.findBySession(s.id)
       for (const n of sessionNotes) {
         (n.actionItems || []).forEach((item) => {
@@ -97,10 +107,39 @@ export async function GET(req: NextRequest) {
       total: totalScore
     }
 
+    // Enviar notificación si el score aumentó significativamente (solo para usuarios autenticados)
+    if (auth.authorized && auth.user && totalScore > previousScore && totalScore - previousScore >= 5) {
+      try {
+        queueNotification({
+          type: 'career_score_update',
+          userEmail: email,
+          userName: userName,
+          oldScore: previousScore,
+          newScore: totalScore,
+          scheduledFor: new Date() // Enviar inmediatamente
+        })
+        console.log(`Career score notification queued for ${email}: ${previousScore}% -> ${totalScore}%`)
+      } catch (notificationError) {
+        console.error('Error queuing career score notification:', notificationError)
+      }
+    }
+
+    // Actualizar score anterior para la próxima comparación
+    if (auth.authorized && auth.user) {
+      roadmapDb.setPreviousScore?.(email, totalScore)
+    }
+
+    // Fallback mentor tasks for demo purposes
+    const fallbackMentorTasks: MentorTask[] = [
+      { id: 1, task: "Completar tu CV con keywords técnicas", completed: false },
+      { id: 2, task: "Preparar 3 preguntas específicas para tu mentor", completed: false },
+      { id: 3, task: "Revisar tu perfil de LinkedIn", completed: false }
+    ]
+
     const payload: ActionPlanResponse = {
       roadmap_status: "in_progress",
       career_score: careerScore,
-      mentor_tasks: fallbackMentorTasks,
+      mentor_tasks: mentorTasks.length > 0 ? mentorTasks : fallbackMentorTasks,
       ai_recommendations: aiRecommendations
     }
 

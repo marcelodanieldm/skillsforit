@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { scheduleSessionReminder } from '@/lib/notifications'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -131,6 +132,21 @@ export async function POST(req: Request) {
       .single()
 
     if (error) throw error
+
+    // Programar recordatorio automático 15 minutos antes de la sesión
+    try {
+      const sessionTime = new Date(scheduled_at)
+      const reminderTime = new Date(sessionTime.getTime() - 15 * 60 * 1000) // 15 minutos antes
+
+      // Solo programar si el recordatorio es en el futuro
+      if (reminderTime > new Date()) {
+        scheduleSessionReminder(newSession.id, reminderTime)
+        console.log(`Recordatorio programado para sesión ${newSession.id} a las ${reminderTime.toISOString()}`)
+      }
+    } catch (reminderError) {
+      console.error('Error scheduling reminder:', reminderError)
+      // No fallar la creación de sesión por error en recordatorio
+    }
 
     return NextResponse.json({
       success: true,
