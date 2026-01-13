@@ -40,6 +40,7 @@ import { MentorMonitor } from '@/components/ceo/MentorMonitor'
 import { SystemHealth } from '@/components/ceo/SystemHealth'
 import ScenarioSimulator from '@/components/ceo/ScenarioSimulator'
 import CEOSidebar from '@/components/ceo/CEOSidebar'
+import MentorMetricsTable from '@/components/ceo/MentorMetricsTable'
 
 interface ProjectionData {
   historical: { month: string; year: number; realistic: number; optimistic: number; actual?: number }[]
@@ -360,6 +361,23 @@ export default function CEODashboard() {
               transition={{ delay: 0.65 }}
             >
               <MentorMonitor />
+            </motion.div>
+
+            {/* Mentor Metrics Table - Sprint 30 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.68 }}
+              className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border-2 border-purple-500/50"
+            >
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                <FaUsers className="text-purple-400" />
+                Tablero de Comando: Rendimiento de Mentores
+              </h2>
+              <p className="text-slate-300 mb-6">
+                Monitorea el rendimiento del equipo humano: Retention Rate, Rating Promedio y Earnings Payout
+              </p>
+              <MentorMetricsTable />
             </motion.div>
           </div>
 
