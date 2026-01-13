@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { sendMentorFeedbackNotification } from '@/lib/notifications'
 
 export const dynamic = 'force-dynamic'
 
@@ -151,6 +152,16 @@ export async function POST(req: NextRequest) {
       }
 
       result = newNotes
+    }
+
+    // Enviar notificación al estudiante (en background)
+    try {
+      setImmediate(() => {
+        sendMentorFeedbackNotification(sessionId)
+      })
+    } catch (notificationError) {
+      console.error('Error sending notification:', notificationError)
+      // No fallar la respuesta por error en notificación
     }
 
     return NextResponse.json({
