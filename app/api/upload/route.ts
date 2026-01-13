@@ -4,12 +4,6 @@ import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 import { db } from '@/lib/database'
 
-// Disable body parser for file uploads
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-}
 
 export async function POST(request: NextRequest) {
   try {

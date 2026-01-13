@@ -41,6 +41,7 @@ import { SystemHealth } from '@/components/ceo/SystemHealth'
 import ScenarioSimulator from '@/components/ceo/ScenarioSimulator'
 import CEOSidebar from '@/components/ceo/CEOSidebar'
 import MentorMetricsTable from '@/components/ceo/MentorMetricsTable'
+import StudentEngagementMetrics from '@/components/ceo/StudentEngagementMetrics'
 
 interface ProjectionData {
   historical: { month: string; year: number; realistic: number; optimistic: number; actual?: number }[]
@@ -208,7 +209,7 @@ export default function CEODashboard() {
     month: `${item.month} ${item.year}`,
     Realista: item.realistic,
     Optimista: item.optimistic,
-    Actual: item.actual
+    Actual: (item as any).actual
   }))
 
   return (
@@ -286,23 +287,6 @@ export default function CEODashboard() {
                 <PriceElasticityWidget />
               </motion.div>
 
-          {/* Funnel Analytics */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <FunnelVisualizer />
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35 }}
-          >
-            <FunnelAnalyticsWidget />
-          </motion.div>
-
           {/* Cart Recovery Widget */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -311,6 +295,7 @@ export default function CEODashboard() {
           >
             <CartRecoveryWidget />
           </motion.div>
+        </div>
         </div>
 
           {/* === CAPA 3: PANEL DE CONTROL DE OPERACIONES (Dynamic Management) === */}
@@ -379,7 +364,17 @@ export default function CEODashboard() {
               </p>
               <MentorMetricsTable />
             </motion.div>
+
+            {/* Student Engagement Metrics - Sprint 31 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+            >
+              {token && <StudentEngagementMetrics token={token} />}
+            </motion.div>
           </div>
+        </div>
 
           {/* === CAPA 4: SALUD DEL SISTEMA (Uptime & Logs) === */}
           <div id="ceo-layer-4" className="scroll-mt-24">
