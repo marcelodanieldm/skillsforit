@@ -47,40 +47,40 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Ejemplos
+                <a href="/mentors" className="text-gray-400 hover:text-white transition-colors">
+                  Mentorías
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  FAQ
+                <a href="/soft-skills-guide" className="text-gray-400 hover:text-white transition-colors">
+                  Guía Soft Skills
                 </a>
               </li>
             </ul>
           </div>
 
-          {/* Legal */}
+          {/* Legal & Account */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Legal</h4>
+            <h4 className="text-white font-semibold mb-4">Cuenta</h4>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                <a href="/auth/signin" className="text-gray-400 hover:text-blue-400 transition-colors">
+                  Iniciar Sesión
+                </a>
+              </li>
+              <li>
+                <a href="/dashboard" className="text-gray-400 hover:text-white transition-colors">
+                  Mi Dashboard
+                </a>
+              </li>
+              <li>
+                <a href="/privacy" className="text-gray-400 hover:text-white transition-colors">
                   Privacidad
                 </a>
               </li>
               <li>
                 <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Términos
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Reembolsos
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Contacto
+                  Soporte
                 </a>
               </li>
             </ul>

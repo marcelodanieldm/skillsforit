@@ -95,7 +95,10 @@ export default function UserDashboardPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 p-6 md:p-10">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mb-6">Mi Progreso</h1>
+        <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mb-2">
+          Hola, {data?.email?.split('@')[0] || 'Usuario'}! 👋
+        </h1>
+        <h2 className="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-6">Mi Progreso</h2>
 
         {/* Career Score */}
         <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 mb-8">

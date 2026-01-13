@@ -28,6 +28,7 @@ export interface AuthSession {
 // In-memory sessions storage (replace with Redis in production)
 const sessions = new Map<string, AuthSession>()
 const users = new Map<string, AuthUser & { password: string }>()
+const passwordResetTokens = new Map<string, { email: string; token: string; expiresAt: Date }>()
 
 // Seed users for development
 const seedUsers = () => {
@@ -260,7 +261,205 @@ export class AuthService {
 
     return cleaned
   }
+
+  /**
+   * Request password reset - generates token and sends email
+   */
+  static requestPasswordReset(email: string): {
+    success: boolean
+    token?: string
+    error?: string
+  } {
+    const user = users.get(email)
+
+    if (!user) {
+      // Don't reveal if user exists or not (security best practice)
+      return {
+        success: true,
+        token: 'fake_token'
+      }
+    }
+
+    // Generate reset token
+    const token = `reset_${Date.now()}_${Math.random().toString(36).substring(7)}`
+    const expiresAt = new Date()
+    expiresAt.setHours(expiresAt.getHours() + 1) // 1 hour expiry
+
+    passwordResetTokens.set(token, {
+      email,
+      token,
+      expiresAt
+    })
+
+    return {
+      success: true,
+      token
+    }
+  }
+
+  /**
+   * Reset password with token
+   */
+  static resetPassword(token: string, newPassword: string): {
+    success: boolean
+    error?: string
+  } {
+    const resetData = passwordResetTokens.get(token)
+
+    if (!resetData) {
+      return {
+        success: false,
+        error: 'Token inválido o expirado'
+      }
+    }
+
+    // Check expiration
+    if (new Date() > resetData.expiresAt) {
+      passwordResetTokens.delete(token)
+      return {
+        success: false,
+        error: 'Token expirado'
+      }
+    }
+
+    const user = users.get(resetData.email)
+
+    if (!user) {
+      return {
+        success: false,
+        error: 'Usuario no encontrado'
+      }
+    }
+
+    // Update password (in production, use bcrypt.hash)
+    user.password = newPassword
+
+    // Remove used token
+    passwordResetTokens.delete(token)
+
+    // Invalidate all existing sessions for this user
+    for (const [sessionToken, session] of sessions.entries()) {
+      if (session.email === user.email) {
+        sessions.delete(sessionToken)
+      }
+    }
+
+    return {
+      success: true
+    }
+  }
+
+  /**
+   * Get all users (admin only)
+   */
+  static getAllUsers(): Omit<AuthUser, 'password'>[] {
+    return Array.from(users.values()).map(user => {
+      const { password, ...userWithoutPassword } = user
+      return userWithoutPassword
+    })
+  }
+
+  /**
+   * Create new user (admin only)
+   */
+  static createUser(userData: {
+    email: string
+    name: string
+    role: UserRole
+    password: string
+  }): {
+    success: boolean
+    user?: Omit<AuthUser, 'password'>
+    error?: string
+  } {
+    if (users.has(userData.email)) {
+      return {
+        success: false,
+        error: 'El usuario ya existe'
+      }
+    }
+
+    const newUser = {
+      id: `user_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+      email: userData.email,
+      name: userData.name,
+      role: userData.role,
+      password: userData.password, // In production, use bcrypt.hash
+      createdAt: new Date()
+    }
+
+    users.set(userData.email, newUser)
+
+    const { password, ...userWithoutPassword } = newUser
+
+    return {
+      success: true,
+      user: userWithoutPassword
+    }
+  }
+
+  /**
+   * Update user (admin only)
+   */
+  static updateUser(email: string, updates: {
+    name?: string
+    role?: UserRole
+    password?: string
+  }): {
+    success: boolean
+    user?: Omit<AuthUser, 'password'>
+    error?: string
+  } {
+    const user = users.get(email)
+
+    if (!user) {
+      return {
+        success: false,
+        error: 'Usuario no encontrado'
+      }
+    }
+
+    if (updates.name) user.name = updates.name
+    if (updates.role) user.role = updates.role
+    if (updates.password) user.password = updates.password // In production, use bcrypt.hash
+
+    const { password, ...userWithoutPassword } = user
+
+    return {
+      success: true,
+      user: userWithoutPassword
+    }
+  }
+
+  /**
+   * Delete user (admin only)
+   */
+  static deleteUser(email: string): {
+    success: boolean
+    error?: string
+  } {
+    if (!users.has(email)) {
+      return {
+        success: false,
+        error: 'Usuario no encontrado'
+      }
+    }
+
+    // Delete user
+    users.delete(email)
+
+    // Invalidate all sessions for this user
+    for (const [token, session] of sessions.entries()) {
+      if (session.email === email) {
+        sessions.delete(token)
+      }
+    }
+
+    return {
+      success: true
+    }
+  }
 }
 
 // Export types and service
-export { sessions, users }
+export { sessions, users, passwordResetTokens }

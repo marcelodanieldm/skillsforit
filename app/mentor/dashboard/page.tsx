@@ -160,9 +160,12 @@ function DashboardContent() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                Panel de Mentor
+                Hola, {mentor.name}! 👋
               </h1>
-              <p className="text-xl text-gray-300">Bienvenido, {mentor.name}</p>
+              <h2 className="text-2xl font-semibold text-purple-400 mb-2">
+                Panel de Mentor
+              </h2>
+              <p className="text-gray-300">Gestiona tus sesiones y estudiantes</p>
             </div>
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">

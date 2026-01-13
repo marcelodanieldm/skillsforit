@@ -72,9 +72,12 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Dashboard
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+            Hola! 👋
           </h1>
+          <h2 className="text-3xl font-semibold text-blue-400 mb-4">
+            Dashboard
+          </h2>
           <p className="text-xl text-gray-300">
             Accede a tus análisis de CV
           </p>

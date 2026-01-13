@@ -139,8 +139,11 @@ export default function CEODashboard() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <h1 className="text-4xl font-bold text-white mb-2">
-                📊 Dashboard CEO
+                Hola, Admin! 👋
               </h1>
+              <h2 className="text-3xl font-semibold text-purple-400 mb-2">
+                📊 Dashboard CEO
+              </h2>
               <p className="text-gray-300">Analytics & Revenue Insights</p>
             </div>
 

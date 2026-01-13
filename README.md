@@ -3,11 +3,92 @@
 ## � Documentación Completa
 
 - **[📖 Setup Guide](SETUP.md)** - Guía completa de instalación y configuración
+- **[🔐 Auth System](AUTH_README.md)** - Sistema de autenticación completo (Login, OAuth, Recovery)
 - **[🔄 Flow Diagrams](FLOW.md)** - Diagramas de flujo del servicio y arquitectura
 - **[🚀 User Journey](USER_JOURNEY.md)** - Flujo completo del proceso de usuario (Landing → Compra → Post-Compra)
 - **[📝 Sprint 4 Documentation](SPRINT4.md)** - CEO Dashboard & Analytics
 - **[📊 Sprint 5 Documentation](SPRINT5.md)** - Event Tracking & User Segmentation
 - **[🎯 Sprint 8 Documentation](SPRINT8.md)** - Dashboard CEO con LTV, Proyecciones y Seguridad
+- **[👥 Sprint 31 Documentation](SPRINT31.md)** - Sistema de Autenticación & Experiencia del Alumno
+
+## 🔐 Sprint 31: Sistema de Autenticación Completo ✅ COMPLETED
+
+Sistema completo de autenticación con login/logout, recuperación de contraseña, Google OAuth y gestión de usuarios.
+
+### 🆕 Características de Autenticación
+
+#### Login/Logout ✅
+- **Email/Password**: Autenticación tradicional con validación de roles
+- **Google OAuth**: Inicio de sesión con cuenta de Google (NextAuth.js)
+- **Sesiones JWT**: Tokens seguros con expiración de 24 horas
+- **Multi-rol**: Soporte para CEO, Mentor, Usuario IT y Admin
+- **Página de Login**: `/auth/signin` con diseño moderno
+
+#### Recuperación de Contraseña ✅
+- **Request Reset**: Solicitud de recuperación con envío de token
+- **Token Temporal**: Validez de 1 hora con expiración automática
+- **Confirm Reset**: Interfaz para establecer nueva contraseña
+- **Invalidación**: Cierra todas las sesiones activas al cambiar contraseña
+- **UI Amigable**: Páginas `/auth/forgot-password` y `/reset-password`
+
+#### Gestión de Usuarios (CEO) ✅
+- **CRUD Completo**: Create, Read, Update, Delete usuarios
+- **API Endpoints**: `/api/users/manage` con autenticación por token
+- **Búsqueda y Filtros**: Filtrado por email, nombre y rol
+- **Validación de Roles**: Solo CEO puede gestionar usuarios
+- **UI Moderna**: Componente con modales, animaciones y diseño profesional
+
+#### Integración en Landing ✅
+- **Navbar Superior**: Dropdown discreto con accesos rápidos
+- **Botón Flotante**: Aparece al scroll en móviles (FloatingAuthButton)
+- **Footer Actualizado**: Enlaces de cuenta y login
+- **No Invasivo**: Diseño que no interfiere con la experiencia del usuario
+
+### 📁 Estructura de Archivos
+
+```
+app/
+  ├── api/auth/
+  │   ├── login/route.ts          - Login endpoint
+  │   ├── logout/route.ts         - Logout endpoint
+  │   ├── password-reset/
+  │   │   ├── request/route.ts    - Solicitar reset
+  │   │   └── confirm/route.ts    - Confirmar reset
+  │   └── [...nextauth]/route.ts  - Google OAuth (NextAuth)
+  ├── api/users/manage/route.ts   - CRUD usuarios (CEO)
+  ├── auth/
+  │   ├── signin/page.tsx         - Página de login
+  │   └── forgot-password/page.tsx - Recuperar contraseña
+  └── reset-password/page.tsx     - Restablecer contraseña
+
+components/
+  ├── Navbar.tsx                  - Navbar con auth dropdown
+  ├── FloatingAuthButton.tsx      - Botón flotante móvil
+  └── ceo/UserManagement.tsx      - Gestión de usuarios
+
+lib/
+  └── auth.ts                     - AuthService (lógica completa)
+```
+
+### 🔑 Configuración Necesaria
+
+```bash
+# .env.local
+NEXTAUTH_SECRET=your-secret-here
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### 👤 Usuarios de Prueba
+
+```
+CEO: ceo@skillsforit.com / ceo123
+Mentor: mentor@skillsforit.com / mentor123
+Usuario IT: user@example.com / user123
+```
+
+---
 
 ## 🚀 Sprint 5: Arquitectura Base y Analytics Avanzados ✅ COMPLETED
 
