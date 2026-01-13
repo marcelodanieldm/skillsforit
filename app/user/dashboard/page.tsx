@@ -5,7 +5,8 @@ import { motion } from 'framer-motion'
 import { FaBook, FaCalendar, FaCheckCircle, FaCloudUploadAlt, FaTasks, FaUserGraduate } from 'react-icons/fa'
 
 type MentorTask = { id: number; task: string; completed: boolean }
-type ActionPlanResponse = { roadmap_status: string; mentor_tasks: MentorTask[]; ai_recommendations: string[] }
+type CareerScore = { cv_score: number; soft_skills_score: number; interview_readiness: number; total: number }
+type ActionPlanResponse = { roadmap_status: string; career_score: CareerScore; mentor_tasks: MentorTask[]; ai_recommendations: string[] }
 
 export default function UserDashboardPage() {
   const [data, setData] = useState<ActionPlanResponse | null>(null)
@@ -53,7 +54,7 @@ export default function UserDashboardPage() {
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer token_user_001' },
         body: JSON.stringify({ id, completed: next })
       })
-      // Re-sync data
+      // Re-sync data to update career score
       await refetch()
     } catch (e) {
       // rollback on error
@@ -63,6 +64,12 @@ export default function UserDashboardPage() {
       }) : prev)
     }
   }
+
+  const ProgressBar = ({ value }: { value: number }) => (
+    <div className="w-full h-4 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+      <div className="h-full bg-gradient-to-r from-green-500 to-blue-600 transition-all duration-500" style={{ width: `${Math.min(100, Math.max(0, value))}%` }} />
+    </div>
+  )
 
   const skeleton = (
     <div className="animate-pulse space-y-6">
@@ -86,6 +93,41 @@ export default function UserDashboardPage() {
           Hola, Usuario! 👋
         </h1>
         <h2 className="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-6">Mi Progreso</h2>
+
+        {/* Career Score - Key Motivator for Virtuous Cycle */}
+        <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-2xl p-8 mb-8 text-white">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-2xl font-bold mb-2">🏆 Career Score</h3>
+              <p className="text-blue-100">¡Llega al 100% para dominar tu carrera!</p>
+            </div>
+            <div className="text-right">
+              <div className="text-4xl font-black">{data?.career_score.total || 0}%</div>
+              <div className="text-sm text-blue-200">Progreso Total</div>
+            </div>
+          </div>
+          {loading || !data ? (
+            <div className="animate-pulse h-4 bg-white/20 rounded" />
+          ) : (
+            <>
+              <ProgressBar value={data.career_score.total} />
+              <div className="grid grid-cols-3 gap-4 mt-6 text-sm">
+                <div className="bg-white/10 rounded-lg p-3 text-center">
+                  <div className="font-semibold text-lg">{data.career_score.cv_score}%</div>
+                  <div className="text-blue-200">CV Score</div>
+                </div>
+                <div className="bg-white/10 rounded-lg p-3 text-center">
+                  <div className="font-semibold text-lg">{data.career_score.soft_skills_score}%</div>
+                  <div className="text-blue-200">Soft Skills</div>
+                </div>
+                <div className="bg-white/10 rounded-lg p-3 text-center">
+                  <div className="font-semibold text-lg">{data.career_score.interview_readiness}%</div>
+                  <div className="text-blue-200">Interview Ready</div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
 
         {error && (
           <div className="mb-6 p-4 rounded-lg bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200">
