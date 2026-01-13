@@ -28,6 +28,11 @@ import {
   Cell,
   LabelList
 } from 'recharts'
+import { FunnelAnalyticsWidget } from '@/components/ceo/FunnelAnalyticsWidget'
+import { FunnelVisualizer } from '@/components/ceo/FunnelVisualizer'
+import { PriceManagement } from '@/components/ceo/PriceManagement'
+import { PriceElasticityWidget } from '@/components/ceo/PriceElasticityWidget'
+import { CartRecoveryWidget } from '@/components/ceo/CartRecoveryWidget'
 
 interface ProjectionData {
   historical: { month: string; year: number; realistic: number; optimistic: number; actual?: number }[]
@@ -65,6 +70,7 @@ export default function CEODashboard() {
   const [projections, setProjections] = useState<ProjectionData | null>(null)
   const [ltv, setLtv] = useState<LTVData[]>([])
   const [funnel, setFunnel] = useState<FunnelStage[]>([])
+  const [funnelAnalytics, setFunnelAnalytics] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -129,6 +135,16 @@ export default function CEODashboard() {
         const funnelData = await funnelRes.json()
         if (funnelData.success) {
           setFunnel(funnelData.data.stages)
+        }
+      }
+
+      // Fetch funnel analytics (nuevo)
+      const funnelAnalyticsRes = await fetch('/api/ceo/funnel-analytics')
+
+      if (funnelAnalyticsRes.ok) {
+        const analyticsData = await funnelAnalyticsRes.json()
+        if (analyticsData.success) {
+          setFunnelAnalytics(analyticsData.data)
         }
       }
 
@@ -384,6 +400,68 @@ export default function CEODashboard() {
             </div>
           </motion.div>
         </div>
+
+        {/* NUEVO: Funnel Analytics de Soft Skills Guide */}
+        {funnelAnalytics && (
+          <>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border-2 border-blue-500/50 mb-8"
+            >
+              <FunnelVisualizer
+                events={funnelAnalytics.funnel.events}
+                conversionRates={funnelAnalytics.funnel.conversion_rates}
+                dropOffRates={funnelAnalytics.funnel.drop_off_rates}
+              />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border-2 border-purple-500/50 mb-8"
+            >
+              <FunnelAnalyticsWidget
+                aov={funnelAnalytics.aov}
+                revenue={funnelAnalytics.revenue}
+                orderBump={funnelAnalytics.order_bump}
+                upsell={funnelAnalytics.upsell}
+              />
+            </motion.div>
+          </>
+        )}
+
+        {/* NUEVO: Price Management (Dynamic Pricing) */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+          className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border-2 border-indigo-500/50 mb-8"
+        >
+          <PriceManagement />
+        </motion.div>
+
+        {/* NUEVO: Price Elasticity Widget (Tablero de Comando) */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.75 }}
+          className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border-2 border-purple-500/50 mb-8"
+        >
+          <PriceElasticityWidget />
+        </motion.div>
+
+        {/* NUEVO: Cart Recovery Widget (Recuperación de Carritos Abandonados) */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border-2 border-amber-500/50 mb-8"
+        >
+          <CartRecoveryWidget />
+        </motion.div>
 
         {/* Quick Stats */}
         <motion.div
