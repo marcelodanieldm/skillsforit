@@ -50,21 +50,7 @@ async function performActualAnalysis(
   purpose?: string
 ): Promise<AnalysisResult> {
   // Use advanced 50-criteria prompt system
-  const prompt = buildAdvancedCVPrompt(cvText, profession, country, purpose)
-2. Formato y estructura
-3. Cuantificación de logros
-4. Skills técnicas específicas
-5. Experiencia relevante
-6. Sección de resumen profesional
-7. Proyectos con impacto medible
-
-Asegúrate de:
-- Identificar al menos 5 problemas específicos
-- Proporcionar al menos 8 mejoras concretas con ejemplos antes/después
-- Dar al menos 5 recomendaciones accionables
-- Usar métricas y porcentajes cuando sea posible
-- Adaptar las recomendaciones a ${profession} y al mercado de ${country}
-`
+  const prompt = buildAdvancedCVPrompt(cvText, profession, country, purpose);
 
   try {
     const completion = await openai.chat.completions.create({

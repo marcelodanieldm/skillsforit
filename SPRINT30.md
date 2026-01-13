@@ -1,3 +1,58 @@
+## User Journey: Día en la Vida de un Mentor
+
+Esta secuencia describe el flujo operativo típico de un mentor durante un día de sesiones y cómo la plataforma habilita cada paso. Incluye el mapeo a funcionalidades implementadas en Sprint 30 y una nota sobre el Copiloto IA (Sprint 31).
+
+### Línea de tiempo
+
+- 08:55 — Apertura del Portal del Mentor
+  - El mentor ingresa al dashboard y visualiza sus próximas sesiones del día (ejemplo: 6 sesiones), el contador regresivo hasta la próxima sesión y el estado de su billetera (saldo acumulado y próximo pago).
+  - Implementación: Dashboard del Mentor con agenda, contador y wallet.
+
+- 09:00 — Inicio de Sesión 1
+  - La Sala de Guerra se habilita con tres paneles: izquierda (CV + reporte IA resumido), centro (video + cronómetro), derecha (notas + action items).
+  - Implementación: Sala de Guerra con paneles y timer síncrono.
+  - Nota: El mensaje contextual del Copiloto IA ("Este alumno es de México, busca su primer empleo como Data Analyst") se implementará en Sprint 31 (RAG + chat en tiempo real).
+
+- 09:08 — Marcado de Action Items y estado del cronómetro
+  - El mentor marca los action items predefinidos (Storytelling, Stack Técnico, LinkedIn, etc.).
+  - El cronómetro cambia a rojo para el rango 9–10 minutos, indicando cierre inminente.
+  - Implementación: Sistema de Action Items y Cronómetro Visual con estados (Verde 0–7, Amarillo 7–9, Rojo 9–10).
+
+- 09:09 — Pitch de Renovación (Upsell)
+  - El mentor realiza el pitch final y envía el enlace de renovación al alumno.
+  - Implementación: Botón de Renovación con Stripe Checkout; se adjunta metadata de la sesión para trazabilidad.
+
+- 09:10 — Finalizar sesión y acreditación en Wallet
+  - El mentor hace clic en "Finalizar"; el sistema marca la sesión como `completed`, registra el horario real de término y acredita la comisión (ejemplo: USD 10) en la billetera del mentor.
+  - Implementación: Actualización de estado de sesión y registro en `mentor_transactions`; el saldo pendiente de pago se actualiza en la wallet.
+
+### Mapeo a funcionalidades de Sprint 30
+
+- Dashboard del Mentor: próxima sesión, agenda del día, billetera, contador.
+- Sala de Guerra: CV + reporte IA (resumen), video embebido, timer sincronizado, notas y action items.
+- Cronómetro Visual: estados por rango de tiempo (verde/amarillo/rojo) y señalización de cierre.
+- Upsell/Stripe: generación y envío de enlace de renovación con contexto de la sesión.
+- Wallet del Mentor: acreditación automática al finalizar sesión y registro histórico de transacciones.
+
+### Notas y dependencias
+
+- Copiloto IA: pendiente para Sprint 31. Requiere RAG sobre CV y chat asistido (Assistant API + function calling).
+- Métricas de CEO: la finalización de sesiones y acreditaciones alimenta el dashboard de métricas (retención, rating simulado, payout pendiente).
+
+### Criterios de aceptación
+
+- El mentor puede ver la agenda y el estado de su wallet antes de iniciar.
+- La sesión puede iniciarse con paneles activos y cronómetro funcionando.
+- Los action items pueden marcarse y persistir.
+- El enlace de renovación puede generarse y enviarse durante el minuto 9.
+- Al finalizar, la sesión cambia a `completed` y la comisión se acredita en la wallet.
+
+### Próximos pasos (Sprint 31)
+
+- Integrar Copiloto IA (contexto del alumno + sugerencias en tiempo real).
+- Enriquecer rating real (reemplazar fórmula simulada) y notificaciones por email.
+- E2E tests del flujo completo (configuración → reserva → sesión → pago).
+
 # 🎯 Sprint 30: Portal de Mentores - Ecosistema Completo
 
 **Fecha de implementación:** 12 de enero de 2026  

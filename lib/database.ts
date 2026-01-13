@@ -126,6 +126,8 @@ const sessionsDB: Map<string, MentorshipSession> = new Map()
 const notesDB: Map<string, SessionNote> = new Map()
 const usersDB: Map<string, User> = new Map()
 const revenueDB: Map<string, RevenueRecord> = new Map()
+// User roadmap completion store: email -> set of completed item IDs
+const userChecklistDB: Map<string, Set<string>> = new Map()
 
 export const db = {
   create: (analysis: CVAnalysis) => {
@@ -436,5 +438,19 @@ export const revenueDb = {
       date,
       revenue
     }))
+  }
+}
+
+// Roadmap completion operations
+export const roadmapDb = {
+  getCompleted(email: string): Set<string> {
+    return userChecklistDB.get(email) || new Set<string>()
+  },
+  setItem(email: string, itemId: string, completed: boolean) {
+    const current = userChecklistDB.get(email) || new Set<string>()
+    if (completed) current.add(itemId)
+    else current.delete(itemId)
+    userChecklistDB.set(email, current)
+    return current
   }
 }
