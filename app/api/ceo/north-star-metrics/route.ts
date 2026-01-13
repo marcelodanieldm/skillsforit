@@ -11,116 +11,60 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url)
     const filter = searchParams.get('filter') || 'month' // day, week, month
 
-    // Calculate date range
-    const now = new Date()
-    let startDate: Date
+    // Sprint 29: Usar vista business_summary para optimización
+    // Un solo query en lugar de múltiples joins
+    const { data: summary, error } = await supabase
+      .from('business_summary')
+      .select('*')
+      .single()
+
+    if (error) throw error
+
+    // Extraer métricas según el filtro de tiempo
+    let grossRevenue = 0
+    let netMargin = 0
+    let netMarginPercentage = 0
+    let cac = 0
+    let totalCosts = 0
+    let openaiCosts = 0
+    let mentorCommissions = 0
+    let newUsersCount = 0
 
     switch (filter) {
       case 'day':
-        startDate = new Date(now.setHours(0, 0, 0, 0))
+        grossRevenue = summary.revenue_today || 0
+        netMargin = summary.net_margin_today || 0
+        netMarginPercentage = summary.margin_percentage_today || 0
+        cac = summary.cac_today || 0
+        totalCosts = summary.total_costs_today || 0
+        openaiCosts = summary.openai_cost_today || 0
+        mentorCommissions = summary.mentor_cost_today || 0
+        newUsersCount = summary.new_users_today || 0
         break
       case 'week':
-        startDate = new Date(now.setDate(now.getDate() - 7))
+        grossRevenue = summary.revenue_week || 0
+        netMargin = summary.net_margin_week || 0
+        netMarginPercentage = summary.margin_percentage_week || 0
+        cac = summary.cac_week || 0
+        totalCosts = summary.total_costs_week || 0
+        openaiCosts = summary.openai_cost_week || 0
+        mentorCommissions = summary.mentor_cost_week || 0
+        newUsersCount = summary.new_users_week || 0
         break
       case 'month':
       default:
-        startDate = new Date(now.setDate(now.getDate() - 30))
+        grossRevenue = summary.revenue_month || 0
+        netMargin = summary.net_margin_month || 0
+        netMarginPercentage = summary.margin_percentage_month || 0
+        cac = summary.cac_month || 0
+        totalCosts = summary.total_costs_month || 0
+        openaiCosts = summary.openai_cost_month || 0
+        mentorCommissions = summary.mentor_cost_month || 0
+        newUsersCount = summary.new_users_month || 0
         break
     }
 
-    // 1. Calculate Gross Revenue (from Stripe payments)
-    const { data: payments, error: paymentsError } = await supabase
-      .from('payments')
-      .select('amount, status, created_at')
-      .eq('status', 'succeeded')
-      .gte('created_at', startDate.toISOString())
-
-    if (paymentsError) throw paymentsError
-
-    const grossRevenue = payments?.reduce((sum, p) => sum + (p.amount / 100), 0) || 0
-
-    // 2. Calculate OpenAI Costs (from cv_audits table)
-    const { data: audits, error: auditsError } = await supabase
-      .from('cv_audits')
-      .select('tokens_used, created_at')
-      .gte('created_at', startDate.toISOString())
-
-    if (auditsError) throw auditsError
-
-    // OpenAI pricing: ~$0.002 per 1K tokens (GPT-4 input+output average)
-    const totalTokens = audits?.reduce((sum, a) => sum + (a.tokens_used || 0), 0) || 0
-    const openaiCosts = (totalTokens / 1000) * 0.002
-
-    // 3. Calculate Mentor Commissions (70% of mentorship fees)
-    const { data: mentorships, error: mentorshipsError } = await supabase
-      .from('mentor_bookings')
-      .select('amount, status, created_at')
-      .eq('status', 'completed')
-      .gte('created_at', startDate.toISOString())
-
-    if (mentorshipsError) throw mentorshipsError
-
-    const mentorCommissions = mentorships?.reduce((sum, m) => sum + (m.amount * 0.7), 0) || 0
-
-    // 4. Calculate Total Costs
-    const totalCosts = openaiCosts + mentorCommissions
-
-    // 5. Calculate Net Margin
-    const netMargin = grossRevenue - totalCosts
-    const netMarginPercentage = grossRevenue > 0 ? (netMargin / grossRevenue) * 100 : 0
-
-    // 6. Calculate CAC (Cost of Acquisition)
-    // For organic LinkedIn traffic, we estimate time cost
-    // Assumption: 5 hours/week content creation = $50/week (at $10/hr opportunity cost)
-    // Distributed across new users acquired in the period
-
-    const { data: newUsers, error: usersError } = await supabase
-      .from('profiles')
-      .select('id, created_at')
-      .gte('created_at', startDate.toISOString())
-
-    if (usersError) throw usersError
-
-    const userCount = newUsers?.length || 1 // Avoid division by zero
-
-    // Calculate marketing time cost based on filter
-    let marketingCost = 0
-    switch (filter) {
-      case 'day':
-        marketingCost = 50 / 7 // ~$7/day
-        break
-      case 'week':
-        marketingCost = 50
-        break
-      case 'month':
-        marketingCost = 50 * 4.3 // ~$215/month
-        break
-    }
-
-    const cac = marketingCost / userCount
-
-    // 7. Calculate LTV (Lifetime Value)
-    // LTV = Average revenue per user across all products
-
-    const { data: userPurchases, error: purchasesError } = await supabase
-      .from('payments')
-      .select('user_id, amount')
-      .eq('status', 'succeeded')
-
-    if (purchasesError) throw purchasesError
-
-    // Group by user and sum amounts
-    const userTotals = new Map<string, number>()
-    userPurchases?.forEach((p) => {
-      const current = userTotals.get(p.user_id) || 0
-      userTotals.set(p.user_id, current + (p.amount / 100))
-    })
-
-    const ltv = userTotals.size > 0
-      ? Array.from(userTotals.values()).reduce((sum, val) => sum + val, 0) / userTotals.size
-      : 0
-
-    // 8. Calculate LTV:CAC Ratio
+    const ltv = summary.ltv_total || 0
     const ltvCacRatio = cac > 0 ? ltv / cac : 0
 
     return NextResponse.json({
@@ -137,14 +81,20 @@ export async function GET(req: Request) {
           mentorCommissions,
           totalCosts
         },
+        conversionRates: {
+          cvAudit: summary.conversion_cv_audit || 0,
+          mentorship: summary.conversion_mentorship || 0,
+          softSkills: summary.conversion_soft_skills || 0
+        },
+        ltvByProduct: {
+          cvAudit: summary.ltv_cv_audit || 0,
+          mentorship: summary.ltv_mentorship || 0,
+          softSkills: summary.ltv_soft_skills || 0
+        },
         metadata: {
           filter,
-          startDate: startDate.toISOString(),
-          endDate: new Date().toISOString(),
-          totalPayments: payments?.length || 0,
-          totalAudits: audits?.length || 0,
-          totalMentorships: mentorships?.length || 0,
-          newUsersCount: userCount
+          newUsersCount,
+          excludesTestPayments: true
         }
       }
     })
