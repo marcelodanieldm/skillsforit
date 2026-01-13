@@ -33,6 +33,11 @@ import { FunnelVisualizer } from '@/components/ceo/FunnelVisualizer'
 import { PriceManagement } from '@/components/ceo/PriceManagement'
 import { PriceElasticityWidget } from '@/components/ceo/PriceElasticityWidget'
 import { CartRecoveryWidget } from '@/components/ceo/CartRecoveryWidget'
+import { NorthStarMetrics } from '@/components/ceo/NorthStarMetrics'
+import { CouponManager } from '@/components/ceo/CouponManager'
+import { AssetUploader } from '@/components/ceo/AssetUploader'
+import { MentorMonitor } from '@/components/ceo/MentorMonitor'
+import { SystemHealth } from '@/components/ceo/SystemHealth'
 
 interface ProjectionData {
   historical: { month: string; year: number; realistic: number; optimistic: number; actual?: number }[]
@@ -215,9 +220,9 @@ export default function CEODashboard() {
             <div>
               <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center gap-3">
                 <FaChartLine className="text-indigo-400" />
-                Dashboard Ejecutivo
+                Dashboard Ejecutivo - Centro de Mando
               </h1>
-              <p className="text-gray-300">Bienvenido, {user?.name}</p>
+              <p className="text-gray-300">Bienvenido, {user?.name} | Decisiones basadas en datos, no intuiciones</p>
             </div>
             <button
               onClick={handleLogout}
@@ -229,6 +234,138 @@ export default function CEODashboard() {
           </div>
         </motion.div>
 
+        {/* === CAPA 1: MÉTRICAS EN TIEMPO REAL (THE NORTH STAR) === */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-8"
+        >
+          <NorthStarMetrics />
+        </motion.div>
+
+        {/* === CAPA 2: TABLERO DE COMANDO (Escenarios y Proyecciones) === */}
+        <div className="mb-8 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+              <FaLightbulb className="text-yellow-400" />
+              Tablero de Comando: Escenarios y Proyecciones
+            </h2>
+          </motion.div>
+
+          {/* Price Elasticity Widget - Selector de Escenarios */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+          >
+            <PriceElasticityWidget />
+          </motion.div>
+
+          {/* Funnel Analytics */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <FunnelVisualizer />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+          >
+            <FunnelAnalyticsWidget />
+          </motion.div>
+
+          {/* Cart Recovery Widget */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <CartRecoveryWidget />
+          </motion.div>
+        </div>
+
+        {/* === CAPA 3: PANEL DE CONTROL DE OPERACIONES (Dynamic Management) === */}
+        <div className="mb-8 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45 }}
+          >
+            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+              <FaLock className="text-indigo-400" />
+              Panel de Control de Operaciones
+            </h2>
+          </motion.div>
+
+          {/* Price Management */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <PriceManagement />
+          </motion.div>
+
+          {/* Coupon Manager */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.55 }}
+          >
+            <CouponManager />
+          </motion.div>
+
+          {/* Asset Uploader */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+          >
+            <AssetUploader />
+          </motion.div>
+
+          {/* Mentor Monitor */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.65 }}
+          >
+            <MentorMonitor />
+          </motion.div>
+        </div>
+
+        {/* === CAPA 4: SALUD DEL SISTEMA (Uptime & Logs) === */}
+        <div className="mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+          >
+            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+              <FaChartLine className="text-teal-400" />
+              Salud del Sistema
+            </h2>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.75 }}
+          >
+            <SystemHealth />
+          </motion.div>
+        </div>
+
+        {/* === LEGACY CONTENT (Revenue Projections) === */}
         {/* Revenue Projections */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
