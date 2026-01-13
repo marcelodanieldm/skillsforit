@@ -207,6 +207,42 @@ function DashboardContent() {
           </div>
         </motion.div>
 
+        {/* Quick Actions */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="grid md:grid-cols-2 gap-4 mb-8"
+        >
+          <a
+            href="/mentor/availability"
+            className="group bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 border-2 border-emerald-500/30 hover:border-emerald-500 rounded-xl p-6 transition-all"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-bold text-white mb-1">Gestionar Disponibilidad</h3>
+                <p className="text-sm text-gray-400">Configura tus horarios y slots disponibles</p>
+              </div>
+              <FaCalendar className="text-3xl text-emerald-400 group-hover:scale-110 transition-transform" />
+            </div>
+          </a>
+
+          <a
+            href={`/mentor/session/${upcomingSessions[0]?.id || 'upcoming'}`}
+            className={`group bg-gradient-to-r from-purple-500/10 to-purple-500/5 border-2 border-purple-500/30 hover:border-purple-500 rounded-xl p-6 transition-all ${
+              !upcomingSessions[0] ? 'opacity-50 pointer-events-none' : ''
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-bold text-white mb-1">Sala de Guerra</h3>
+                <p className="text-sm text-gray-400">Inicia tu próxima sesión de mentoría</p>
+              </div>
+              <FaNotesMedical className="text-3xl text-purple-400 group-hover:scale-110 transition-transform" />
+            </div>
+          </a>
+        </motion.div>
+
         {/* Upcoming Sessions */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
