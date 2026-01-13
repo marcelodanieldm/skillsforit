@@ -438,6 +438,33 @@ CREATE TABLE mentor_payouts (
 )
 ```
 
+**mentor_availability:**
+```sql
+CREATE TABLE mentor_availability (
+  id UUID PRIMARY KEY,
+  mentor_id UUID REFERENCES mentors(id),
+  day_of_week INT CHECK (day_of_week BETWEEN 0 AND 6), -- 0=Domingo, 6=Sábado
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  slot_duration_minutes INT DEFAULT 10,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT NOW()
+)
+```
+
+**mentorship_notes:**
+```sql
+CREATE TABLE mentorship_notes (
+  id UUID PRIMARY KEY,
+  session_id UUID REFERENCES mentor_bookings(id),
+  action_items JSONB, -- Lista estructurada con estado, prioridad
+  private_mentor_notes TEXT, -- Notas privadas del mentor
+  student_visible_feedback TEXT, -- Feedback visible al alumno
+  progress_rating INT CHECK (progress_rating BETWEEN 1 AND 5),
+  created_at TIMESTAMP DEFAULT NOW()
+)
+```
+
 ### **Columnas Nuevas en mentor_bookings**
 
 ```sql
@@ -549,6 +576,138 @@ ADD COLUMN student_role VARCHAR(255)
 - 💰 Comisión del mentor: 70% del pago
 - 💰 Pago mínimo para retiro: $50
 - 💰 Frecuencia de pagos: Cada 15 días
+
+---
+
+## 🆕 APIs Adicionales (Gestión de Disponibilidad y Notas)
+
+### **API: Disponibilidad de Mentores**
+
+**Endpoint:** `/api/mentor/availability`
+
+**GET:** Obtener disponibilidad de un mentor
+```typescript
+GET /api/mentor/availability?mentorId=uuid&dayOfWeek=1
+
+Response:
+{
+  success: true,
+  data: [
+    {
+      id: "uuid",
+      mentor_id: "uuid",
+      day_of_week: 1, // 0=Domingo, 6=Sábado
+      start_time: "09:00:00",
+      end_time: "17:00:00",
+      slot_duration_minutes: 10,
+      is_active: true
+    }
+  ]
+}
+```
+
+**POST:** Crear slot de disponibilidad
+```typescript
+POST /api/mentor/availability
+Body: {
+  mentorId: "uuid",
+  dayOfWeek: 1,
+  startTime: "09:00",
+  endTime: "17:00",
+  slotDurationMinutes: 10
+}
+
+Response:
+{
+  success: true,
+  data: { /* nuevo slot */ }
+}
+```
+
+**DELETE:** Desactivar slot (soft delete)
+```typescript
+DELETE /api/mentor/availability
+Body: { availabilityId: "uuid" }
+
+Response:
+{
+  success: true,
+  message: "Disponibilidad desactivada"
+}
+```
+
+**Validaciones:**
+- Detecta conflictos de horario (overlapping)
+- Valida formato de tiempo (HH:MM:SS)
+- Verifica que end_time > start_time
+- Solo un mentor puede tener un horario a la vez
+
+---
+
+### **API: Notas de Mentoría**
+
+**Endpoint:** `/api/mentor/notes`
+
+**GET:** Obtener notas de una sesión
+```typescript
+GET /api/mentor/notes?sessionId=uuid
+
+Response:
+{
+  success: true,
+  data: {
+    id: "uuid",
+    session_id: "uuid",
+    action_items: {
+      items: [
+        { task: "Mejorar Storytelling", status: "pending", priority: "high" }
+      ]
+    },
+    private_mentor_notes: "Alumno motivado pero necesita...",
+    student_visible_feedback: "Excelente sesión, enfócate en...",
+    progress_rating: 4
+  }
+}
+```
+
+**POST:** Crear o actualizar notas completas
+```typescript
+POST /api/mentor/notes
+Body: {
+  sessionId: "uuid",
+  actionItems: { items: [...] },
+  privateMentorNotes: "...",
+  studentVisibleFeedback: "...",
+  progressRating: 4
+}
+
+Response:
+{
+  success: true,
+  data: { /* notas actualizadas */ }
+}
+```
+
+**PUT:** Actualización parcial (autosave)
+```typescript
+PUT /api/mentor/notes
+Body: {
+  sessionId: "uuid",
+  privateMentorNotes: "Actualización incremental..."
+}
+
+Response:
+{
+  success: true,
+  data: { /* notas con campo actualizado */ }
+}
+```
+
+**Características:**
+- Diferencia entre notas privadas y feedback público
+- JSONB para action_items (estructura flexible)
+- Rating de progreso del alumno (1-5 estrellas)
+- Autosave con método PUT para actualizaciones parciales
 
 ---
 
