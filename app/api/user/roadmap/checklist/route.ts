@@ -9,12 +9,13 @@ export async function POST(req: NextRequest) {
     const email = auth.authorized && auth.user ? auth.user.email : 'user@example.com'
 
     const body = await req.json()
-    const { id, completed } = body as { id: string; completed: boolean }
-    if (!id || typeof completed !== 'boolean') {
-      return new Response(JSON.stringify({ error: 'Parámetros inválidos' }), { status: 400 })
+    const { id, completed } = body as { id: number; completed: boolean }
+    if (typeof id !== 'number' || typeof completed !== 'boolean') {
+      return new Response(JSON.stringify({ error: 'Parámetros inválidos: id debe ser número, completed debe ser boolean' }), { status: 400 })
     }
 
-    const set = roadmapDb.setItem(email, id, completed)
+    // Use the numeric id directly as the key for completion tracking
+    const set = roadmapDb.setItem(email, id.toString(), completed)
     return new Response(JSON.stringify({ success: true, completedCount: set.size }), { status: 200 })
   } catch (err: any) {
     return new Response(JSON.stringify({ error: err?.message || 'Internal error' }), { status: 500 })

@@ -3,14 +3,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { FaBook, FaCalendar, FaCheckCircle, FaCloudUploadAlt, FaTasks, FaUserGraduate } from 'react-icons/fa'
-import { recommendNext } from '@/lib/recommender'
 
-type CareerScore = { cvScore: number; softSkillsScore: number; interviewReadiness: number; total: number }
-type RoadmapItem = { id: string; title: string; completed: boolean; source: 'mentor' | 'ai'; sessionId?: string; createdAt?: string }
-type RoadmapResponse = { email: string; careerScore: CareerScore; aiAudits: { id: string; reportUrl?: string; score?: number; createdAt: string }[]; checklist: RoadmapItem[] }
+type MentorTask = { id: number; task: string; completed: boolean }
+type ActionPlanResponse = { roadmap_status: string; mentor_tasks: MentorTask[]; ai_recommendations: string[] }
 
 export default function UserDashboardPage() {
-  const [data, setData] = useState<RoadmapResponse | null>(null)
+  const [data, setData] = useState<ActionPlanResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -43,11 +41,11 @@ export default function UserDashboardPage() {
     }
   }
 
-  const onToggle = async (id: string, next: boolean) => {
+  const onToggle = async (id: number, next: boolean) => {
     // Optimistic update
     setData(prev => prev ? ({
       ...prev,
-      checklist: prev.checklist.map(i => i.id === id ? { ...i, completed: next } : i)
+      mentor_tasks: prev.mentor_tasks.map(task => task.id === id ? { ...task, completed: next } : task)
     }) : prev)
     try {
       await fetch('/api/user/roadmap/checklist', {
@@ -55,21 +53,16 @@ export default function UserDashboardPage() {
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer token_user_001' },
         body: JSON.stringify({ id, completed: next })
       })
-      // Re-sync to update Career Score
+      // Re-sync data
       await refetch()
     } catch (e) {
       // rollback on error
       setData(prev => prev ? ({
         ...prev,
-        checklist: prev.checklist.map(i => i.id === id ? { ...i, completed: !next } : i)
+        mentor_tasks: prev.mentor_tasks.map(task => task.id === id ? { ...task, completed: !next } : task)
       }) : prev)
     }
   }
-
-  const suggestions = useMemo(() => {
-    const completed = (data?.checklist || []).filter(i => i.completed).map(i => i.title)
-    return recommendNext(completed)
-  }, [data])
 
   const skeleton = (
     <div className="animate-pulse space-y-6">
@@ -86,39 +79,13 @@ export default function UserDashboardPage() {
     </div>
   )
 
-  const ProgressBar = ({ value }: { value: number }) => (
-    <div className="w-full h-4 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-      <div className="h-full bg-gradient-to-r from-green-500 to-blue-600" style={{ width: `${Math.min(100, Math.max(0, value))}%` }} />
-    </div>
-  )
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 p-6 md:p-10">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mb-2">
-          Hola, {data?.email?.split('@')[0] || 'Usuario'}! 👋
+          Hola, Usuario! 👋
         </h1>
         <h2 className="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-6">Mi Progreso</h2>
-
-        {/* Career Score */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div className="font-bold text-slate-900 dark:text-white">Career Score</div>
-            <div className="text-sm text-slate-500 dark:text-slate-400">Objetivo: llegar a 100%</div>
-          </div>
-          {loading || !data ? (
-            <div className="animate-pulse h-4 bg-slate-200 dark:bg-slate-700 rounded" />
-          ) : (
-            <>
-              <ProgressBar value={data.careerScore.total} />
-              <div className="grid grid-cols-3 gap-4 mt-4 text-sm">
-                <div>CV Score: <span className="font-semibold">{data.careerScore.cvScore}%</span></div>
-                <div>Soft Skills: <span className="font-semibold">{data.careerScore.softSkillsScore}%</span></div>
-                <div>Interview Ready: <span className="font-semibold">{data.careerScore.interviewReadiness}%</span></div>
-              </div>
-            </>
-          )}
-        </div>
 
         {error && (
           <div className="mb-6 p-4 rounded-lg bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200">
@@ -135,14 +102,6 @@ export default function UserDashboardPage() {
                 <h2 className="text-xl font-bold">Mi Auditoría IA</h2>
               </div>
               <p className="text-slate-600 dark:text-slate-300 mb-4">Re-subí tu CV si tenés créditos y revisá tus reportes anteriores.</p>
-              <div className="space-y-2">
-                {data?.aiAudits?.slice(0, 3).map(r => (
-                  <div key={r.id} className="flex items-center justify-between text-sm">
-                    <span className="text-slate-600 dark:text-slate-300">Reporte del {new Date(r.createdAt).toLocaleDateString()}</span>
-                    <a href={r.reportUrl || '#'} className="text-blue-600 hover:underline">Ver</a>
-                  </div>
-                ))}
-              </div>
               <a href="/upload" className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg">Re-subir CV</a>
             </motion.div>
 
@@ -166,18 +125,18 @@ export default function UserDashboardPage() {
                 <h2 className="text-xl font-bold">Hoja de Ruta (Action Items)</h2>
               </div>
               <ul className="space-y-3">
-                {data?.checklist?.slice(0, 6).map(item => (
-                  <li key={item.id} className="flex items-center gap-3">
+                {data?.mentor_tasks?.map(task => (
+                  <li key={task.id} className="flex items-center gap-3">
                     <input
                       type="checkbox"
-                      checked={item.completed}
-                      onChange={e => onToggle(item.id, e.target.checked)}
+                      checked={task.completed}
+                      onChange={e => onToggle(task.id, e.target.checked)}
                       className="w-5 h-5"
                     />
-                    <span className="text-slate-800 dark:text-slate-200">{item.title}</span>
+                    <span className="text-slate-800 dark:text-slate-200">{task.task}</span>
                   </li>
                 ))}
-                {(!data || data.checklist.length === 0) && (
+                {(!data || data.mentor_tasks.length === 0) && (
                   <li className="text-slate-500 dark:text-slate-400">Aún no tenés tareas asignadas.</li>
                 )}
               </ul>
@@ -186,7 +145,7 @@ export default function UserDashboardPage() {
             {/* Agendamiento y Sesiones */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6">
               <div className="flex items-center gap-3 mb-4">
-                <FaCalendarAlt className="text-orange-500" />
+                <FaCalendar className="text-orange-500" />
                 <h2 className="text-xl font-bold">Agendamiento y Sesiones</h2>
               </div>
               <p className="text-slate-600 dark:text-slate-300 mb-3">Elegí horarios y accedé a la sala de video cuando sea el momento.</p>
@@ -212,22 +171,18 @@ export default function UserDashboardPage() {
               </div>
             </motion.div>
             
-            {/* Sugerencias de la Guía */}
+            {/* Recomendaciones de la IA */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 md:col-span-2">
               <div className="flex items-center gap-3 mb-4">
                 <FaCheckCircle className="text-emerald-500" />
-                <h2 className="text-xl font-bold">Sugerencias de la Guía</h2>
+                <h2 className="text-xl font-bold">Recomendaciones de la IA</h2>
               </div>
-              {suggestions.length === 0 ? (
-                <p className="text-slate-500 dark:text-slate-400">Completá algunos Action Items para recibir recomendaciones personalizadas.</p>
+              {(!data || data.ai_recommendations.length === 0) ? (
+                <p className="text-slate-500 dark:text-slate-400">No hay recomendaciones disponibles en este momento.</p>
               ) : (
                 <ul className="list-disc ml-6 text-slate-700 dark:text-slate-300">
-                  {suggestions.map((s, i) => (
-                    <li key={i} className="mb-2">
-                      <span className="font-semibold">{s.title}</span>
-                      <span className="ml-2 text-slate-500">— {s.reason}</span>
-                      {s.link && <a href={s.link} className="ml-3 text-purple-600 hover:underline">Abrir</a>}
-                    </li>
+                  {data.ai_recommendations.map((rec, i) => (
+                    <li key={i} className="mb-2">{rec}</li>
                   ))}
                 </ul>
               )}

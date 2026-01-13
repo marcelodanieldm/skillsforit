@@ -2,30 +2,16 @@ import { NextRequest } from 'next/server'
 import { db, notesDb, sessionsDb, roadmapDb } from '@/lib/database'
 import { AuthService } from '@/lib/auth'
 
-type RoadmapItem = {
-  id: string
-  title: string
+type MentorTask = {
+  id: number
+  task: string
   completed: boolean
-  source: 'mentor' | 'ai'
-  sessionId?: string
-  createdAt?: string
 }
 
-type RoadmapResponse = {
-  email: string
-  careerScore: {
-    cvScore: number
-    softSkillsScore: number
-    interviewReadiness: number
-    total: number
-  }
-  aiAudits: Array<{
-    id: string
-    reportUrl?: string
-    score?: number
-    createdAt: string
-  }>
-  checklist: RoadmapItem[]
+type ActionPlanResponse = {
+  roadmap_status: string
+  mentor_tasks: MentorTask[]
+  ai_recommendations: string[]
 }
 
 export async function GET(req: NextRequest) {
@@ -36,70 +22,63 @@ export async function GET(req: NextRequest) {
     // Fallback a modo demo si no hay token válido
     const email = auth.authorized && auth.user ? auth.user.email : 'user@example.com'
 
-    // Gather AI CV audits for this user
-    const audits = db.findByEmail(email) || []
-    const aiAudits = audits
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-      .map(a => ({
-        id: a.id,
-        reportUrl: a.reportUrl,
-        score: a.analysisResult?.score ?? a.analysisResult?.atsScore,
-        createdAt: a.createdAt.toISOString()
-      }))
-
-    const latestCvScore = aiAudits[0]?.score ?? 0
-
-    // Build checklist from mentor notes' actionItems for this user
+    // Build mentor_tasks from mentor notes' actionItems for this user
     const userSessions = sessionsDb.findByMentee(email)
-    const checklist: RoadmapItem[] = []
+    const mentorTasks: MentorTask[] = []
     const completedSet = roadmapDb.getCompleted(email)
+    let taskId = 1
+
     for (const s of userSessions) {
       const sessionNotes = notesDb.findBySession(s.id)
       for (const n of sessionNotes) {
-        (n.actionItems || []).forEach((item, idx) => {
-          checklist.push({
-            id: `${n.id}_${idx}`,
-            title: item,
-            completed: completedSet.has(`${n.id}_${idx}`),
-            source: 'mentor',
-            sessionId: s.id,
-            createdAt: n.createdAt.toISOString()
+        (n.actionItems || []).forEach((item) => {
+          mentorTasks.push({
+            id: taskId++,
+            task: item,
+            completed: completedSet.has(`${n.id}_${mentorTasks.length}`)
           })
         })
       }
     }
 
-    // Soft skills score proxy: percentage of completed action items (none persisted yet, default 50)
-    const softSkillsScore = checklist.length > 0 ? Math.min(100, Math.round((checklist.filter(i => i.completed).length / checklist.length) * 100)) : 50
+    // Generate AI recommendations based on CV analysis
+    const audits = db.findByEmail(email) || []
+    const latestAudit = audits.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0]
+    const aiRecommendations: string[] = []
 
-    // Interview readiness proxy: average of last completed sessions count vs total (simple heuristic)
-    const completedCount = userSessions.filter(s => s.status === 'completed').length
-    const interviewReadiness = Math.min(100, Math.round((completedCount / Math.max(1, userSessions.length)) * 100))
+    if (latestAudit?.analysisResult) {
+      const score = latestAudit.analysisResult.score ?? latestAudit.analysisResult.atsScore ?? 0
 
-    const careerScore = {
-      cvScore: Math.round(latestCvScore || 0),
-      softSkillsScore,
-      interviewReadiness,
-      total: Math.round((latestCvScore * 0.5) + (softSkillsScore * 0.2) + (interviewReadiness * 0.3))
+      if (score < 60) {
+        aiRecommendations.push("Tu CV necesita más keywords técnicas específicas de tu rol")
+        aiRecommendations.push("Repasa el capítulo 2 del E-book sobre 'Estructura del CV'")
+      } else if (score < 80) {
+        aiRecommendations.push("Considera agregar métricas cuantificables a tus logros")
+        aiRecommendations.push("Repasa el capítulo 4 del E-book sobre 'Logros y Métricas'")
+      }
+
+      // Add recommendations from the analysis result
+      if (latestAudit.analysisResult.recommendations?.length > 0) {
+        aiRecommendations.push(...latestAudit.analysisResult.recommendations.slice(0, 2))
+      }
+    }
+
+    // Default recommendations if no audit data
+    if (aiRecommendations.length === 0) {
+      aiRecommendations.push("Tu CV necesita más keywords de Cloud (AWS/Azure)")
+      aiRecommendations.push("Repasa el capítulo 3 del E-book sobre Negociación")
     }
 
     // Fallback demo data si no hay registros
-    const fallbackAudits = aiAudits.length === 0 ? [{ id: 'demo_audit', reportUrl: '#', score: 72, createdAt: new Date().toISOString() }] : aiAudits
-    const fallbackChecklist = checklist.length === 0 ? [
-      { id: 'demo_1', title: 'Rehacer sección de experiencia', completed: false, source: 'mentor' as const },
-      { id: 'demo_2', title: 'Practicar el Elevator Pitch', completed: true, source: 'mentor' as const }
-    ] : checklist
+    const fallbackMentorTasks = mentorTasks.length === 0 ? [
+      { id: 1, task: "Optimizar perfil de LinkedIn", completed: true },
+      { id: 2, task: "Practicar respuesta a 'Háblame de ti'", completed: false }
+    ] : mentorTasks
 
-    const payload: RoadmapResponse = {
-      email,
-      careerScore: aiAudits.length === 0 && checklist.length === 0 ? {
-        cvScore: 72,
-        softSkillsScore: 50,
-        interviewReadiness: 50,
-        total: Math.round((72 * 0.5) + (50 * 0.2) + (50 * 0.3))
-      } : careerScore,
-      aiAudits: fallbackAudits,
-      checklist: fallbackChecklist
+    const payload: ActionPlanResponse = {
+      roadmap_status: "in_progress",
+      mentor_tasks: fallbackMentorTasks,
+      ai_recommendations: aiRecommendations
     }
 
     return new Response(JSON.stringify(payload), { status: 200, headers: { 'content-type': 'application/json' } })
