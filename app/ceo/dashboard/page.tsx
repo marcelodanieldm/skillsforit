@@ -42,6 +42,7 @@ import ScenarioSimulator from '@/components/ceo/ScenarioSimulator'
 import CEOSidebar from '@/components/ceo/CEOSidebar'
 import MentorMetricsTable from '@/components/ceo/MentorMetricsTable'
 import StudentEngagementMetrics from '@/components/ceo/StudentEngagementMetrics'
+import UserManagement from '@/components/ceo/UserManagement'
 
 interface ProjectionData {
   historical: { month: string; year: number; realistic: number; optimistic: number; actual?: number }[]
@@ -227,11 +228,14 @@ export default function CEODashboard() {
           >
             <div className="flex justify-between items-center">
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center gap-3">
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+                  Hola, {user?.name}! 👋
+                </h1>
+                <h2 className="text-2xl font-semibold text-indigo-400 mb-2 flex items-center gap-3">
                   <FaChartLine className="text-indigo-400" />
                   Dashboard Ejecutivo - Centro de Mando
-                </h1>
-                <p className="text-gray-300">Bienvenido, {user?.name} | Decisiones basadas en datos, no intuiciones</p>
+                </h2>
+                <p className="text-gray-300">Decisiones basadas en datos, no intuiciones</p>
               </div>
               <button
                 onClick={handleLogout}
@@ -635,14 +639,15 @@ export default function CEODashboard() {
           <CartRecoveryWidget />
         </motion.div>
 
-        {/* Quick Stats */}
+        {/* NUEVO: User Management (Gestión de Usuarios) */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="grid md:grid-cols-4 gap-6"
+          transition={{ delay: 0.85 }}
+          className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border-2 border-indigo-500/50 mb-8"
         >
-          {[
+          {token && <UserManagement token={token} />}
+        </motion.div>
             { 
               label: 'Revenue Actual', 
               value: `$${projections?.historical[projections.historical.length - 1]?.actual?.toLocaleString() || 0}`,

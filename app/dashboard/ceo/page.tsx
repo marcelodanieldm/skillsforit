@@ -165,9 +165,12 @@ export default function CEODashboard() {
         <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 rounded-2xl p-8 mb-8 text-white">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
+              <h1 className="text-4xl font-bold mb-2">
+                Hola, CEO! 👋
+              </h1>
               <div className="flex items-center gap-3 mb-2">
-                <FaTrophy className="text-4xl" />
-                <h1 className="text-4xl font-bold">Dashboard Ejecutivo</h1>
+                <FaTrophy className="text-3xl" />
+                <h2 className="text-3xl font-semibold">Dashboard Ejecutivo</h2>
               </div>
               <p className="text-purple-100">Vista de 360° de SkillsForIT - {new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}</p>
             </div>

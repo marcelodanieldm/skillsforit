@@ -6,10 +6,14 @@ import Pricing from '@/components/Pricing'
 import Testimonials from '@/components/Testimonials'
 import CTA from '@/components/CTA'
 import Footer from '@/components/Footer'
+import Navbar from '@/components/Navbar'
+import FloatingAuthButton from '@/components/FloatingAuthButton'
 
 export default function Home() {
   return (
     <main className="min-h-screen">
+      <Navbar />
+      <FloatingAuthButton />
       <Hero />
       <BeforeAfterComparison />
       <Benefits />
