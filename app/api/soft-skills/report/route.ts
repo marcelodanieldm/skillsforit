@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     // Red flags totales
     const totalRedFlags = analyses.reduce((sum, a) => sum + (a.redFlags?.length || 0), 0)
     const criticalRedFlags = analyses.reduce((sum, a) => {
-      return sum + (a.redFlags?.filter(rf => rf.severity === 'critical').length || 0)
+      return sum + (a.redFlags?.filter((rf: any) => rf.severity === 'critical').length || 0)
     }, 0)
     
     // Top recomendaciones
