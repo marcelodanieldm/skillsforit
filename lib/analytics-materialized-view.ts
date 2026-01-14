@@ -156,7 +156,7 @@ export class AnalyticsMaterializedView {
       monthData.revenues.push(entry.amount)
       
       // Determinar si es nuevo usuario o existente
-      const previousEntries = revenueDb.filter(r => 
+      const previousEntries = revenueDb.findAll().filter(r => 
         r.userId === entry.userId && 
         new Date(r.createdAt) < date
       )
