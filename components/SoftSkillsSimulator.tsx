@@ -3,7 +3,9 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FaPaperPlane, FaMicrophone, FaRobot, FaUser, FaSpinner, FaCheckCircle } from 'react-icons/fa'
+import { useRouter } from 'next/navigation'
 import SoftSkillsRadarChart from './SoftSkillsRadarChart'
+import LeadCaptureForm from './LeadCaptureForm'
 import { SOFT_SKILLS_QUESTIONS } from '@/lib/prompts/soft-skills-analyzer'
 
 /**
@@ -26,7 +28,7 @@ interface Message {
 }
 
 interface SimulatorStep {
-  step: 'intro' | 'question1' | 'question2' | 'question3' | 'analyzing' | 'results' | 'email-gate'
+  step: 'intro' | 'question1' | 'question2' | 'question3' | 'analyzing' | 'results' | 'lead-capture'
   currentQuestion: number
 }
 
@@ -40,9 +42,13 @@ interface AnalysisResult {
     severity: string
     description: string
   }>
+  toneScore?: number
+  fillerWordsCount?: number
+  starCompliance?: number
 }
 
 export default function SoftSkillsSimulator() {
+  const router = useRouter()
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -63,8 +69,8 @@ export default function SoftSkillsSimulator() {
   const [analyses, setAnalyses] = useState<AnalysisResult[]>([])
   const [radarData, setRadarData] = useState<{ labels: string[], scores: number[] } | null>(null)
   const [finalLevel, setFinalLevel] = useState<string>('Colaborador Reactivo')
-  const [email, setEmail] = useState('')
-  const [showEmailGate, setShowEmailGate] = useState(false)
+  const [sessionId] = useState(`sim_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`)
+  const [showLeadCapture, setShowLeadCapture] = useState(false)
   
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -193,10 +199,11 @@ export default function SoftSkillsSimulator() {
               
               addMessage('assistant', `📊 **Análisis completado.** Tu nivel detectado: **${report.finalLevel}**\n\nVe tu gráfica de radar abajo para ver tus fortalezas y debilidades.`)
               
-              // Email gate después de 5 segundos
+              // Lead capture form después de 3 segundos
               setTimeout(() => {
-                setShowEmailGate(true)
-              }, 5000)
+                setShowLeadCapture(true)
+                setSimulatorStep({ step: 'lead-capture', currentQuestion: 3 })
+              }, 3000)
               
             } catch (error) {
               console.error('Report generation error:', error)
@@ -214,30 +221,10 @@ export default function SoftSkillsSimulator() {
     }
   }
 
-  const handleEmailSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!email.trim()) return
-
-    try {
-      // Guardar lead y enviar reporte completo
-      const response = await fetch('/api/soft-skills/unlock-report', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          responses,
-          analyses
-        })
-      })
-
-      if (!response.ok) throw new Error('Failed to unlock report')
-
-      // Redirigir a página de resultados detallados con oferta de ebook
-      window.location.href = `/soft-skills/report?email=${encodeURIComponent(email)}`
-      
-    } catch (error) {
-      console.error('Email submission error:', error)
-      alert('Hubo un error. Por favor, intenta de nuevo.')
+  // Handler para éxito del formulario de lead capture
+  const handleLeadCaptureSuccess = () => {
+    // La API de audio-feedback/generate-report ya redirige internamente
+    // Aquí solo limpiamos el estado si es necesario
     }
   }
 
@@ -403,64 +390,25 @@ export default function SoftSkillsSimulator() {
           </motion.div>
         )}
 
-        {/* Email Gate */}
+        {/* Lead Capture Form - Sprint 39 Integration */}
         <AnimatePresence>
-          {showEmailGate && (
+          {showLeadCapture && radarData && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
-              onClick={() => setShowEmailGate(false)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm overflow-y-auto z-50"
             >
-              <motion.div
-                initial={{ scale: 0.9 }}
-                animate={{ scale: 1 }}
-                onClick={(e) => e.stopPropagation()}
-                className="bg-white dark:bg-slate-800 rounded-2xl p-8 max-w-lg w-full shadow-2xl"
-              >
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                  🔓 Desbloquea tu análisis completo
-                </h2>
-                <p className="text-gray-600 dark:text-gray-300 mb-6">
-                  Detectamos {analyses.filter(a => a.redFlags.length > 0).length} áreas críticas de mejora en tus respuestas.
-                  <br /><br />
-                  Ingresa tu email para recibir:
-                </p>
-                <ul className="space-y-2 mb-6">
-                  <li className="flex items-start gap-2">
-                    <FaCheckCircle className="text-green-500 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700 dark:text-gray-300">Análisis detallado de tus 3 respuestas con Red Flags específicos</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <FaCheckCircle className="text-green-500 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700 dark:text-gray-300">Reescritura de tus respuestas usando el método STAR</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <FaCheckCircle className="text-green-500 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700 dark:text-gray-300">Guía PDF: "Dominando Entrevistas de Comportamiento" (USD 10)</span>
-                  </li>
-                </ul>
-                <form onSubmit={handleEmailSubmit} className="space-y-4">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="tu@email.com"
-                    required
-                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-slate-600 rounded-xl focus:border-purple-500 focus:outline-none bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
-                  />
-                  <button
-                    type="submit"
-                    className="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold rounded-xl transition-all text-lg"
-                  >
-                    Ver mi análisis completo →
-                  </button>
-                </form>
-                <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-4">
-                  No spam. Solo insights valiosos para tu carrera.
-                </p>
-              </motion.div>
+              <LeadCaptureForm
+                sessionId={sessionId}
+                analysisResults={{
+                  toneScore: analyses.reduce((sum, a) => sum + (a.toneScore || 70), 0) / analyses.length,
+                  fillerWordsCount: analyses.reduce((sum, a) => sum + (a.fillerWordsCount || 5), 0) / analyses.length,
+                  starCompliance: analyses.reduce((sum, a) => sum + (a.starCompliance || a.overallScore), 0) / analyses.length,
+                  transcriptions: responses
+                }}
+                onSuccess={handleLeadCaptureSuccess}
+              />
             </motion.div>
           )}
         </AnimatePresence>

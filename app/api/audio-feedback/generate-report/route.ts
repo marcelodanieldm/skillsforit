@@ -47,6 +47,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Si vienen del simulador de texto (no audio), usar métricas estimadas
+    const toneScore = analysisResults.toneScore || 70
+    const fillerWordsCount = analysisResults.fillerWordsCount || 5
+    const starCompliance = analysisResults.starCompliance || 65
+    const transcriptions = analysisResults.transcriptions || []
+
     // Determinar nivel basado en años de experiencia
     let experienceLevel: 'Junior' | 'Mid' | 'Senior' | 'Staff'
     if (experienceYears < 2) experienceLevel = 'Junior'
@@ -92,7 +98,7 @@ export async function POST(request: NextRequest) {
           country,
           experience_years: experienceYears,
           experience_level: experienceLevel,
-          source: 'audio-feedback-simulator',
+          source: 'soft-skills-simulator',
           status: 'qualified',
           audio_feedback_completed: true,
           audio_feedback_completed_at: new Date().toISOString(),
@@ -119,10 +125,10 @@ export async function POST(request: NextRequest) {
       .insert({
         lead_id: leadId,
         session_id: sessionId,
-        tone_score: analysisResults.toneScore,
-        filler_words_count: analysisResults.fillerWordsCount,
-        star_compliance: analysisResults.starCompliance,
-        transcriptions: JSON.stringify(analysisResults.transcriptions),
+        tone_score: Math.round(toneScore),
+        filler_words_count: Math.round(fillerWordsCount),
+        star_compliance: Math.round(starCompliance),
+        transcriptions: JSON.stringify(transcriptions),
         experience_level: experienceLevel,
         created_at: new Date().toISOString()
       })
@@ -135,7 +141,12 @@ export async function POST(request: NextRequest) {
     // 3. Generar reporte personalizado según nivel
     const report = generatePersonalizedReport(
       experienceLevel,
-      analysisResults,
+      {
+        toneScore,
+        fillerWordsCount,
+        starCompliance,
+        transcriptions
+      },
       email
     )
 
