@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { withAuth } from '@/components/hoc/withAuth'
 import { 
   FaChartBar, 
   FaDollarSign, 
@@ -63,7 +62,7 @@ interface LTVData {
   highest: any
 }
 
-function FunnelAnalytics({ user }: { user: any }) {
+function FunnelAnalytics() {
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -478,7 +477,4 @@ function FunnelAnalytics({ user }: { user: any }) {
 }
 
 // Exportar con HOC de protección
-export default withAuth(FunnelAnalytics, {
-  requiredRoles: ['ceo', 'admin'],
-  redirectTo: '/ceo/login'
-})
+export default FunnelAnalytics

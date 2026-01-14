@@ -174,7 +174,7 @@ export async function GET(request: NextRequest) {
       period: `${days} days`,
       total,
       accepted,
-      rejected: total - rejected,
+      rejected: total - accepted,
       acceptanceRate: Math.round(acceptanceRate * 10) / 10,
       target: 25,
       performance: acceptanceRate >= 25 ? 'on-target' : 'below-target',

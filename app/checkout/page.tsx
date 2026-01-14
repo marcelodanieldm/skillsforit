@@ -2,11 +2,8 @@
 
 import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { loadStripe } from '@stripe/stripe-js'
 import { motion } from 'framer-motion'
 import { FaCreditCard, FaLock, FaCheckCircle, FaArrowLeft } from 'react-icons/fa'
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
 function CheckoutContent() {
   const searchParams = useSearchParams()
@@ -41,16 +38,12 @@ function CheckoutContent() {
         throw new Error(data.error || 'Error al crear sesión de pago')
       }
 
-      // Redirect to Stripe Checkout
-      const stripe = await stripePromise
-      if (stripe) {
-        const result = await stripe.redirectToCheckout({
-          sessionId: data.sessionId,
-        })
-
-        if (result.error) {
-          setError(result.error.message || 'Error al redirigir a pago')
-        }
+      // Redirect to Stripe Checkout using the URL from the session
+      if (data.url) {
+        window.location.href = data.url
+      } else if (data.sessionId) {
+        // Fallback: redirect using sessionId
+        window.location.href = `https://checkout.stripe.com/pay/${data.sessionId}`
       }
     } catch (err: any) {
       console.error('Checkout error:', err)

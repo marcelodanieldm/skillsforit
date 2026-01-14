@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
 
     // Procesar revenue de mentorías
     for (const rev of allRevenue) {
-      if (rev.type === 'mentorship' && new Date(rev.date) >= startDate) {
+      if (rev.type === 'mentorship' && new Date(rev.createdAt) >= startDate) {
         const country = rev.country || 'Unknown'
         
         if (countryMetrics.has(country)) {

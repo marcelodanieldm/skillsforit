@@ -1,3 +1,5 @@
+'use server'
+
 import { startNotificationProcessor } from './notifications'
 
 // Initialize notification processor when the app starts

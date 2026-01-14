@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { authDB, userChecklistDB } from '@/lib/database'
+import { userChecklistDB } from '@/lib/database'
 import { cvAnalysisDB, sessionsDB } from '@/lib/database'
+import { AuthService } from '@/lib/auth'
 
 /**
  * GET /api/ceo/student-engagement
@@ -20,8 +21,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
-    const session = authDB.get(token)
-    if (!session || session.role !== 'ceo') {
+    const validation = AuthService.validateSession(token)
+    if (!validation.valid || validation.session?.role !== 'ceo') {
       return NextResponse.json({ error: 'Acceso denegado' }, { status: 403 })
     }
 

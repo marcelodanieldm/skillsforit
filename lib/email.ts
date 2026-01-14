@@ -1,3 +1,5 @@
+'use server'
+
 import * as sgMail from '@sendgrid/mail'
 
 // Initialize SendGrid

@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   try {
     // Authenticate CEO
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
-    const auth = AuthService.validateSession(token)
+    const auth = AuthService.validateSession(token || '')
 
     if (!auth.valid || !['ceo', 'admin'].includes(auth.session!.role)) {
       return NextResponse.json(
@@ -57,7 +57,7 @@ export async function DELETE(request: NextRequest) {
   try {
     // Authenticate CEO
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
-    const auth = AuthService.validateSession(token)
+    const auth = AuthService.validateSession(token || '')
 
     if (!auth.valid || auth.session!.role !== 'ceo') {
       return NextResponse.json(

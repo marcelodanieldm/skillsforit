@@ -3,7 +3,7 @@ import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia'
+  apiVersion: '2025-12-15.clover'
 })
 
 const supabase = createClient(
@@ -22,13 +22,16 @@ export async function GET() {
 
     // Transform to our format
     const coupons = promoCodes.data.map((promo) => {
-      const coupon = promo.coupon
+      const couponRef = (promo as any).coupon
+      const coupon = typeof couponRef === 'string'
+        ? stripeCoupons.data.find(c => c.id === couponRef)
+        : couponRef
       
       return {
         id: promo.id,
         code: promo.code,
-        discountType: coupon.percent_off ? 'percentage' : 'fixed',
-        discountValue: coupon.percent_off || (coupon.amount_off ? coupon.amount_off / 100 : 0),
+        discountType: coupon?.percent_off ? 'percentage' : 'fixed',
+        discountValue: coupon?.percent_off || (coupon?.amount_off ? coupon.amount_off / 100 : 0),
         expiresAt: promo.expires_at ? new Date(promo.expires_at * 1000).toISOString() : null,
         maxRedemptions: promo.max_redemptions,
         timesUsed: promo.times_redeemed,
@@ -84,10 +87,10 @@ export async function POST(req: Request) {
     const stripeCoupon = await stripe.coupons.create(couponData)
 
     // Create promotion code
-    const promoCodeData: Stripe.PromotionCodeCreateParams = {
+    const promoCodeData = {
       coupon: stripeCoupon.id,
       code: code.toUpperCase()
-    }
+    } as any
 
     if (expiresAt) {
       promoCodeData.expires_at = Math.floor(new Date(expiresAt).getTime() / 1000)

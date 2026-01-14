@@ -1,9 +1,9 @@
-import NextAuth, { NextAuthOptions } from 'next-auth'
+import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { AuthService } from '@/lib/auth'
 
-export const authOptions: NextAuthOptions = {
+const handler = NextAuth({
   providers: [
     // Google OAuth Provider
     GoogleProvider({
@@ -93,8 +93,8 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       // Add role and id to session
       if (session.user) {
-        (session.user as any).role = token.role
-        (session.user as any).id = token.id
+        (session.user as any).role = token.role as string
+        (session.user as any).id = token.id as string
       }
       return session
     }
@@ -111,8 +111,6 @@ export const authOptions: NextAuthOptions = {
   },
 
   secret: process.env.NEXTAUTH_SECRET || 'dev-secret-change-in-production',
-}
-
-const handler = NextAuth(authOptions)
+})
 
 export { handler as GET, handler as POST }

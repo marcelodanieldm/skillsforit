@@ -10,12 +10,15 @@ import { Elements, CardElement, useStripe, useElements } from '@stripe/react-str
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '')
 
 interface PaymentFormProps {
-  email: string
-  includeCVAudit: boolean
-  totalPrice: number
+  amount: number // in cents
+  productName: string
+  productType: string
+  metadata?: Record<string, any>
+  onSuccess?: (paymentIntent: any) => void
+  buttonText?: string
 }
 
-function PaymentFormInner({ email, includeCVAudit, totalPrice }: PaymentFormProps) {
+function PaymentFormInner({ amount, productName, productType, metadata = {}, onSuccess, buttonText = "Pagar Ahora" }: PaymentFormProps) {
   const stripe = useStripe()
   const elements = useElements()
   const [processing, setProcessing] = useState(false)
@@ -32,17 +35,30 @@ function PaymentFormInner({ email, includeCVAudit, totalPrice }: PaymentFormProp
     setError(null)
 
     try {
+      // Determine API endpoint based on product type
+      const endpoint = productType === 'cv_audit_full'
+        ? '/api/cv-audit/create-payment-intent'
+        : '/api/ebook/create-payment-intent'
+
       // Create payment intent
-      const response = await fetch('/api/ebook/create-payment-intent', {
+      const requestBody = {
+        amount,
+        productType,
+        metadata,
+      }
+
+      // For CV audit, include email from metadata
+      if (productType === 'cv_audit_full' && metadata.email) {
+        requestBody.email = metadata.email
+        requestBody.analysisId = metadata.analysisId
+      }
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          email,
-          includeCVAudit,
-          amount: totalPrice * 100, // Convert to cents
-        }),
+        body: JSON.stringify(requestBody),
       })
 
       const { clientSecret, error: serverError } = await response.json()
@@ -55,9 +71,6 @@ function PaymentFormInner({ email, includeCVAudit, totalPrice }: PaymentFormProp
       const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: elements.getElement(CardElement)!,
-          billing_details: {
-            email,
-          },
         },
       })
 
@@ -66,8 +79,12 @@ function PaymentFormInner({ email, includeCVAudit, totalPrice }: PaymentFormProp
       }
 
       if (paymentIntent?.status === 'succeeded') {
-        // Redirect to success page with upsell
-        window.location.href = `/ebook/success?payment_intent=${paymentIntent.id}&email=${encodeURIComponent(email)}&cv_audit=${includeCVAudit}`
+        if (onSuccess) {
+          onSuccess(paymentIntent)
+        } else {
+          // Fallback redirect
+          window.location.href = `/cv-audit/report?paymentIntentId=${paymentIntent.id}`
+        }
       }
     } catch (err: any) {
       setError(err.message || 'Error processing payment')
@@ -151,7 +168,7 @@ function PaymentFormInner({ email, includeCVAudit, totalPrice }: PaymentFormProp
           ) : (
             <>
               <FaCreditCard />
-              Pagar USD {totalPrice}
+              {buttonText}
             </>
           )}
         </button>

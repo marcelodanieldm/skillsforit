@@ -9,11 +9,8 @@ import { v4 as uuidv4 } from 'uuid'
 import path from 'path'
 
 // Disable body parser for Stripe webhooks
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-}
+export const runtime = 'nodejs' // Required for body parsing
+export const dynamic = 'force-dynamic' // Ensure dynamic rendering
 
 export async function POST(request: NextRequest) {
   try {
@@ -56,7 +53,7 @@ export async function POST(request: NextRequest) {
         // Update payment status
         db.update(analysisId, {
           paymentStatus: 'completed',
-          analysisStatus: 'queued', // Changed from 'processing' to 'queued'
+          analysisStatus: 'processing', // Queue for background processing
         })
 
         // Check if E-book was included

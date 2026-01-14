@@ -21,10 +21,6 @@ export default function EbookDashboard() {
     loadUserAssets()
   }, [])
 
-  const hasEbookAccess = assets.some(asset => asset.asset_type === 'ebook')
-  const hasCVAuditAccess = assets.some(asset => asset.asset_type === 'cv_audit')
-  const hasMentorshipAccess = assets.some(asset => asset.asset_type === 'mentorship')
-
   const loadUserAssets = async () => {
     try {
       // In a real app, this would get the user from auth context
@@ -273,6 +269,43 @@ export default function EbookDashboard() {
                   </Link>
                 </div>
               )}
+            </div>
+          </motion.div>
+
+          {/* CV Audit Access */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-white rounded-xl shadow-lg overflow-hidden"
+          >
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-3 rounded-lg bg-blue-500 text-white">
+                  <FaRobot />
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900">Auditoría CV con IA</h3>
+                  <p className="text-sm text-gray-600">Análisis inteligente de tu CV</p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-blue-600 text-sm">
+                  <FaCheck />
+                  <span>Herramienta disponible</span>
+                </div>
+                <Link
+                  href="/cv-audit"
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                >
+                  <FaRobot />
+                  Analizar mi CV
+                </Link>
+                <p className="text-xs text-gray-500 text-center">
+                  Primer análisis gratis • Reporte completo por $7
+                </p>
+              </div>
             </div>
           </motion.div>
         </div>
