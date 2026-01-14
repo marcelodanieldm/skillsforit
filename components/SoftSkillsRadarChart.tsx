@@ -148,7 +148,7 @@ export default function SoftSkillsRadarChart({
         labels: {
           font: {
             size: 14,
-            weight: '600'
+            weight: 600
           },
           color: 'rgb(55, 65, 81)',
           padding: 20
