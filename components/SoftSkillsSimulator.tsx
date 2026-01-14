@@ -225,7 +225,6 @@ export default function SoftSkillsSimulator() {
   const handleLeadCaptureSuccess = () => {
     // La API de audio-feedback/generate-report ya redirige internamente
     // Aquí solo limpiamos el estado si es necesario
-    }
   }
 
   return (
