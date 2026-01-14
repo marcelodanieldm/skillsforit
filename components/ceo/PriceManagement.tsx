@@ -454,7 +454,11 @@ export function PriceManagement() {
             setPendingChange(null)
           }}
           onConfirm={confirmUpdate}
-          service={pendingChange.service}
+          service={{
+            ...pendingChange.service,
+            currentPrice: pendingChange.service.base_price,
+            proposedPrice: pendingChange.newPrice
+          }}
           impact={pendingChange.impact}
           isLoading={isUpdating}
         />
