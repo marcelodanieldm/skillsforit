@@ -179,8 +179,12 @@ export class AnalyticsMaterializedView {
       // Calcular MRR components
       const totalMRR = monthData.totalRevenue
       const newMRR = Array.from(monthData.newUsers).reduce((sum, userId) => {
-        const userRevenue = revenueDb
-          .filter(r => r.userId === userId && r.date.startsWith(monthKey))
+        const userRevenue = revenueDb.findAll()
+          .filter(r => {
+            const rDate = new Date(r.createdAt)
+            const rMonthKey = `${rDate.getFullYear()}-${String(rDate.getMonth() + 1).padStart(2, '0')}`
+            return r.userId === userId && rMonthKey === monthKey
+          })
           .reduce((s, r) => s + r.amount, 0)
         return sum + userRevenue
       }, 0)
@@ -199,8 +203,12 @@ export class AnalyticsMaterializedView {
         previousMonthData.existingUsers.forEach(userId => {
           if (!currentMonthUsers.has(userId)) {
             // Usuario churned
-            const lastRevenue = revenueDb
-              .filter(r => r.userId === userId && r.date.startsWith(previousMonthKey))
+            const lastRevenue = revenueDb.findAll()
+              .filter(r => {
+                const rDate = new Date(r.createdAt)
+                const rMonthKey = `${rDate.getFullYear()}-${String(rDate.getMonth() + 1).padStart(2, '0')}`
+                return r.userId === userId && rMonthKey === previousMonthKey
+              })
               .reduce((s, r) => s + r.amount, 0)
             churnMRR += lastRevenue
           }
@@ -248,7 +256,7 @@ export class AnalyticsMaterializedView {
 
     return segments.map(segment => {
       // Filtrar usuarios del segmento
-      const segmentRevenues = revenueDb.filter(r => {
+      const segmentRevenues = revenueDb.findAll().filter(r => {
         // Simulación: segmentar por monto (en producción usar datos reales)
         if (segment === 'Junior') return r.amount <= 30
         if (segment === 'Transition') return r.amount > 30 && r.amount <= 100
