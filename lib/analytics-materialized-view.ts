@@ -13,7 +13,7 @@
  */
 
 import { revenueDb } from './db'
-import { UserSegment } from './user-segmentation'
+import { UserSegment } from './analytics'
 
 interface MRRData {
   month: string
