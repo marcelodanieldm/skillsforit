@@ -338,6 +338,137 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 PRODUCT_PRICE=7.00
 ```
 
+### 💳 Configuración de Stripe en Modo de Prueba
+
+#### 1. Obtener Claves de Prueba
+
+1. Ve a tu [Dashboard de Stripe](https://dashboard.stripe.com/)
+2. Asegúrate de que el **modo de prueba** esté activado (toggle en la esquina superior derecha)
+3. Navega a **Developers** → **API keys**
+4. Copia tus claves:
+   - **Publishable key**: `pk_test_...`
+   - **Secret key**: `sk_test_...`
+
+#### 2. Configurar Webhooks para Desarrollo Local
+
+**Opción A: Stripe CLI (Recomendado)**
+
+```bash
+# Instalar Stripe CLI
+# Windows (con Scoop):
+scoop install stripe
+
+# Alternativamente, descarga desde:
+# https://github.com/stripe/stripe-cli/releases
+
+# Iniciar sesión
+stripe login
+
+# Escuchar webhooks y reenviar a tu servidor local
+stripe listen --forward-to localhost:3000/api/webhook
+
+# Copia el webhook signing secret que aparece (whsec_...)
+# y agrégalo a tu .env.local
+```
+
+**Opción B: ngrok (Alternativa)**
+
+```bash
+# Instalar ngrok
+# https://ngrok.com/download
+
+# Crear túnel público
+ngrok http 3000
+
+# Configura el webhook en Stripe Dashboard:
+# 1. Ve a Developers → Webhooks
+# 2. Agrega endpoint: https://tu-url.ngrok.io/api/webhook
+# 3. Selecciona eventos: checkout.session.completed, payment_intent.succeeded
+# 4. Copia el webhook signing secret
+```
+
+#### 3. Archivo .env.local
+
+Crea el archivo `.env.local` en la raíz del proyecto:
+
+```env
+# STRIPE (Test Mode)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_tu_clave_publica
+STRIPE_SECRET_KEY=sk_test_tu_clave_secreta
+STRIPE_WEBHOOK_SECRET=whsec_tu_webhook_secret
+
+# Resto de variables...
+```
+
+#### 4. Tarjetas de Prueba de Stripe
+
+Usa estas tarjetas para probar diferentes escenarios:
+
+| Escenario | Número de Tarjeta | Resultado |
+|-----------|-------------------|-----------|
+| ✅ Pago exitoso | `4242 4242 4242 4242` | Pago aprobado |
+| ❌ Pago rechazado | `4000 0000 0000 0002` | Tarjeta declinada |
+| 🔒 3D Secure | `4000 0025 0000 3155` | Requiere autenticación |
+| 💰 Fondos insuficientes | `4000 0000 0000 9995` | Fondos insuficientes |
+| ⚠️ Tarjeta expirada | `4000 0000 0000 0069` | Tarjeta expirada |
+
+**Detalles para todas las tarjetas:**
+- **Fecha de expiración**: Cualquier fecha futura (ej: 12/34)
+- **CVC**: Cualquier 3 dígitos (ej: 123)
+- **Código postal**: Cualquiera
+
+#### 5. Probar el Flujo Completo
+
+```bash
+# Terminal 1: Iniciar servidor de desarrollo
+npm run dev
+
+# Terminal 2: Escuchar webhooks de Stripe (si usas Stripe CLI)
+stripe listen --forward-to localhost:3000/api/webhook
+
+# Ahora ve a http://localhost:3000 y:
+# 1. Sube un CV
+# 2. Completa el formulario
+# 3. Procede al checkout
+# 4. Usa tarjeta de prueba: 4242 4242 4242 4242
+# 5. Verifica el pago en Dashboard de Stripe
+```
+
+#### 6. Verificar Pagos en el Dashboard
+
+Después de cada prueba, verifica:
+- [Pagos en modo test](https://dashboard.stripe.com/test/payments)
+- [Eventos de webhook](https://dashboard.stripe.com/test/webhooks)
+- [Logs del Stripe CLI](terminal donde corre `stripe listen`)
+
+#### 7. Eventos de Webhook Configurados
+
+El proyecto escucha estos eventos de Stripe:
+
+- `checkout.session.completed` - Checkout completado
+- `checkout.session.expired` - Sesión expirada (carrito abandonado)
+- `payment_intent.succeeded` - Pago exitoso
+- `payment_intent.payment_failed` - Pago fallido
+
+#### 🚨 Importante: Seguridad
+
+- ✅ **NUNCA** subas tu `.env.local` a Git (ya está en `.gitignore`)
+- ✅ Las claves de **test** (`sk_test_...`) solo funcionan en modo prueba
+- ✅ Para producción, necesitarás claves **live** (`sk_live_...`)
+- ✅ Stripe requiere verificación de cuenta para usar claves live
+- ✅ Los webhooks de producción deben usar HTTPS (no HTTP)
+
+#### 📋 Checklist de Configuración
+
+- [ ] Cuenta de Stripe creada
+- [ ] Modo de prueba activado en Dashboard
+- [ ] Claves API copiadas a `.env.local`
+- [ ] Stripe CLI instalado y autenticado
+- [ ] Webhook local configurado y funcionando
+- [ ] Pago de prueba completado exitosamente
+- [ ] Email de confirmación recibido
+- [ ] Dashboard de Stripe muestra el pago
+
 ### 🔄 User Flow Diagram
 
 ```
@@ -386,24 +517,37 @@ PRODUCT_PRICE=7.00
 └─────────────┘
 ```
 
-### 🧪 Testing Webhook Locally
+### 🧪 Solución de Problemas Comunes
 
-To test Stripe webhooks locally, use Stripe CLI:
+#### El webhook no recibe eventos
 
 ```bash
-# Install Stripe CLI
-# https://stripe.com/docs/stripe-cli
-
-# Login to Stripe
-stripe login
-
-# Forward webhooks to local server
+# Verifica que Stripe CLI esté corriendo
 stripe listen --forward-to localhost:3000/api/webhook
 
-# Use test cards for checkout:
-# 4242 4242 4242 4242 (Success)
-# 4000 0000 0000 9995 (Declined)
+# Verifica que el servidor Next.js esté corriendo
+npm run dev
+
+# Revisa los logs en ambos terminales
 ```
+
+#### Error: "Webhook signature verification failed"
+
+- Verifica que `STRIPE_WEBHOOK_SECRET` en `.env.local` coincida con el mostrado en Stripe CLI
+- Reinicia el servidor después de cambiar variables de entorno
+- Asegúrate de usar el secreto correcto (empieza con `whsec_`)
+
+#### El pago se completa pero no recibo el email
+
+- Verifica las credenciales de email en `.env.local`
+- Revisa la consola del servidor para errores
+- Verifica que el webhook se ejecutó correctamente en los logs
+
+#### No puedo ver los pagos en el Dashboard
+
+- Asegúrate de estar en **modo de prueba** en Stripe Dashboard
+- Ve a [Pagos en test](https://dashboard.stripe.com/test/payments)
+- Verifica que estés usando claves `pk_test_` y `sk_test_`
 
 ### 📊 Data Flow
 
