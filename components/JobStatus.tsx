@@ -59,15 +59,16 @@ export default function JobStatus({ jobId, onComplete, onError }: JobStatusProps
       const result = await response.json()
       return result.job as Job
     },
-    refetchInterval: (data) => {
+    refetchInterval: (query) => {
       // Stop polling when job is completed or failed
-      if (data?.status === 'completed' || data?.status === 'failed') {
+      const jobData = query.state.data as Job | undefined
+      if (jobData?.status === 'completed' || jobData?.status === 'failed') {
         // Trigger callbacks
-        if (data.status === 'completed' && onComplete) {
-          onComplete(data.result)
+        if (jobData.status === 'completed' && onComplete) {
+          onComplete(jobData.result)
         }
-        if (data.status === 'failed' && onError) {
-          onError(data.error || 'Job failed')
+        if (jobData.status === 'failed' && onError) {
+          onError(jobData.error || 'Job failed')
         }
         return false // Stop polling
       }
