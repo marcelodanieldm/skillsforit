@@ -2,9 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { loadStripe } from '@stripe/stripe-js'
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
 export default function SoftSkillsGuideCheckout() {
   const router = useRouter()
@@ -47,7 +44,7 @@ export default function SoftSkillsGuideCheckout() {
         })
       })
 
-      const { sessionId, error: apiError } = await response.json()
+      const { url, error: apiError } = await response.json()
 
       if (apiError) {
         setError(apiError)
@@ -55,19 +52,14 @@ export default function SoftSkillsGuideCheckout() {
         return
       }
 
-      const stripe = await stripePromise
-      if (!stripe) {
-        setError('Stripe no pudo cargarse')
+      if (!url) {
+        setError('No se pudo obtener la URL de checkout')
         setLoading(false)
         return
       }
 
-      const { error: stripeError } = await stripe.redirectToCheckout({ sessionId })
-
-      if (stripeError) {
-        setError(stripeError.message || 'Error al redirigir a Stripe')
-        setLoading(false)
-      }
+      // Redirect to Stripe Checkout
+      window.location.href = url
     } catch (err) {
       console.error('Checkout error:', err)
       setError('Error al procesar el pago')
