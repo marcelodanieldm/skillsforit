@@ -134,7 +134,7 @@ export default function SoftSkillsRadarChart({
         pointLabels: {
           font: {
             size: 12,
-            weight: '600'
+            weight: 600
           },
           color: 'rgb(55, 65, 81)',
           padding: 15
