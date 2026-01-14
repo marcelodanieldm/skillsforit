@@ -295,7 +295,7 @@ export function PriceElasticityWidget() {
               x={selectedService?.base_price || 0} 
               stroke="#6366f1" 
               strokeDasharray="3 3"
-              label={{ value: 'Actual', fill: '#6366f1', fontSize: 12 }}
+              label={{ value: 'Actual', fill: '#6366f1', fontSize: 12 } as any}
             />
             <Area 
               type="monotone" 
