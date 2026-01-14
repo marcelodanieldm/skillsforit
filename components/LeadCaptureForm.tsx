@@ -164,8 +164,9 @@ export default function LeadCaptureForm({ sessionId, analysisResults, onSuccess 
       
       const result = await response.json()
       
-      // Éxito - redirigir a página de éxito
-      onSuccess()
+      // Redirigir a página de éxito con query params
+      const successUrl = `/audio-feedback/success?email=${encodeURIComponent(formData.email)}&level=${result.experienceLevel || 'Mid'}&toneScore=${Math.round(analysisResults.toneScore)}&fillerCount=${Math.round(analysisResults.fillerWordsCount)}`
+      window.location.href = successUrl
       
     } catch (error) {
       console.error('Lead capture error:', error)
