@@ -12,6 +12,7 @@ interface User {
   id: string
   email: string
   name?: string
+  role?: 'mentee' | 'mentor' | 'admin'
 }
 
 interface AuthContextType {
@@ -36,7 +37,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser({
           id: session.user.id,
           email: session.user.email || '',
-          name: session.user.user_metadata?.name
+          name: session.user.user_metadata?.name,
+          role: session.user.user_metadata?.role
         })
       }
       setLoading(false)
@@ -51,7 +53,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser({
             id: session.user.id,
             email: session.user.email || '',
-            name: session.user.user_metadata?.name
+            name: session.user.user_metadata?.name,
+            role: session.user.user_metadata?.role
           })
         } else {
           setUser(null)
