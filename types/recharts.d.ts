@@ -178,6 +178,17 @@ declare module 'recharts' {
     [key: string]: any;
   }
 
+  export interface ReferenceLineProps {
+    x?: number | string;
+    y?: number | string;
+    stroke?: string;
+    strokeDasharray?: string | number;
+    strokeWidth?: number;
+    label?: string | number | ReactElement | ComponentType<any>;
+    isFront?: boolean;
+    [key: string]: any;
+  }
+
   export const ResponsiveContainer: ComponentType<ResponsiveContainerProps>;
   export const LineChart: ComponentType<LineChartProps>;
   export const BarChart: ComponentType<BarChartProps>;
@@ -196,4 +207,5 @@ declare module 'recharts' {
   export const Cell: ComponentType<CellProps>;
   export const Funnel: ComponentType<FunnelProps>;
   export const LabelList: ComponentType<LabelListProps>;
+  export const ReferenceLine: ComponentType<ReferenceLineProps>;
 }
