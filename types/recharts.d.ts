@@ -184,7 +184,13 @@ declare module 'recharts' {
     stroke?: string;
     strokeDasharray?: string | number;
     strokeWidth?: number;
-    label?: string | number | ReactElement | ComponentType<any>;
+    label?: string | number | ReactElement | ComponentType<any> | {
+      value?: string | number;
+      fill?: string;
+      fontSize?: number;
+      position?: string;
+      [key: string]: any;
+    };
     isFront?: boolean;
     [key: string]: any;
   }
