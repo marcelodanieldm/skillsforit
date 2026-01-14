@@ -137,7 +137,7 @@ export class AnalyticsMaterializedView {
     }>()
 
     // Agrupar revenue por mes
-    revenueDb.forEach(entry => {
+    revenueDb.findAll().forEach(entry => {
       const date = new Date(entry.date)
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
       
