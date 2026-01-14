@@ -41,7 +41,7 @@ function PaymentFormInner({ amount, productName, productType, metadata = {}, onS
         : '/api/ebook/create-payment-intent'
 
       // Create payment intent
-      const requestBody = {
+      const requestBody: any = {
         amount,
         productType,
         metadata,
