@@ -11,7 +11,8 @@ import {
   FaCheckSquare,
   FaSave,
   FaPaperPlane,
-  FaTimes
+  FaTimes,
+  FaUser
 } from 'react-icons/fa'
 import SessionTimer from '@/components/mentor/SessionTimer'
 import CVViewer from '@/components/mentor/CVViewer'
