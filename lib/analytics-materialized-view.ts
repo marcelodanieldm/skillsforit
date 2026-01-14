@@ -290,15 +290,11 @@ export class AnalyticsMaterializedView {
 
       // Calcular desglose por fuente
       const cvAnalysisRevenue = segmentRevenues
-        .filter(r => r.source === 'cv_analysis')
+        .filter(r => r.type === 'cv_analysis')
         .reduce((sum, r) => sum + r.amount, 0)
       
       const mentorshipRevenue = segmentRevenues
-        .filter(r => r.source === 'mentorship')
-        .reduce((sum, r) => sum + r.amount, 0)
-      
-      const ebooksRevenue = segmentRevenues
-        .filter(r => r.source === 'ebook')
+        .filter(r => r.type === 'mentorship')
         .reduce((sum, r) => sum + r.amount, 0)
 
       const churnRate = churnRates[segment]
