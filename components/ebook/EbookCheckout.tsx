@@ -131,9 +131,15 @@ export default function EbookCheckout() {
 
           {currentStep === 'payment' && (
             <PaymentForm
-              email={email}
-              includeCVAudit={includeCVAudit}
-              totalPrice={totalPrice}
+              amount={totalPrice * 100}
+              productName={includeCVAudit ? "Guía de Soft Skills + Auditoría de CV con IA" : "Guía de Soft Skills"}
+              productType="ebook"
+              metadata={{ 
+                email, 
+                includeCVAudit,
+                ebook: true,
+                cvAudit: includeCVAudit
+              }}
             />
           )}
         </motion.div>
