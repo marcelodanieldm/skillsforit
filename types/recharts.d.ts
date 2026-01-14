@@ -63,6 +63,10 @@ declare module 'recharts' {
     stackOffset?: 'expand' | 'none' | 'wiggle' | 'silhouette' | 'sign';
   }
 
+  export interface FunnelChartProps extends ChartProps {
+    layout?: 'horizontal' | 'vertical';
+  }
+
   export interface XAxisProps {
     dataKey?: string | number | ((dataObject: any) => any);
     hide?: boolean;
@@ -156,11 +160,30 @@ declare module 'recharts' {
     [key: string]: any;
   }
 
+  export interface FunnelProps {
+    dataKey: string | number;
+    fill?: string;
+    stroke?: string;
+    isAnimationActive?: boolean;
+    animationDuration?: number;
+    [key: string]: any;
+  }
+
+  export interface LabelListProps {
+    dataKey?: string | number;
+    position?: 'top' | 'left' | 'right' | 'bottom' | 'inside' | 'outside' | 'insideLeft' | 'insideRight' | 'insideTop' | 'insideBottom' | 'insideTopLeft' | 'insideBottomLeft' | 'insideTopRight' | 'insideBottomRight' | 'insideStart' | 'insideEnd' | 'end' | 'center';
+    content?: ReactElement | ComponentType<any>;
+    valueAccessor?: (entry: any, index: number) => any;
+    formatter?: (value: any) => string;
+    [key: string]: any;
+  }
+
   export const ResponsiveContainer: ComponentType<ResponsiveContainerProps>;
   export const LineChart: ComponentType<LineChartProps>;
   export const BarChart: ComponentType<BarChartProps>;
   export const PieChart: ComponentType<PieChartProps>;
   export const AreaChart: ComponentType<AreaChartProps>;
+  export const FunnelChart: ComponentType<FunnelChartProps>;
   export const XAxis: ComponentType<XAxisProps>;
   export const YAxis: ComponentType<YAxisProps>;
   export const CartesianGrid: ComponentType<CartesianGridProps>;
@@ -171,4 +194,6 @@ declare module 'recharts' {
   export const Area: ComponentType<AreaProps>;
   export const Pie: ComponentType<PieProps>;
   export const Cell: ComponentType<CellProps>;
+  export const Funnel: ComponentType<FunnelProps>;
+  export const LabelList: ComponentType<LabelListProps>;
 }
