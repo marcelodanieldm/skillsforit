@@ -348,24 +348,36 @@ function generatePersonalizedReport(
 }
 
 async function sendFeedbackEmail(email: string, reportHtml: string, level: string) {
-  // TODO: Integrar con Resend o SendGrid
-  // Por ahora, solo loggear
-  console.log('[Audio Feedback] Email would be sent to:', email)
-  console.log('[Audio Feedback] Experience level:', level)
-  console.log('[Audio Feedback] Report generated (HTML length):', reportHtml.length)
-  
-  // En producción:
-  /*
-  const { Resend } = await import('resend')
-  const resend = new Resend(process.env.RESEND_API_KEY)
-  
-  await resend.emails.send({
-    from: 'feedback@skillsforit.com',
-    to: email,
-    subject: '📊 Tu Reporte de Feedback de Audio está listo',
-    html: reportHtml
-  })
-  */
+  try {
+    // Verificar si Resend está configurado
+    if (!process.env.RESEND_API_KEY) {
+      console.warn('[Audio Feedback] RESEND_API_KEY not configured. Email will not be sent.')
+      console.log('[Audio Feedback] Email would be sent to:', email)
+      console.log('[Audio Feedback] Experience level:', level)
+      return
+    }
+
+    const { Resend } = await import('resend')
+    const resend = new Resend(process.env.RESEND_API_KEY)
+    
+    const { data, error } = await resend.emails.send({
+      from: 'SkillsForIT <feedback@skillsforit.com>',
+      to: email,
+      subject: '📊 Tu Reporte de Feedback está listo',
+      html: reportHtml
+    })
+
+    if (error) {
+      console.error('[Audio Feedback] Resend error:', error)
+      throw error
+    }
+
+    console.log('[Audio Feedback] Email sent successfully to:', email)
+    console.log('[Audio Feedback] Resend email ID:', data?.id)
+  } catch (error) {
+    console.error('[Audio Feedback] Failed to send email:', error)
+    throw error
+  }
 }
 
 // GET method not allowed

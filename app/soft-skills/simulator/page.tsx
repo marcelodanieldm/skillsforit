@@ -1,23 +1,29 @@
-import SoftSkillsSimulator from '@/components/SoftSkillsSimulator'
+import HybridSoftSkillsSimulator from '@/components/HybridSoftSkillsSimulator'
 
 export const metadata = {
-  title: 'Simulador de Entrevista - ¿Superarías Google o Amazon? | SkillsForIT',
-  description: 'Responde 3 preguntas STAR y descubre si tus soft skills te están bloqueando en entrevistas técnicas. Análisis con IA en 2 minutos.'
+  title: 'Simulador Híbrido de Entrevista - Texto o Voz | SkillsForIT',
+  description: 'Responde con texto o voz: 3 preguntas STAR para descubrir cómo te comunicas mejor. Análisis comparativo con IA en 3 minutos.'
 }
 
 /**
- * Soft Skills Simulator Landing Page
+ * Hybrid Soft Skills Simulator Landing Page
  * 
- * Sprint 37: Top-of-funnel lead magnet
+ * Sprint 41: Simulador híbrido (texto + voz)
  * 
  * Flujo:
- * 1. Landing con CTA "Iniciar Simulación Gratis"
- * 2. Chat interactivo con 3 preguntas STAR
- * 3. Análisis con IA (STAR method, communication style, red flags)
- * 4. Radar chart con resultados preliminares
- * 5. Email gate para desbloquear análisis completo
- * 6. Redirección a página de resultados + oferta de ebook
+ * 1. Chat interactivo con opción de escribir O grabar
+ * 2. Usuario puede alternar entre texto y voz en cada pregunta
+ * 3. Análisis diferenciado: gramática/vocabulario (texto) vs tono/muletillas (voz)
+ * 4. Radar chart + comparativa: comunicación escrita vs verbal
+ * 5. Mensaje motivador si solo usa texto
+ * 6. Lead capture + reporte personalizado
+ * 7. Upsell de E-book con CTA específico según debilidad detectada
+ * 
+ * Métricas clave:
+ * - Input Split: 60% voz / 40% texto (target)
+ * - Completion Rate: >85% (permitir texto aumenta completación)
+ * - Text-to-Ebook Conversion: >10%
  */
 export default function SoftSkillsSimulatorPage() {
-  return <SoftSkillsSimulator />
+  return <HybridSoftSkillsSimulator />
 }

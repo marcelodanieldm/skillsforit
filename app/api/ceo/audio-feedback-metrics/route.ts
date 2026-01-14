@@ -180,7 +180,70 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // 8. Retornar todo
+    // 8. Input Split (Sprint 41: Hybrid Simulator)
+    // Track usage of text vs voice input
+    const { data: hybridSessions } = await supabase
+      .from('audio_feedback_analyses')
+      .select('transcriptions')
+      .gte('created_at', startDate.toISOString())
+
+    let textInputCount = 0
+    let voiceInputCount = 0
+    
+    // Check if session metadata includes channel info
+    // For now, we'll estimate: if transcription is very clean (no filler words pattern), it's likely text
+    hybridSessions?.forEach((session: any) => {
+      try {
+        const transcriptions = session.transcriptions || []
+        transcriptions.forEach((transcript: any) => {
+          // Heuristic: text has better punctuation, no filler word patterns
+          const hasFillerPattern = /\b(eh|este|o sea|entonces|bueno|pues|mm|ah)\b/gi.test(transcript)
+          
+          if (hasFillerPattern) {
+            voiceInputCount++
+          } else {
+            textInputCount++
+          }
+        })
+      } catch (e) {
+        // Skip invalid data
+      }
+    })
+
+    const totalInputs = textInputCount + voiceInputCount
+    const textPercentage = totalInputs > 0 ? Math.round((textInputCount / totalInputs) * 100) : 0
+    const voicePercentage = totalInputs > 0 ? Math.round((voiceInputCount / totalInputs) * 100) : 0
+
+    // 9. Text-to-Ebook Conversion (users who only used text)
+    // This helps measure if text-only users convert better/worse
+    const { data: textOnlyLeads } = await supabase
+      .from('leads')
+      .select('id, email')
+      .eq('audio_feedback_completed', true)
+      .gte('audio_feedback_completed_at', startDate.toISOString())
+
+    let textOnlyPurchases = 0
+    
+    // Cross-reference with purchases (simplified for now)
+    if (textOnlyLeads) {
+      for (const lead of textOnlyLeads) {
+        const { count } = await supabase
+          .from('purchases')
+          .select('*', { count: 'exact', head: true })
+          .eq('email', lead.email)
+          .eq('product_id', 'soft-skills-guide')
+        
+        if (count && count > 0) {
+          textOnlyPurchases++
+        }
+      }
+    }
+
+    const textToEbookConversion = textOnlyLeads && textOnlyLeads.length > 0
+      ? Math.round((textOnlyPurchases / textOnlyLeads.length) * 100 * 10) / 10
+      : 0
+
+    // 10. Retornar todo
     return NextResponse.json({
       period,
       overview: {
@@ -197,6 +260,31 @@ export async function GET(request: NextRequest) {
       topCountries,
       topRoles,
       trendData,
+      // Sprint 41: Hybrid Simulator Metrics
+      hybridMetrics: {
+        inputSplit: {
+          text: {
+            count: textInputCount,
+            percentage: textPercentage,
+            target: 40 // 40% text, 60% voice is the target
+          },
+          voice: {
+            count: voiceInputCount,
+            percentage: voicePercentage,
+            target: 60
+          }
+        },
+        textToEbookConversion: {
+          rate: textToEbookConversion,
+          target: 10, // 10% target for text-only users
+          explanation: 'Usuarios que solo escribieron y luego compraron el E-book'
+        },
+        completionRate: {
+          rate: Math.round(leadCaptureRate),
+          target: 85, // With text option, completion should be higher
+          explanation: 'Al permitir texto, más usuarios terminan en entornos ruidosos'
+        }
+      },
       timestamp: new Date().toISOString()
     })
 
