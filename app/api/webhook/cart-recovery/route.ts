@@ -4,7 +4,7 @@ import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia' as any,
+  apiVersion: '2025-12-15.clover',
 })
 
 const supabase = createClient(
@@ -31,7 +31,7 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
 export async function POST(request: Request) {
   try {
     const body = await request.text()
-    const headersList = headers()
+    const headersList = await headers()
     const signature = headersList.get('stripe-signature')
 
     if (!signature) {

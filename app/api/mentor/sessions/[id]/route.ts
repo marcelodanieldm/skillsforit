@@ -9,10 +9,10 @@ const supabase = createClient(
 // PUT: Actualizar estado de sesión (Start, Complete, Cancel)
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const sessionId = params.id
+    const { id: sessionId } = await params
     const body = await req.json()
     const { action, notes, action_items, rating, renewal_sent } = body
 
@@ -137,10 +137,10 @@ export async function PUT(
 // DELETE: Cancelar sesión
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const sessionId = params.id
+    const { id: sessionId } = await params
     const { searchParams } = new URL(req.url)
     const reason = searchParams.get('reason') || 'Cancelled by mentor'
 

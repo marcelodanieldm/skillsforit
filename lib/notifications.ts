@@ -268,12 +268,12 @@ const scheduledReminders: Array<{
   processed: boolean
 }> = []
 
-export const queueNotification = (notification: typeof notificationQueue[0]) => {
+export const queueNotification = async (notification: typeof notificationQueue[0]) => {
   notificationQueue.push(notification)
   console.log(`Notification queued: ${notification.type} for ${notification.scheduledFor.toISOString()}`)
 }
 
-export const scheduleSessionReminder = (sessionId: string, reminderTime: Date) => {
+export const scheduleSessionReminder = async (sessionId: string, reminderTime: Date) => {
   scheduledReminders.push({
     sessionId,
     reminderTime,
@@ -339,11 +339,11 @@ export const processNotificationQueue = async () => {
 }
 
 // Cron job simulation - call this function every minute
-export const startNotificationProcessor = () => {
+export const startNotificationProcessor = async () => {
   console.log('Starting notification processor...')
 
   // Process immediately
-  processNotificationQueue()
+  await processNotificationQueue()
 
   // Process every minute
   setInterval(async () => {

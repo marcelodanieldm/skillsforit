@@ -1,7 +1,25 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import {
   ACTION_ITEM_TEMPLATES,
   ActionItemTemplate,
@@ -54,6 +72,14 @@ export default function QuickFeedbackEditor({
   const [saving, setSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [startTime] = useState(Date.now())
+  const [activeId, setActiveId] = useState<string | null>(null)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
 
   // Cargar datos iniciales
   useEffect(() => {
@@ -77,34 +103,37 @@ export default function QuickFeedbackEditor({
     ? searchActionItems(searchQuery)
     : getActionItemsByCategory(selectedCategory)
 
-  const handleDragEnd = (result: DropResult) => {
-    if (!result.destination) return
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string)
+  }
 
-    const { source, destination } = result
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    setActiveId(null)
 
-    // Mover de templates a selected
-    if (source.droppableId === 'templates' && destination.droppableId === 'selected') {
-      const item = availableItems[source.index]
-      if (!selectedItems.find(i => i.id === item.id)) {
-        const newItems = [...selectedItems]
-        newItems.splice(destination.index, 0, item)
-        setSelectedItems(newItems)
+    if (!over) return
+
+    const activeId = active.id as string
+    const overId = over.id as string
+
+    // Check if dragging from templates to selected
+    if (activeId.startsWith('template-') && overId === 'selected-droppable') {
+      const itemId = activeId.replace('template-', '')
+      const item = availableItems.find(i => i.id === itemId)
+      if (item && !selectedItems.find(i => i.id === item.id)) {
+        setSelectedItems([...selectedItems, item])
       }
+      return
     }
 
-    // Reordenar dentro de selected
-    if (source.droppableId === 'selected' && destination.droppableId === 'selected') {
-      const newItems = Array.from(selectedItems)
-      const [removed] = newItems.splice(source.index, 1)
-      newItems.splice(destination.index, 0, removed)
-      setSelectedItems(newItems)
-    }
-
-    // Remover (arrastrar de selected a templates)
-    if (source.droppableId === 'selected' && destination.droppableId === 'templates') {
-      const newItems = [...selectedItems]
-      newItems.splice(source.index, 1)
-      setSelectedItems(newItems)
+    // Reorder within selected items
+    if (activeId.startsWith('selected-') && overId.startsWith('selected-')) {
+      const oldIndex = selectedItems.findIndex(item => `selected-${item.id}` === activeId)
+      const newIndex = selectedItems.findIndex(item => `selected-${item.id}` === overId)
+      
+      if (oldIndex !== -1 && newIndex !== -1) {
+        setSelectedItems(arrayMove(selectedItems, oldIndex, newIndex))
+      }
     }
   }
 
@@ -164,6 +193,125 @@ export default function QuickFeedbackEditor({
     return acc + (months * 4) + weeks + (days / 7)
   }, 0)
 
+  // Sortable Template Item Component
+  const SortableTemplateItem = ({ item }: { item: ActionItemTemplate }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id: `template-${item.id}` })
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      opacity: isDragging ? 0.5 : 1,
+    }
+
+    const isSelected = selectedItems.find(i => i.id === item.id)
+
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners}
+        className={`mb-3 p-3 bg-white border rounded-lg cursor-grab transition ${
+          isDragging
+            ? 'shadow-lg border-blue-500'
+            : 'border-gray-200 hover:border-blue-300'
+        } ${isSelected ? 'opacity-50' : ''}`}
+      >
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <h4 className="font-semibold text-sm text-gray-900">{item.title}</h4>
+            <p className="text-xs text-gray-600 mt-1">{item.description}</p>
+            <div className="flex gap-2 mt-2">
+              <span className={`text-xs px-2 py-0.5 rounded ${
+                item.priority === 'high' ? 'bg-red-100 text-red-700' :
+                item.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                'bg-green-100 text-green-700'
+              }`}>
+                {item.priority}
+              </span>
+              <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded">
+                ⏱️ {item.estimatedTime}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Sortable Selected Item Component
+  const SortableSelectedItem = ({ item, index }: { item: SelectedActionItem; index: number }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id: `selected-${item.id}` })
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+    }
+
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        className={`mb-3 p-3 bg-white border rounded-lg transition ${
+          isDragging ? 'shadow-lg border-green-500' : 'border-gray-200'
+        }`}
+      >
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex items-center flex-1">
+            <div {...listeners} className="cursor-grab mr-2 text-gray-400 hover:text-gray-600">
+              ⋮⋮
+            </div>
+            <h4 className="font-semibold text-sm text-gray-900 flex-1">{item.title}</h4>
+          </div>
+          <button
+            onClick={() => handleRemoveItem(index)}
+            className="text-red-600 hover:text-red-800 text-sm ml-2"
+          >
+            ✕
+          </button>
+        </div>
+        <textarea
+          placeholder="Customize description (optional)..."
+          value={item.customDescription || item.description}
+          onChange={(e) => handleEditDescription(index, e.target.value)}
+          className="w-full text-xs text-gray-600 border border-gray-200 rounded p-2 focus:ring-1 focus:ring-blue-500"
+          rows={2}
+        />
+        {item.resources && item.resources.length > 0 && (
+          <div className="mt-2">
+            <p className="text-xs font-semibold text-gray-700 mb-1">Resources:</p>
+            {item.resources.map((resource, idx) => (
+              <a
+                key={idx}
+                href={resource}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-blue-600 hover:underline block"
+              >
+                🔗 {resource}
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
       <div className="mb-4 flex items-center justify-between">
@@ -173,7 +321,12 @@ export default function QuickFeedbackEditor({
         </div>
       </div>
 
-      <DragDropContext onDragEnd={handleDragEnd}>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
         <div className="grid grid-cols-2 gap-6">
           {/* Panel Izquierdo: Templates */}
           <div className="space-y-4">
@@ -210,58 +363,20 @@ export default function QuickFeedbackEditor({
             </div>
 
             {/* Lista de Templates */}
-            <Droppable droppableId="templates">
-              {(provided, snapshot) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  className={`border-2 border-dashed rounded-lg p-4 min-h-[400px] max-h-[500px] overflow-y-auto ${
-                    snapshot.isDraggingOver ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
-                  }`}
-                >
-                  {availableItems.length === 0 ? (
-                    <p className="text-gray-500 text-center py-8">No templates found</p>
-                  ) : (
-                    availableItems.map((item, index) => (
-                      <Draggable key={item.id} draggableId={item.id} index={index}>
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className={`mb-3 p-3 bg-white border rounded-lg cursor-grab transition ${
-                              snapshot.isDragging
-                                ? 'shadow-lg border-blue-500'
-                                : 'border-gray-200 hover:border-blue-300'
-                            } ${selectedItems.find(i => i.id === item.id) ? 'opacity-50' : ''}`}
-                          >
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <h4 className="font-semibold text-sm text-gray-900">{item.title}</h4>
-                                <p className="text-xs text-gray-600 mt-1">{item.description}</p>
-                                <div className="flex gap-2 mt-2">
-                                  <span className={`text-xs px-2 py-0.5 rounded ${
-                                    item.priority === 'high' ? 'bg-red-100 text-red-700' :
-                                    item.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                                    'bg-green-100 text-green-700'
-                                  }`}>
-                                    {item.priority}
-                                  </span>
-                                  <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded">
-                                    ⏱️ {item.estimatedTime}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))
-                  )}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
+            <SortableContext
+              items={availableItems.map(item => `template-${item.id}`)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="border-2 border-dashed rounded-lg p-4 min-h-[400px] max-h-[500px] overflow-y-auto border-gray-300">
+                {availableItems.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">No templates found</p>
+                ) : (
+                  availableItems.map((item) => (
+                    <SortableTemplateItem key={item.id} item={item} />
+                  ))
+                )}
+              </div>
+            </SortableContext>
           </div>
 
           {/* Panel Derecho: Selected Items */}
@@ -273,72 +388,25 @@ export default function QuickFeedbackEditor({
               </span>
             </div>
 
-            <Droppable droppableId="selected">
-              {(provided, snapshot) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  className={`border-2 border-dashed rounded-lg p-4 min-h-[400px] max-h-[500px] overflow-y-auto ${
-                    snapshot.isDraggingOver ? 'border-green-500 bg-green-50' : 'border-gray-300'
-                  }`}
-                >
-                  {selectedItems.length === 0 ? (
-                    <p className="text-gray-500 text-center py-8">
-                      👈 Drag action items here
-                    </p>
-                  ) : (
-                    selectedItems.map((item, index) => (
-                      <Draggable key={item.id} draggableId={`selected-${item.id}`} index={index}>
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className={`mb-3 p-3 bg-white border rounded-lg transition ${
-                              snapshot.isDragging ? 'shadow-lg border-green-500' : 'border-gray-200'
-                            }`}
-                          >
-                            <div className="flex items-start justify-between mb-2">
-                              <h4 className="font-semibold text-sm text-gray-900 flex-1">{item.title}</h4>
-                              <button
-                                onClick={() => handleRemoveItem(index)}
-                                className="text-red-600 hover:text-red-800 text-sm ml-2"
-                              >
-                                ✕
-                              </button>
-                            </div>
-                            <textarea
-                              placeholder="Customize description (optional)..."
-                              value={item.customDescription || item.description}
-                              onChange={(e) => handleEditDescription(index, e.target.value)}
-                              className="w-full text-xs text-gray-600 border border-gray-200 rounded p-2 focus:ring-1 focus:ring-blue-500"
-                              rows={2}
-                            />
-                            {item.resources && item.resources.length > 0 && (
-                              <div className="mt-2">
-                                <p className="text-xs font-semibold text-gray-700 mb-1">Resources:</p>
-                                {item.resources.map((resource, idx) => (
-                                  <a
-                                    key={idx}
-                                    href={resource}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-xs text-blue-600 hover:underline block"
-                                  >
-                                    🔗 {resource}
-                                  </a>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </Draggable>
-                    ))
-                  )}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
+            <SortableContext
+              items={selectedItems.map(item => `selected-${item.id}`)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div
+                id="selected-droppable"
+                className="border-2 border-dashed rounded-lg p-4 min-h-[400px] max-h-[500px] overflow-y-auto border-gray-300"
+              >
+                {selectedItems.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">
+                    👈 Drag action items here
+                  </p>
+                ) : (
+                  selectedItems.map((item, index) => (
+                    <SortableSelectedItem key={item.id} item={item} index={index} />
+                  ))
+                )}
+              </div>
+            </SortableContext>
 
             {/* Topics y Next Steps */}
             <div className="space-y-3">
@@ -406,7 +474,7 @@ export default function QuickFeedbackEditor({
             </div>
           </div>
         </div>
-      </DragDropContext>
+      </DndContext>
 
       {/* Save Button */}
       <div className="mt-6 flex items-center justify-between">

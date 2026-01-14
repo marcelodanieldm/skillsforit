@@ -8,11 +8,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 // PATCH: Update coupon status (activate/deactivate)
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { active } = await req.json()
-    const couponId = params.id
+    const { id: couponId } = await params
 
     // Update promotion code in Stripe
     const promoCode = await stripe.promotionCodes.update(couponId, {
@@ -39,10 +39,10 @@ export async function PATCH(
 // DELETE: Delete coupon
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const couponId = params.id
+    const { id: couponId } = await params
 
     // Retrieve promo code to get coupon ID
     const promoCode = await stripe.promotionCodes.retrieve(couponId)
