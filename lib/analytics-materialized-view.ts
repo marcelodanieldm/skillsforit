@@ -138,7 +138,7 @@ export class AnalyticsMaterializedView {
 
     // Agrupar revenue por mes
     revenueDb.findAll().forEach(entry => {
-      const date = new Date(entry.date)
+      const date = new Date(entry.createdAt)
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
       
       if (!monthlyData.has(monthKey)) {
@@ -158,7 +158,7 @@ export class AnalyticsMaterializedView {
       // Determinar si es nuevo usuario o existente
       const previousEntries = revenueDb.filter(r => 
         r.userId === entry.userId && 
-        new Date(r.date) < date
+        new Date(r.createdAt) < date
       )
       
       if (previousEntries.length === 0) {
