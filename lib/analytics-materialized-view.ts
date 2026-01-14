@@ -251,7 +251,8 @@ export class AnalyticsMaterializedView {
     const churnRates: Record<UserSegment, number> = {
       'Junior': 0.35,      // 35% churn mensual
       'Transition': 0.20,  // 20% churn mensual
-      'Leadership': 0.12   // 12% churn mensual
+      'Leadership': 0.12,  // 12% churn mensual
+      'Uncategorized': 0.25 // 25% churn mensual
     }
 
     return segments.map(segment => {
