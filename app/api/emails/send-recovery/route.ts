@@ -160,7 +160,7 @@ async function createRecoveryCoupon(cart: any) {
       code: code,
       max_redemptions: 1,
       expires_at: Math.floor(expiresAt.getTime() / 1000)
-    })
+    } as any)
 
     // Registrar en BD
     const { data: coupon } = await supabase

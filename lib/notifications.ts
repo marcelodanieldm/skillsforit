@@ -1,3 +1,5 @@
+'use server'
+
 import { sendEmail } from './email'
 import { db, notesDb, sessionsDb, usersDb } from './database'
 

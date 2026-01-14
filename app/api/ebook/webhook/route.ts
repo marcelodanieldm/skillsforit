@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 }
 
 async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
-  const { email, product, includeCVAudit, basePrice, cvAuditPrice, base_payment_intent_id, mentorship_price } = paymentIntent.metadata
+  const { email, product, includeCVAudit, basePrice, cvAuditPrice, base_payment_intent_id, mentorship_price, analysis_id } = paymentIntent.metadata
 
   if (!email) {
     console.error('[EbookWebhook] No email in payment intent metadata')
@@ -56,6 +56,12 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
   }
 
   try {
+    // Handle CV audit full report payment
+    if (product === 'cv_audit_full') {
+      await handleCVAuditPayment(email, paymentIntent, analysis_id)
+      return
+    }
+
     // Handle mentorship upsell
     if (product === 'mentorship_upsell') {
       await handleMentorshipUpsell(email, paymentIntent, mentorship_price)
@@ -441,4 +447,128 @@ async function handleMentorshipUpsell(email: string, paymentIntent: Stripe.Payme
   await sendMentorshipEmail(email, paymentIntent.id)
 
   console.log(`[EbookWebhook] Successfully processed mentorship upsell for ${email}`)
+}
+
+async function handleCVAuditPayment(email: string, paymentIntent: Stripe.PaymentIntent, analysisId: string) {
+  // Find or create user
+  let { data: user, error: userError } = await supabase
+    .from('users')
+    .select('id')
+    .eq('email', email)
+    .single()
+
+  if (userError && userError.code !== 'PGRST116') { // PGRST116 = not found
+    throw userError
+  }
+
+  let userId: string
+
+  if (!user) {
+    // Create new user
+    const { data: newUser, error: createError } = await supabase
+      .from('users')
+      .insert({
+        email,
+        created_at: new Date().toISOString()
+      })
+      .select('id')
+      .single()
+
+    if (createError) throw createError
+    userId = newUser.id
+  } else {
+    userId = user.id
+  }
+
+  // Record CV audit payment
+  const { error: paymentError } = await supabase
+    .from('cv_audit_payments')
+    .insert({
+      user_id: userId,
+      analysis_id: analysisId,
+      stripe_payment_intent_id: paymentIntent.id,
+      amount: paymentIntent.amount,
+      currency: paymentIntent.currency,
+      status: 'completed',
+      created_at: new Date().toISOString()
+    })
+
+  if (paymentError) {
+    console.error('[EbookWebhook] Error recording CV audit payment:', paymentError)
+  }
+
+  // Send confirmation email
+  await sendCVAuditConfirmationEmail(email, paymentIntent.id)
+
+  console.log(`[EbookWebhook] Successfully processed CV audit payment for ${email}`)
+}
+
+async function sendCVAuditConfirmationEmail(email: string, paymentIntentId: string) {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
+    const emailData = {
+      to: email,
+      subject: '¡Tu Auditoría Completa de CV está Lista! 📊',
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Tu Auditoría Completa de CV</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+          <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h1 style="color: #2563eb; text-align: center;">¡Auditoría Completa Desbloqueada! 🎉</h1>
+
+            <p>Hola,</p>
+
+            <p>Tu pago ha sido procesado exitosamente. Ahora tienes acceso completo a tu auditoría de CV con IA, incluyendo:</p>
+
+            <div style="background: #ecfdf5; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981;">
+              <h2 style="color: #065f46; margin-top: 0;">✅ Lo que Ahora tienes Acceso</h2>
+              <ul>
+                <li><strong>Consejos Detallados:</strong> Soluciones específicas para cada problema</li>
+                <li><strong>Keywords Específicas:</strong> Lista completa de términos técnicos</li>
+                <li><strong>Plan de Mejora:</strong> Pasos concretos para optimizar tu CV</li>
+                <li><strong>Ejemplos Prácticos:</strong> Antes/Después de frases y secciones</li>
+                <li><strong>Reporte Completo:</strong> Análisis exhaustivo de 50+ criterios</li>
+              </ul>
+            </div>
+
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${baseUrl}/cv-audit/report?paymentIntentId=${paymentIntentId}"
+                 style="background: #2563eb; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+                📊 Ver mi Auditoría Completa
+              </a>
+            </div>
+
+            <p style="text-align: center; color: #666; font-size: 14px;">
+              SkillsForIT - Transformando Carreras IT<br>
+              ID de Transacción: ${paymentIntentId}
+            </p>
+          </div>
+        </body>
+        </html>
+      `
+    }
+
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(emailData)
+    })
+
+    if (!response.ok) {
+      console.error('[EbookWebhook] Failed to send CV audit confirmation email:', await response.text())
+    } else {
+      console.log(`[EbookWebhook] CV audit confirmation email sent to ${email}`)
+    }
+
+  } catch (error: any) {
+    console.error('[EbookWebhook] Error sending CV audit confirmation email:', error)
+  }
 }

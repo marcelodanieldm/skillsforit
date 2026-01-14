@@ -427,3 +427,9 @@ export const userProfiles = {
     return distribution
   }
 }
+
+// Basic event tracking function
+export function trackEvent(eventType: EventType, metadata?: any) {
+  console.log('Track event:', eventType, metadata)
+  // In a real app, this would send to analytics service
+}

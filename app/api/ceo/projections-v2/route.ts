@@ -31,9 +31,7 @@ export async function GET(request: NextRequest) {
     const fourWeeksAgo = new Date()
     fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28)
 
-    const recentRevenue = revenueDb.filter(entry => 
-      new Date(entry.date) >= fourWeeksAgo
-    )
+    const recentRevenue = revenueDb.findAll().filter(entry => entry.createdAt >= fourWeeksAgo)
 
     if (recentRevenue.length === 0) {
       return NextResponse.json({
@@ -45,7 +43,7 @@ export async function GET(request: NextRequest) {
     const weeklyRevenue = new Map<number, { revenue: number; date: Date }>()
     
     recentRevenue.forEach(entry => {
-      const date = new Date(entry.date)
+      const date = new Date(entry.createdAt)
       const weekNumber = Math.floor(
         (date.getTime() - fourWeeksAgo.getTime()) / (7 * 24 * 60 * 60 * 1000)
       )

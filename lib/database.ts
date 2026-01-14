@@ -14,6 +14,7 @@ export interface CVAnalysis {
   analysisStatus: 'pending' | 'processing' | 'completed' | 'failed'
   analysisResult?: AnalysisResult
   reportUrl?: string
+  jobId?: string  // Queue job ID for tracking
   createdAt: Date
   updatedAt: Date
 }
@@ -462,3 +463,46 @@ export const roadmapDb = {
     userPreviousScoreDB.set(email, score)
   }
 }
+
+// Helper functions
+export function getMentorById(id: string) {
+  return mentorshipDB.mentors.find(mentor => mentor.id === id)
+}
+
+export function getAllMentors() {
+  return mentorshipDB.mentors
+}
+
+// Export missing database objects for compatibility
+export const mentorshipDb = {
+  create: (session: MentorshipSession) => {
+    sessionsDB.set(session.id, session)
+    return session
+  },
+  findById: (id: string) => sessionsDB.get(id),
+  findByMentor: (mentorId: string, status?: MentorshipSession['status']) => {
+    let sessions = Array.from(sessionsDB.values()).filter(s => s.mentorId === mentorId)
+    if (status) sessions = sessions.filter(s => s.status === status)
+    return sessions.sort((a, b) => a.scheduledAt.getTime() - b.scheduledAt.getTime())
+  },
+  findByMentee: (menteeEmail: string) => {
+    return Array.from(sessionsDB.values())
+      .filter(s => s.menteeEmail === menteeEmail)
+      .sort((a, b) => b.scheduledAt.getTime() - a.scheduledAt.getTime())
+  },
+  findAll: () => Array.from(sessionsDB.values()),
+  getAll: () => Array.from(sessionsDB.values()),
+  update: (id: string, data: Partial<MentorshipSession>) => {
+    const existing = sessionsDB.get(id)
+    if (!existing) return null
+    const updated = { ...existing, ...data, updatedAt: new Date() }
+    sessionsDB.set(id, updated)
+    return updated
+  },
+  delete: (id: string) => sessionsDB.delete(id)
+}
+
+export const authDB = usersDb
+export { userChecklistDB }
+export { sessionsDB }
+export const cvAnalysisDB = database

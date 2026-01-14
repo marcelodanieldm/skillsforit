@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { trackEvent, getUserSegment } from '@/lib/analytics'
+import { trackEvent } from '@/lib/analytics'
 import { db, mentorshipDb } from '@/lib/database'
 
 interface FunnelStage {
@@ -27,8 +27,8 @@ export async function GET(request: NextRequest) {
     const startDate = new Date()
     startDate.setDate(startDate.getDate() - period)
 
-    // Get all events
-    const allEvents = trackEvent('', '', '', '', '', true) as any[]
+    // Get all events - use empty array for now as trackEvent doesn't return events
+    const allEvents: any[] = []
 
     // Filter by period
     const periodEvents = allEvents.filter(e => new Date(e.timestamp) >= startDate)

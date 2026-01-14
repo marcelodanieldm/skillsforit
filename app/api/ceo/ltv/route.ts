@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { AuthService } from '@/lib/auth'
 import { revenueDb } from '@/lib/database'
 import { SessionCreditsManager } from '@/lib/session-credits'
-import { trackEvent } from '@/lib/analytics'
 
 interface UserLTV {
   segment: 'Junior' | 'Transition' | 'Leadership'
@@ -206,9 +205,8 @@ export async function GET(request: NextRequest) {
 // Helper functions
 
 function classifyUserSegment(email: string, userId: string): 'Junior' | 'Transition' | 'Leadership' {
-  // Try to get from event tracking
-  const events = trackEvent('', '', '', '', '', true) // Get all events
-  const userEvents = events.filter((e: any) => e.userId === userId || e.email === email)
+  // Try to get from event tracking (not wired in this endpoint yet)
+  const userEvents: any[] = []
 
   if (userEvents.length > 0) {
     // Use the segment from analytics if available

@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   try {
     // Validar autenticación y permisos CEO/Admin
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
-    const auth = AuthService.requireRole(token, ['ceo', 'admin'])
+    const auth = AuthService.requireRole(token || '', ['ceo', 'admin'])
 
     if (!auth.authorized) {
       return NextResponse.json(
@@ -34,11 +34,14 @@ export async function GET(request: NextRequest) {
     // Obtener vista materializada (con cache de 5 minutos)
     const materializedView = await AnalyticsMaterializedView.getView()
 
+    // Obtener eventos de tracking (mock/DB)
+    const events = await trackingEvents.getAll()
+
     // Calcular métricas del embudo
     const funnelMetrics = {
-      visits: trackingEvents.filter(e => e.eventType === 'landing_view').length,
-      payments: trackingEvents.filter(e => e.eventType === 'payment_completed').length,
-      activations: trackingEvents.filter(e => e.eventType === 'cv_upload_complete').length,
+      visits: events.filter(e => e.eventType === 'landing_view').length,
+      payments: events.filter(e => e.eventType === 'payment_completed').length,
+      activations: events.filter(e => e.eventType === 'cv_upload_complete').length,
       
       // Conversiones
       visitToPayment: 0,

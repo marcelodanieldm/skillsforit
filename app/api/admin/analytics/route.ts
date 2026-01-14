@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { revenueDb, db, sessionsDb } from '@/lib/database'
+import { revenueDb, db, sessionsDb, sessionsDB } from '@/lib/database'
 
 export async function GET(request: NextRequest) {
   try {
@@ -25,11 +25,11 @@ export async function GET(request: NextRequest) {
     const dailyRevenue = revenueDb.getDailyRevenue(30)
 
     // Total customers
-    const allAnalyses = db.findAll()
+    const allAnalyses = db.all()
     const totalCustomers = new Set(allAnalyses.map(a => a.email)).size
 
     // Total mentorship sessions
-    const allSessions = sessionsDb.findAll()
+    const allSessions = Array.from(sessionsDB.values())
     const completedSessions = allSessions.filter(s => s.status === 'completed').length
 
     // Calculate growth (mock projection for now)

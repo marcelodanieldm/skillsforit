@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { FaGlobe, FaDollarSign, FaUsers, FaTrendingUp, FaLightbulb } from 'react-icons/fa'
+import { FaGlobe, FaDollarSign, FaUsers, FaChartLine, FaLightbulb } from 'react-icons/fa'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 
 interface CountryConversion {
@@ -101,7 +101,7 @@ export default function MentorshipAnalyticsPage() {
           className="mb-8"
         >
           <h1 className="text-4xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-            <FaTrendingUp className="text-indigo-600" />
+            <FaChartLine className="text-indigo-600" />
             Analítica de Mentoría
           </h1>
           <p className="text-gray-600 text-lg">
@@ -346,7 +346,7 @@ export default function MentorshipAnalyticsPage() {
             </div>
             <div>
               <h4 className="font-semibold mb-2 flex items-center gap-2">
-                <FaTrendingUp />
+                <FaChartLine />
                 Campañas de Marketing
               </h4>
               <p className="text-indigo-100 text-sm">

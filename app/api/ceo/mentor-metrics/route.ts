@@ -128,10 +128,14 @@ export async function GET(req: NextRequest) {
       const totalEarnings = wallet?.total_earned || 0
       const pendingPayout = wallet?.balance || 0
 
+      const profile = Array.isArray((mentor as any).profiles)
+        ? (mentor as any).profiles[0]
+        : (mentor as any).profiles
+
       return {
         mentorId,
-        mentorName: mentor.profiles?.full_name || 'Sin nombre',
-        mentorEmail: mentor.profiles?.email || '',
+        mentorName: profile?.full_name || 'Sin nombre',
+        mentorEmail: profile?.email || '',
         totalSessions: totalSessions || 0,
         completedSessions,
         avgRating: Math.round(avgRating * 10) / 10,

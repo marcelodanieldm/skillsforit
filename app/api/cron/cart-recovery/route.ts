@@ -38,7 +38,14 @@ export async function GET(request: Request) {
 
     console.log('[CRON] Starting cart recovery job...')
 
-    const results = {
+    const results: {
+      cartsProcessed: number
+      email1Sent: number
+      email2Sent: number
+      couponsExpired: number
+      cartsExpired: number
+      errors: Array<{ step: string; error: string; cart_id?: string }>
+    } = {
       cartsProcessed: 0,
       email1Sent: 0,
       email2Sent: 0,

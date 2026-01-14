@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia'
+  apiVersion: '2025-12-15.clover'
 })
 
 // PATCH: Update coupon status (activate/deactivate)
@@ -51,7 +51,13 @@ export async function DELETE(
     await stripe.promotionCodes.update(couponId, { active: false })
     
     // Delete the coupon
-    await stripe.coupons.del(promoCode.coupon as string)
+    const couponRef = (promoCode as any).coupon
+    const stripeCouponId: string | undefined =
+      typeof couponRef === 'string' ? couponRef : couponRef?.id
+
+    if (stripeCouponId) {
+      await stripe.coupons.del(stripeCouponId)
+    }
 
     return NextResponse.json({
       success: true,
