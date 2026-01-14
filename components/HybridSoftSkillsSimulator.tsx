@@ -489,12 +489,9 @@ export default function HybridSoftSkillsSimulator() {
               sessionId={sessionId}
               analysisResults={{
                 toneScore: analyses.reduce((sum, a) => sum + (a.toneScore || 0), 0) / analyses.filter(a => a.toneScore).length || 70,
-                fillerWordsCount: analyses.reduce((sum, a) => sum + (a.fillerWordsCount || 0), 0) / analyses.filter(a => a.fillerWordsCount).length || 5,
-                starCompliance: analyses.reduce((sum, a) => sum + a.starCompliance, 0) / analyses.length,
-                transcriptions: responses.map(r => r.text),
-                grammarScore: analyses.reduce((sum, a) => sum + (a.grammarScore || 0), 0) / analyses.filter(a => a.grammarScore).length,
-                vocabularyScore: analyses.reduce((sum, a) => sum + (a.vocabularyScore || 0), 0) / analyses.filter(a => a.vocabularyScore).length,
-                channelUsage
+                fillerWordsCount: Math.round(analyses.reduce((sum, a) => sum + (a.fillerWordsCount || 0), 0) / analyses.filter(a => a.fillerWordsCount).length) || 5,
+                starCompliance: Math.round(analyses.reduce((sum, a) => sum + a.starCompliance, 0) / analyses.length),
+                transcriptions: responses.map(r => r.text)
               }}
               onSuccess={handleLeadCaptureSuccess}
             />
