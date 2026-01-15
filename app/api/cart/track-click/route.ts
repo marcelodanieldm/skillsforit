@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 /**
  * POST /api/cart/track-click
@@ -26,6 +28,7 @@ export async function POST(request: Request) {
     }
 
     // Actualizar status del email a 'clicked'
+    const supabase = getSupabase()
     await supabase
       .from('recovery_emails')
       .update({
@@ -60,6 +63,7 @@ export async function GET(request: Request) {
 
     if (token) {
       // Actualizar status a 'opened'
+      const supabase = getSupabase()
       await supabase
         .from('recovery_emails')
         .update({
