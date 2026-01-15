@@ -3,9 +3,11 @@ import { AnalysisResult } from './database'
 import { buildAdvancedCVPrompt } from './cv-auditor'
 import { semanticCache } from './semantic-cache'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+function getOpenAI() {
+  return new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  })
+}
 
 /**
  * Analyze CV with AI (with Semantic Caching)
@@ -53,6 +55,7 @@ async function performActualAnalysis(
   const prompt = buildAdvancedCVPrompt(cvText, profession, country, purpose);
 
   try {
+    const openai = getOpenAI()
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o', // Use GPT-4o for advanced analysis
       messages: [
