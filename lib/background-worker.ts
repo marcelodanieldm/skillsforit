@@ -180,8 +180,7 @@ export class CVAnalysisProcessor extends BaseJobProcessor {
     await sendAnalysisReport(
       data.email,
       data.name,
-      fullReportPath,
-      ebookPath
+      fullReportPath
     )
 
     return {
