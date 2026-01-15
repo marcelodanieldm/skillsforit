@@ -4,15 +4,22 @@ import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 import crypto from 'crypto'
 
-const resend = new Resend(process.env.RESEND_API_KEY!)
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-12-15.clover',
-})
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY!)
+}
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: '2025-12-15.clover',
+  })
+}
+
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'SkillsForIt <noreply@skillsforit.com>'
@@ -29,6 +36,10 @@ const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'SkillsForIt <noreply@skills
  * }
  */
 export async function POST(request: Request) {
+  const resend = getResend()
+  const stripe = getStripe()
+  const supabase = getSupabase()
+  
   try {
     // Autenticación (solo cron o admin)
     const authHeader = request.headers.get('authorization')

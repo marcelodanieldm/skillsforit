@@ -2,13 +2,17 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { scheduleSessionReminder } from '@/lib/notifications'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 // GET: Obtener sesiones del mentor
 export async function GET(req: Request) {
+  const supabase = getSupabase()
+  
   try {
     const { searchParams } = new URL(req.url)
     const mentorId = searchParams.get('mentorId')
@@ -78,6 +82,8 @@ export async function GET(req: Request) {
 
 // POST: Crear nueva sesión
 export async function POST(req: Request) {
+  const supabase = getSupabase()
+  
   try {
     const body = await req.json()
     const { 

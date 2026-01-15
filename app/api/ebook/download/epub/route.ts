@@ -3,12 +3,16 @@ import { createClient } from '@supabase/supabase-js'
 import path from 'path'
 import fs from 'fs'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  )
+}
 
 export async function GET(request: NextRequest) {
+  const supabase = getSupabase()
+  
   try {
     const { searchParams } = new URL(request.url)
     const token = searchParams.get('token')
