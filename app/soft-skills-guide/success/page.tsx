@@ -10,6 +10,8 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import confetti from 'canvas-confetti'
 
+export const dynamic = 'force-dynamic'
+
 /**
  * Sprint 24: Success/Confirmation Page
  * 

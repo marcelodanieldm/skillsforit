@@ -13,6 +13,8 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from 'recharts'
 
+export const dynamic = 'force-dynamic'
+
 // Tipos de Métricas
 interface GrowthMetrics {
   cac: number // Customer Acquisition Cost

@@ -9,6 +9,8 @@ import {
   FaClock, FaExclamationTriangle, FaLock, FaKey
 } from 'react-icons/fa'
 
+export const dynamic = 'force-dynamic'
+
 interface ConsentPreferences {
   cookies: boolean
   analytics: boolean

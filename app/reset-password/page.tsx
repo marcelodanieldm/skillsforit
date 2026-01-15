@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { FaKey, FaCheckCircle } from 'react-icons/fa'
 
+export const dynamic = 'force-dynamic'
+
 function ResetPasswordContent() {
   const router = useRouter()
   const searchParams = useSearchParams()

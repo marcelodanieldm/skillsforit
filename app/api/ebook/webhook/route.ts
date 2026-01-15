@@ -84,6 +84,7 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
 }
 
 async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
+  const supabase = getSupabase()
   const { email } = paymentIntent.metadata
 
   if (!email) return
@@ -109,6 +110,8 @@ async function sendDeliveryEmail(email: string, options: {
   includeMentorship: boolean
   paymentIntentId: string
 }) {
+  const supabase = getSupabase()
+  
   try {
     // Generate secure download links (24 hours expiry)
     const downloadToken = generateSecureToken()
@@ -320,6 +323,8 @@ async function sendMentorshipEmail(email: string, paymentIntentId: string) {
 }
 
 async function handleEbookPurchase(email: string, paymentIntent: Stripe.PaymentIntent, includeCVAudit: string, basePrice: string, cvAuditPrice: string) {
+  const supabase = getSupabase()
+  
   // Find or create user
   let { data: user, error: userError } = await supabase
     .from('users')
@@ -417,6 +422,8 @@ async function handleEbookPurchase(email: string, paymentIntent: Stripe.PaymentI
 }
 
 async function handleMentorshipUpsell(email: string, paymentIntent: Stripe.PaymentIntent, mentorshipPrice: string) {
+  const supabase = getSupabase()
+  
   // Find user by email
   const { data: user, error: userError } = await supabase
     .from('users')
@@ -458,6 +465,8 @@ async function handleMentorshipUpsell(email: string, paymentIntent: Stripe.Payme
 }
 
 async function handleCVAuditPayment(email: string, paymentIntent: Stripe.PaymentIntent, analysisId: string) {
+  const supabase = getSupabase()
+  
   // Find or create user
   let { data: user, error: userError } = await supabase
     .from('users')

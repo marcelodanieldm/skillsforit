@@ -6,6 +6,8 @@ import { motion } from 'framer-motion'
 import { FaCheck, FaClock, FaUser, FaRocket, FaDownload, FaTimes } from 'react-icons/fa'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 export default function EbookSuccess() {
   const searchParams = useSearchParams()
   const email = searchParams.get('email') || ''
