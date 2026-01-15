@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 /**
  * GET /api/ceo/cart-recovery-analytics
@@ -13,6 +15,7 @@ const supabase = createClient(
  * Usa las vistas SQL creadas en la migración
  */
 export async function GET(request: Request) {
+  const supabase = getSupabase()
   try {
     // Obtener analytics desde la vista
     const { data: analytics, error: analyticsError } = await supabase

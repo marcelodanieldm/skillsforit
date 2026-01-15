@@ -20,10 +20,12 @@ import { createClient } from '@supabase/supabase-js'
  * - purchase_completed: Completó la compra
  */
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  )
+}
 
 interface FunnelEvent {
   eventType: string
@@ -33,6 +35,8 @@ interface FunnelEvent {
 }
 
 export async function POST(request: NextRequest) {
+  const supabase = getSupabase()
+  
   try {
     const body: FunnelEvent = await request.json()
     const { eventType, sessionId, email, metadata } = body
