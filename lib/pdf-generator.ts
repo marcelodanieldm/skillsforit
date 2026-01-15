@@ -10,10 +10,10 @@ export async function generatePDFReport(
   const doc = new jsPDF()
   
   // Colors
-  const primaryColor = [59, 130, 246] // blue-500
-  const accentColor = [147, 51, 234] // purple-600
-  const textColor = [30, 41, 59] // slate-800
-  const lightGray = [226, 232, 240] // slate-200
+  const primaryColor: [number, number, number] = [59, 130, 246] // blue-500
+  const accentColor: [number, number, number] = [147, 51, 234] // purple-600
+  const textColor: [number, number, number] = [30, 41, 59] // slate-800
+  const lightGray: [number, number, number] = [226, 232, 240] // slate-200
   
   let yPos = 20
 
