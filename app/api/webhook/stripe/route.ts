@@ -15,19 +15,24 @@ import { triggerDelivery, mapCartToDeliveryItems } from '@/lib/delivery-system'
  * incluso si el usuario cierra la ventana después del pago.
  */
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-12-15.clover'
-})
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+    apiVersion: '2025-12-15.clover'
+  })
+}
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  )
+}
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || ''
 
 export async function POST(request: NextRequest) {
   try {
+    const stripe = getStripe()
     const body = await request.text()
     const signature = request.headers.get('stripe-signature')
 
@@ -84,6 +89,7 @@ export async function POST(request: NextRequest) {
 async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
   console.log('[Webhook] Payment succeeded:', paymentIntent.id)
 
+  const supabase = getSupabase()
   const email = paymentIntent.metadata.email
   const products = JSON.parse(paymentIntent.metadata.products || '[]')
   const sessionId = paymentIntent.metadata.sessionId || 'webhook'
@@ -177,6 +183,7 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
 async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
   console.log('[Webhook] Payment failed:', paymentIntent.id)
 
+  const supabase = getSupabase()
   const email = paymentIntent.metadata.email
   const sessionId = paymentIntent.metadata.sessionId || 'webhook'
 
@@ -210,6 +217,7 @@ async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
 async function handleRefund(charge: Stripe.Charge) {
   console.log('[Webhook] Refund issued:', charge.id)
 
+  const supabase = getSupabase()
   const paymentIntentId = charge.payment_intent as string
 
   // Find order
