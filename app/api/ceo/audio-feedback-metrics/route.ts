@@ -18,10 +18,12 @@ import { createClient } from '@supabase/supabase-js'
  * - Top roles
  */
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -37,6 +39,7 @@ export async function GET(request: NextRequest) {
 
     // 1. Lead Capture Rate
     // (leads con audio_feedback_completed / total sessions iniciadas)
+    const supabase = getSupabase()
     const { data: completedLeads, count: completedCount } = await supabase
       .from('leads')
       .select('*', { count: 'exact', head: true })
