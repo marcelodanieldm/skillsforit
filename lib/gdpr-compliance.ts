@@ -500,10 +500,11 @@ export class AccountDeleter {
       s.menteeEmail === userEmail && (s as any).isDeleted
     )
     sessions.forEach(session => {
-      (session as any).deletedAt = null
-      (session as any).deletionReason = null
-      (session as any).deletedBy = null
-      (session as any).isDeleted = false
+      const sessionAny = session as any
+      sessionAny.deletedAt = null
+      sessionAny.deletionReason = null
+      sessionAny.deletedBy = null
+      sessionAny.isDeleted = false
     })
 
     // Cancelar solicitud de borrado
