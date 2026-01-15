@@ -289,8 +289,7 @@ export class EmailDeliveryProcessor extends BaseJobProcessor {
     await sendAnalysisReport(
       data.to,
       data.name || 'User',
-      data.reportPath,
-      data.ebookPath
+      data.reportPath
     )
 
     return {
