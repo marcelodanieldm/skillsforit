@@ -439,14 +439,14 @@ export class AccountDeleter {
    * Borrado lógico (soft delete) de datos del usuario
    */
   private static async softDelete(userId: string, userEmail: string, reason: string): Promise<void> {
-    const deletedAt = new Date()
+    const deletedAtTimestamp = new Date()
 
     // Soft delete CV analyses
     const cvAnalyses = db.findByEmail(userEmail)
     cvAnalyses.forEach(cv => {
       db.update(cv.id, {
         // @ts-ignore - agregando campos de soft delete
-        deletedAt,
+        deletedAt: deletedAtTimestamp,
         deletionReason: reason,
         deletedBy: 'user',
         isDeleted: true
@@ -458,7 +458,7 @@ export class AccountDeleter {
     sessions.forEach(session => {
       // En producción, actualizar en database
       // Por ahora, marcar en memoria
-      (session as any).deletedAt = deletedAt
+      (session as any).deletedAt = deletedAtTimestamp
       (session as any).deletionReason = reason
       (session as any).deletedBy = 'user'
       (session as any).isDeleted = true
