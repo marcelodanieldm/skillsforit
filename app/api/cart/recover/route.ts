@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 /**
  * POST /api/cart/recover
@@ -32,6 +34,7 @@ export async function POST(request: Request) {
     }
 
     // Buscar email con este token
+    const supabase = getSupabase()
     const { data: email, error: emailError } = await supabase
       .from('recovery_emails')
       .select(`
