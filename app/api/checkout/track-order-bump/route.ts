@@ -21,10 +21,12 @@ import { createClient } from '@supabase/supabase-js'
  * - Revenue forecasting
  */
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  )
+}
 
 interface OrderBumpEvent {
   sessionId: string
@@ -36,6 +38,8 @@ interface OrderBumpEvent {
 }
 
 export async function POST(request: NextRequest) {
+  const supabase = getSupabase()
+  
   try {
     const body: OrderBumpEvent = await request.json()
     const { sessionId, email, accepted, timeSpent, variant, metadata } = body

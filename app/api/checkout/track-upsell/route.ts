@@ -21,10 +21,12 @@ import { createClient } from '@supabase/supabase-js'
  * - Revenue maximization
  */
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  )
+}
 
 interface UpsellEvent {
   sessionId: string
@@ -37,6 +39,8 @@ interface UpsellEvent {
 }
 
 export async function POST(request: NextRequest) {
+  const supabase = getSupabase()
+  
   try {
     const body: UpsellEvent = await request.json()
     const { 
