@@ -23,9 +23,11 @@
 import OpenAI from 'openai'
 import { AnalysisResult } from './database'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+function getOpenAI() {
+  return new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  })
+}
 
 /**
  * Cache entry structure
@@ -150,6 +152,7 @@ export class SemanticCache {
    */
   private static async generateEmbedding(text: string): Promise<number[]> {
     try {
+      const openai = getOpenAI()
       const response = await openai.embeddings.create({
         model: this.EMBEDDING_MODEL,
         input: this.normalizeText(text),
