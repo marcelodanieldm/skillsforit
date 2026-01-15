@@ -1,15 +1,18 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-12-15.clover'
-})
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: '2025-12-15.clover'
+  })
+}
 
 // PATCH: Update coupon status (activate/deactivate)
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const stripe = getStripe()
   try {
     const { active } = await req.json()
     const { id: couponId } = await params
@@ -41,6 +44,8 @@ export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const stripe = getStripe()
+  
   try {
     const { id: couponId } = await params
 

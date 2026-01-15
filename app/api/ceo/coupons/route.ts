@@ -2,17 +2,23 @@ import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-12-15.clover'
-})
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: '2025-12-15.clover'
+  })
+}
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 // GET: List all coupons
 export async function GET() {
+  const stripe = getStripe()
+  const supabase = getSupabase()
   try {
     // Fetch coupons from Stripe
     const stripeCoupons = await stripe.coupons.list({ limit: 100 })
@@ -59,6 +65,9 @@ export async function GET() {
 
 // POST: Create new coupon
 export async function POST(req: Request) {
+  const stripe = getStripe()
+  const supabase = getSupabase()
+  
   try {
     const body = await req.json()
     const { code, discountType, discountValue, expiresAt, maxRedemptions } = body
