@@ -150,6 +150,9 @@ export async function POST(request: NextRequest) {
 // ============================================
 
 export async function PUT(request: NextRequest) {
+  const stripe = getStripe()
+  const supabase = getSupabase()
+  
   try {
     const body = await request.json()
     const { paymentIntentId, sessionId, userId } = body
@@ -279,6 +282,8 @@ export async function PUT(request: NextRequest) {
 // ============================================
 
 export async function GET(request: NextRequest) {
+  const supabase = getSupabase()
+  
   try {
     const searchParams = request.nextUrl.searchParams
     const orderId = searchParams.get('orderId')
@@ -344,6 +349,8 @@ export async function GET(request: NextRequest) {
 // ============================================
 
 async function grantProductAccess(email: string, products: string[]): Promise<void> {
+  const supabase = getSupabase()
+  
   try {
     // Find or create user
     const { data: user, error: userError } = await supabase
