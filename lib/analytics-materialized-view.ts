@@ -37,7 +37,6 @@ interface LTVSegmentData {
   revenueBreakdown: {
     cvAnalysis: number
     mentorship: number
-    ebooks: number
   }
   lastCalculated: Date
 }
