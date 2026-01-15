@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 
@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic'
 import { FaLock, FaUnlock, FaCreditCard, FaShieldAlt } from 'react-icons/fa'
 import PaymentForm from '@/components/ebook/PaymentForm'
 
-export default function CVAuditPaymentPage() {
+function CVAuditPaymentContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const analysisId = searchParams.get('analysisId')
@@ -261,4 +261,39 @@ export default function CVAuditPaymentPage() {
       </div>
     </div>
   )
-}
+} 
+ e x p o r t   d e f a u l t   f u n c t i o n   C V A u d i t P a y m e n t P a g e ( )   {  
+     r e t u r n   (  
+         < S u s p e n s e   f a l l b a c k = {  
+             < d i v   c l a s s N a m e = \  
+ m i n - h - s c r e e n  
+ b g - g r a d i e n t - t o - b r  
+ f r o m - p u r p l e - 5 0  
+ t o - b l u e - 5 0  
+ d a r k : f r o m - g r a y - 9 0 0  
+ d a r k : t o - p u r p l e - 9 0 0  
+ f l e x  
+ i t e m s - c e n t e r  
+ j u s t i f y - c e n t e r \ >  
+                 < d i v   c l a s s N a m e = \  
+ t e x t - c e n t e r \ >  
+                     < d i v   c l a s s N a m e = \  
+ a n i m a t e - s p i n  
+ r o u n d e d - f u l l  
+ h - 1 2  
+ w - 1 2  
+ b o r d e r - b - 2  
+ b o r d e r - p u r p l e - 6 0 0  
+ m x - a u t o  
+ m b - 4 \ > < / d i v >  
+                     < p   c l a s s N a m e = \  
+ t e x t - g r a y - 6 0 0  
+ d a r k : t e x t - g r a y - 4 0 0 \ > L o a d i n g   p a y m e n t . . . < / p >  
+                 < / d i v >  
+             < / d i v >  
+         } >  
+             < C V A u d i t P a y m e n t C o n t e n t   / >  
+         < / S u s p e n s e >  
+     )  
+ }  
+ 
