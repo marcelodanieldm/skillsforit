@@ -304,7 +304,7 @@ export async function auditCVWithFallback(
   tokensUsed: number
   success: boolean
 }> {
-  const { getLLMStrategyManager } = await import('./llm-strategy')
+  const { getLLMStrategyManager } = await import('../llm-strategy')
   const manager = getLLMStrategyManager()
 
   const prompt = generateCVAuditPrompt(
