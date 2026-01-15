@@ -196,7 +196,7 @@ export class QueueManager {
   /**
    * Start background processing
    */
-  private startProcessing() {
+  startProcessing() {
     if (this.isProcessing) return
 
     this.isProcessing = true
