@@ -92,15 +92,17 @@ export async function updateServicePrice(
     const stripePrice = await createStripePrice(service, newPrice)
 
     // 3. Configurar contexto para el trigger de price_history
-    await supabase.rpc('exec_sql', {
-      query: `
-        SELECT set_config('app.user_email', '${changedBy}', false);
-        SELECT set_config('app.change_reason', '${reason || 'Manual price update'}', false);
-      `
-    }).catch(() => {
+    try {
+      await supabase.rpc('exec_sql', {
+        query: `
+          SELECT set_config('app.user_email', '${changedBy}', false);
+          SELECT set_config('app.change_reason', '${reason || 'Manual price update'}', false);
+        `
+      })
+    } catch (error) {
       // Si falla, continuamos igual (el trigger usará valores por defecto)
       console.warn('No se pudo configurar el contexto del usuario para el trigger')
-    })
+    }
 
     // 4. Actualizar servicio en la base de datos
     const { data: updatedService, error: updateError } = await supabase
