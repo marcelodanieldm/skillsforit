@@ -3,14 +3,21 @@ import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 import { headers } from 'next/headers'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '')
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-)
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY || '')
+}
+
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  )
+}
 
 export async function POST(request: NextRequest) {
   try {
+    const stripe = getStripe()
+    const supabase = getSupabase()
     const body = await request.text()
     const headersList = await headers()
     const sig = headersList.get('stripe-signature')
