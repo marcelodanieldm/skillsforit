@@ -2,11 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { SOFT_SKILLS_QUESTIONS } from '@/lib/prompts/soft-skills-analyzer'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-})
+function getOpenAI() {
+  return new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+  })
+}
 
 export async function POST(request: NextRequest) {
+  const openai = getOpenAI()
+  
   try {
     const formData = await request.formData()
     
