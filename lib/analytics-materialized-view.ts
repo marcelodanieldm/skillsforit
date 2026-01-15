@@ -310,8 +310,7 @@ export class AnalyticsMaterializedView {
         ltv: Math.round(ltv * 100) / 100,
         revenueBreakdown: {
           cvAnalysis: Math.round((cvAnalysisRevenue / totalRevenue) * 100),
-          mentorship: Math.round((mentorshipRevenue / totalRevenue) * 100),
-          ebooks: Math.round((ebooksRevenue / totalRevenue) * 100)
+          mentorship: Math.round((mentorshipRevenue / totalRevenue) * 100)
         },
         lastCalculated: new Date()
       }
