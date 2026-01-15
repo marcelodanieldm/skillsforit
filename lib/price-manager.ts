@@ -2,15 +2,19 @@ import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
 // Inicializar Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-12-15.clover'
-})
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: '2025-12-15.clover'
+  })
+}
 
 // Inicializar Supabase
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 // =====================================================
 // TIPOS Y INTERFACES
@@ -62,6 +66,9 @@ export interface PriceChangeResult {
 export async function updateServicePrice(
   request: PriceChangeRequest
 ): Promise<PriceChangeResult> {
+  const stripe = getStripe()
+  const supabase = getSupabase()
+  
   const { serviceId, newPrice, changedBy, reason } = request
 
   // 1. Obtener servicio actual
@@ -167,6 +174,9 @@ export async function createStripePrice(
   service: Service,
   price: number
 ): Promise<Stripe.Price> {
+  const stripe = getStripe()
+  const supabase = getSupabase()
+  
   try {
     // 1. Asegurar que existe el producto en Stripe
     let productId = service.stripe_product_id
@@ -212,6 +222,8 @@ export async function createStripePrice(
 export async function createStripeProduct(
   service: Service
 ): Promise<Stripe.Product> {
+  const stripe = getStripe()
+  
   try {
     const product = await stripe.products.create({
       name: service.name,
@@ -240,6 +252,8 @@ export async function syncAllServicesWithStripe(): Promise<{
   synced: number
   errors: string[]
 }> {
+  const supabase = getSupabase()
+  
   const { data: services, error } = await supabase
     .from('services')
     .select('*')
@@ -277,6 +291,8 @@ export async function syncAllServicesWithStripe(): Promise<{
  * Obtiene todos los servicios activos
  */
 export async function getActiveServices(): Promise<Service[]> {
+  const supabase = getSupabase()
+  
   const { data, error } = await supabase
     .from('services')
     .select('*')
@@ -294,6 +310,8 @@ export async function getActiveServices(): Promise<Service[]> {
  * Obtiene un servicio por slug
  */
 export async function getServiceBySlug(slug: string): Promise<Service | null> {
+  const supabase = getSupabase()
+  
   const { data, error } = await supabase
     .from('services')
     .select('*')
@@ -315,6 +333,8 @@ export async function getPriceHistory(
   serviceId: string,
   limit: number = 50
 ): Promise<any[]> {
+  const supabase = getSupabase()
+  
   const { data, error } = await supabase
     .from('price_history_detailed')
     .select('*')

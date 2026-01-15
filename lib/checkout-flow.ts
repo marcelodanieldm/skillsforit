@@ -19,10 +19,12 @@
 
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  )
+}
 
 // ============================================
 // TYPES & INTERFACES
@@ -252,6 +254,8 @@ export class UpsellManager {
 
 export class ConversionTracker {
   async trackEvent(event: FunnelEvent): Promise<void> {
+    const supabase = getSupabase()
+    
     try {
       // Save to Supabase
       const { error } = await supabase
@@ -284,6 +288,8 @@ export class ConversionTracker {
   }
 
   async getSessionEvents(sessionId: string): Promise<FunnelEvent[]> {
+    const supabase = getSupabase()
+    
     try {
       const { data, error } = await supabase
         .from('funnel_events')
@@ -317,6 +323,8 @@ export class ConversionTracker {
     startDate?: Date, 
     endDate?: Date
   ): Promise<FunnelAnalytics> {
+    const supabase = getSupabase()
+    
     try {
       const start = startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // 30 days ago
       const end = endDate || new Date()
