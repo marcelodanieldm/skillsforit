@@ -458,10 +458,11 @@ export class AccountDeleter {
     sessions.forEach(session => {
       // En producción, actualizar en database
       // Por ahora, marcar en memoria
-      (session as any).deletedAt = deletedAtTimestamp
-      (session as any).deletionReason = reason
-      (session as any).deletedBy = 'user'
-      (session as any).isDeleted = true
+      const sessionAny = session as any
+      sessionAny.deletedAt = deletedAtTimestamp
+      sessionAny.deletionReason = reason
+      sessionAny.deletedBy = 'user'
+      sessionAny.isDeleted = true
     })
 
     console.log(`🗑️ Soft deleted ${cvAnalyses.length} CV analyses and ${sessions.length} sessions for ${userEmail}`)
