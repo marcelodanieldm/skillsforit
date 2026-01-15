@@ -3,11 +3,15 @@ import { v4 as uuidv4 } from 'uuid'
 import Stripe from 'stripe'
 import { sessionsDb, mentorsDb } from '@/lib/database'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-12-15.clover'
-})
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: '2025-12-15.clover'
+  })
+}
 
 export async function POST(request: NextRequest) {
+  const stripe = getStripe()
+  
   try {
     const body = await request.json()
     const { mentorId, menteeEmail, menteeName, scheduledAt, duration, amount } = body

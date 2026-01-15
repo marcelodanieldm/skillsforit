@@ -1,13 +1,17 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 // GET: Obtener wallet del mentor
 export async function GET(req: Request) {
+  const supabase = getSupabase()
+  
   try {
     const { searchParams } = new URL(req.url)
     const mentorId = searchParams.get('mentorId')
@@ -85,6 +89,8 @@ export async function GET(req: Request) {
 
 // POST: Solicitar pago (payout)
 export async function POST(req: Request) {
+  const supabase = getSupabase()
+  
   try {
     const body = await req.json()
     const { mentor_id, amount, bank_account } = body
