@@ -466,11 +466,11 @@ export const roadmapDb = {
 
 // Helper functions
 export function getMentorById(id: string) {
-  return mentorshipDB.mentors.find(mentor => mentor.id === id)
+  return mentorsDb.findById(id)
 }
 
 export function getAllMentors() {
-  return mentorshipDB.mentors
+  return mentorsDb.findAll()
 }
 
 // Export missing database objects for compatibility
