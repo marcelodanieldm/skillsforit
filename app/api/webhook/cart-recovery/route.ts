@@ -3,14 +3,18 @@ import { headers } from 'next/headers'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-12-15.clover',
-})
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: '2025-12-15.clover',
+  })
+}
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
 
@@ -42,6 +46,7 @@ export async function POST(request: Request) {
     }
 
     // Verificar firma de Stripe
+    const stripe = getStripe()
     let event: Stripe.Event
     try {
       event = stripe.webhooks.constructEvent(
@@ -93,6 +98,8 @@ export async function POST(request: Request) {
  */
 async function handleSessionExpired(session: Stripe.Checkout.Session) {
   try {
+    const stripe = getStripe()
+    const supabase = getSupabase()
     console.log('Processing expired session:', session.id)
 
     // Extraer datos del carrito desde metadata o line_items
@@ -197,6 +204,7 @@ async function handlePaymentFailed(session: Stripe.Checkout.Session) {
     await handleSessionExpired(session)
 
     // Actualizar status a 'failed' si ya existe
+    const supabase = getSupabase()
     await supabase
       .from('abandoned_carts')
       .update({ 
@@ -223,6 +231,7 @@ async function handleSessionCompleted(session: Stripe.Checkout.Session) {
     if (!customerEmail) return
 
     // Buscar carrito abandonado por email (últimas 24 horas)
+    const supabase = getSupabase()
     const { data: carts } = await supabase
       .from('abandoned_carts')
       .select('*')
