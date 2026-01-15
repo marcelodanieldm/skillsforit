@@ -2,16 +2,19 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 
-// Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-12-15.clover',
-})
+// Initialize Stripe and Supabase lazily
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: '2025-12-15.clover',
+  })
+}
 
-// Initialize Supabase
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 /**
  * PATCH /api/admin/update-price
@@ -74,6 +77,7 @@ export async function PATCH(request: Request) {
     }
 
     // 3. Obtener servicio actual
+    const supabase = getSupabase()
     const { data: service, error: fetchError } = await supabase
       .from('services')
       .select('*')
@@ -119,6 +123,7 @@ export async function PATCH(request: Request) {
 
     if (!stripeProductId) {
       // Crear producto en Stripe si no existe
+      const stripe = getStripe()
       const product = await stripe.products.create({
         name: service.name,
         description: service.description || undefined,
@@ -138,6 +143,7 @@ export async function PATCH(request: Request) {
     }
 
     // 7. Crear nuevo precio en Stripe
+    const stripe = getStripe()
     const stripePrice = await stripe.prices.create({
       product: stripeProductId,
       unit_amount: Math.round(newPrice * 100), // Convertir a centavos
@@ -248,6 +254,7 @@ export async function GET(request: Request) {
     }
 
     // Obtener historial desde la vista
+    const supabase = getSupabase()
     const { data: history, error } = await supabase
       .from('price_log')
       .select('*')
