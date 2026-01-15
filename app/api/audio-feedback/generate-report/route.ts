@@ -29,10 +29,12 @@ import { createClient } from '@supabase/supabase-js'
  * 4. Registra evento en funnel tracking
  */
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -61,6 +63,7 @@ export async function POST(request: NextRequest) {
     else experienceLevel = 'Staff'
 
     // 1. Guardar/actualizar lead en DB
+    const supabase = getSupabase()
     const { data: existingLead } = await supabase
       .from('leads')
       .select('id')
