@@ -30,14 +30,18 @@ import { triggerDelivery, mapCartToDeliveryItems } from '@/lib/delivery-system'
  * - Upsell acceptance
  */
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-12-15.clover'
-})
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+    apiVersion: '2025-12-15.clover'
+  })
+}
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  )
+}
 
 // ============================================
 // CREATE ORDER (Payment Intent)
@@ -45,6 +49,8 @@ const supabase = createClient(
 
 export async function POST(request: NextRequest) {
   try {
+    const stripe = getStripe()
+    const supabase = getSupabase()
     const body = await request.json()
     const { 
       email, 
