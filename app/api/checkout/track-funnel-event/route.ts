@@ -96,6 +96,8 @@ export async function POST(request: NextRequest) {
 
 // GET: Obtener estadísticas del funnel completo
 export async function GET(request: NextRequest) {
+  const supabase = getSupabase()
+  
   try {
     const { searchParams } = new URL(request.url)
     const days = parseInt(searchParams.get('days') || '30')
