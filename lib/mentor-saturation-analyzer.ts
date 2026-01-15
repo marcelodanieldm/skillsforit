@@ -177,7 +177,7 @@ function calculateRecommendedHires(
 export function analyzeMentorSaturation(): SaturationAnalysis {
   // 1. Obtener mentores y calcular capacidad
   const allMentors = getAllMentors()
-  const activeMentors = allMentors.filter(m => m.availability?.isActive !== false)
+  const activeMentors = allMentors.filter(m => m.availability && m.availability.length > 0)
   
   const mentorCapacities = activeMentors.map(calculateMentorCapacity)
   const totalWeeklyCapacity = mentorCapacities.reduce((sum, m) => sum + m.weeklyCapacity, 0)
