@@ -143,6 +143,8 @@ export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const supabase = getSupabase()
+  
   try {
     const { id: sessionId } = await params
     const { searchParams } = new URL(req.url)
