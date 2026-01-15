@@ -178,6 +178,8 @@ export async function DELETE(
 
 // Helper: Actualizar billetera del mentor
 async function updateMentorWallet(mentorId: string, sessionAmount: number) {
+  const supabase = getSupabase()
+  
   try {
     // Comisión del mentor: 70% del pago
     const mentorEarnings = sessionAmount * 0.7

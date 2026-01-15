@@ -149,6 +149,11 @@ export async function POST(request: Request) {
  * Crear cupón de recuperación en Stripe
  */
 async function createRecoveryCoupon(cart: any) {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: '2025-12-15.clover',
+  })
+  const supabase = getSupabase()
+  
   const code = `RECOVER${Math.random().toString(36).substring(2, 8).toUpperCase()}`
   const expiresAt = new Date(Date.now() + 12 * 60 * 60 * 1000) // 12 horas
   

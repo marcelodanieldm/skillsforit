@@ -172,6 +172,8 @@ export async function GET(request: Request) {
  * Enviar email de recuperación
  */
 async function sendRecoveryEmail(cart: any, emailType: 'hour_1' | 'hour_24') {
+  const supabase = getSupabase()
+  
   try {
     // Llamar a API de emails
     const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/emails/send-recovery`, {
@@ -215,6 +217,8 @@ async function sendRecoveryEmail(cart: any, emailType: 'hour_1' | 'hour_24') {
  * Endpoint alternativo para testing manual
  */
 export async function POST(request: Request) {
+  const supabase = getSupabase()
+  
   try {
     const authHeader = request.headers.get('authorization')
     const cronSecret = process.env.CRON_SECRET || 'dev-secret-change-in-production'

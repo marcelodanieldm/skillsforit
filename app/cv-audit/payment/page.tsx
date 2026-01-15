@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+
+export const dynamic = 'force-dynamic'
 import { FaLock, FaUnlock, FaCreditCard, FaShieldAlt } from 'react-icons/fa'
 import PaymentForm from '@/components/ebook/PaymentForm'
 

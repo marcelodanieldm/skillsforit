@@ -1,13 +1,15 @@
 'use client'
 
 import { signIn } from 'next-auth/react'
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { FaGoogle, FaEnvelope, FaKey, FaArrowLeft } from 'react-icons/fa'
 import Link from 'next/link'
 
-export default function SignInPage() {
+export const dynamic = 'force-dynamic'
+
+function SignInContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
@@ -164,5 +166,13 @@ export default function SignInPage() {
         )}
       </motion.div>
     </div>
+  )
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">Loading...</div>}>
+      <SignInContent />
+    </Suspense>
   )
 }

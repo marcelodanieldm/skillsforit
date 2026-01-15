@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
+
+export const dynamic = 'force-dynamic'
 import { motion } from 'framer-motion'
 import { FaCheck, FaExclamationTriangle, FaLightbulb, FaRocket, FaDownload } from 'react-icons/fa'
 

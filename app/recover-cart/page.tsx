@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { ShoppingCart, CheckCircle, XCircle, Loader2 } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
 export default function RecoverCartPage() {
   const router = useRouter()
   const searchParams = useSearchParams()

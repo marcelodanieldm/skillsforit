@@ -6,6 +6,8 @@ import { motion } from 'framer-motion'
 import { FaCheckCircle, FaExclamationTriangle, FaBook, FaFileAlt, FaVideo, FaArrowRight, FaSpinner } from 'react-icons/fa'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 /**
  * Soft Skills Report & Sales Funnel
  * 

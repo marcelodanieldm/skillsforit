@@ -1,10 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { FaCheckCircle, FaEnvelope, FaDownload, FaBook, FaChartLine, FaRocket } from 'react-icons/fa'
 import Confetti from 'react-confetti'
+
+export const dynamic = 'force-dynamic'
 
 /**
  * Success Page - Post Lead Capture
@@ -17,7 +19,7 @@ import Confetti from 'react-confetti'
  * - Beneficios específicos según áreas de mejora detectadas
  */
 
-export default function AudioFeedbackSuccessPage() {
+function AudioFeedbackSuccessContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   
@@ -275,5 +277,13 @@ export default function AudioFeedbackSuccessPage() {
         </motion.div>
       </div>
     </div>
+  )
+}
+
+export default function AudioFeedbackSuccessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <AudioFeedbackSuccessContent />
+    </Suspense>
   )
 }
