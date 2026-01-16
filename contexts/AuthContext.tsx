@@ -1,12 +1,26 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.SUPABASE_ANON_KEY || ''
-)
+// Lazy-loaded Supabase client to prevent build-time initialization
+let _supabaseClient: SupabaseClient | null = null
+
+function getSupabaseClient() {
+  if (!_supabaseClient) {
+    _supabaseClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+      process.env.SUPABASE_ANON_KEY || ''
+    )
+  }
+  return _supabaseClient
+}
+
+const supabase = new Proxy({} as SupabaseClient, {
+  get(_target, prop) {
+    return getSupabaseClient()[prop as keyof SupabaseClient]
+  }
+})
 
 interface User {
   id: string
