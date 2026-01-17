@@ -62,7 +62,27 @@ const seedUsers = () => {
     createdAt: new Date()
   })
 
-  console.log('✅ Seeded auth users')
+  // Seed mentor in mentorsDb for dashboard
+  try {
+    const { mentorsDb } = require('./database')
+    mentorsDb.create({
+      id: 'mentor_001',
+      userId: 'mentor_001',
+      name: 'María García (Mentor)',
+      email: 'mentor@skillsforit.com',
+      bio: 'Mentora experta en desarrollo profesional y frontend.',
+      expertise: ['Frontend', 'React', 'Career Growth'],
+      hourlyRate: 25,
+      totalSessions: 0,
+      rating: 5,
+      reviewCount: 0,
+      availability: [],
+    })
+  } catch (e) {
+    console.warn('No mentorsDb available for seeding mentor')
+  }
+
+  console.log('✅ Seeded auth users and mentor')
 }
 
 // Initialize on import
