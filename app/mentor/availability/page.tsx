@@ -92,6 +92,35 @@ export default function MentorAvailabilityPage() {
     }
   }
 
+  // Calcular totalSlots como la cantidad de slots activos
+  const totalSlots = slots.filter(slot => slot.is_active).length;
+
+  // ...existing code...
+
+  // Calcular días únicos con disponibilidad activa (justo antes del return)
+  const daysWithAvailability = Array.from(new Set(
+    slots.filter(slot => slot.is_active).map(slot => slot.day_of_week)
+  )).length;
+
+  // Eliminar slot por id
+  const handleDeleteSlot = async (slotId: string) => {
+    try {
+      setIsLoading(true);
+      const res = await fetch(`/api/mentor/availability/${slotId}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (data.success) {
+        await fetchAvailability();
+      } else {
+        setError(data.error || 'Error al eliminar slot');
+      }
+    } catch (err: any) {
+      setError('Error al eliminar slot');
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-slate-950 text-white flex">
       {/* Menú lateral */}
