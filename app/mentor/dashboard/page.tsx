@@ -52,6 +52,15 @@ interface MentorData {
 }
 
 function DashboardContent() {
+    // Estado para menú lateral
+    const [menuOpen, setMenuOpen] = useState(true);
+
+    // Logout handler
+    const handleLogout = () => {
+      localStorage.removeItem('mentor_token');
+      localStorage.removeItem('mentor_user');
+      window.location.href = '/mentor/login';
+    };
   const searchParams = useSearchParams()
   const mentorId = searchParams.get('id')
   
@@ -149,8 +158,37 @@ function DashboardContent() {
   })
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-12 flex">
+      {/* Menú lateral */}
+      <div className={`bg-slate-800 border-r border-purple-700 p-4 flex flex-col transition-all duration-300 ${menuOpen ? 'w-64' : 'w-16'} min-h-full`}>
+        <button
+          className="mb-6 text-purple-400 hover:text-white focus:outline-none"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          {menuOpen ? '⏴' : '⏵'}
+        </button>
+        <nav className="flex flex-col gap-4">
+          <a href="#" className="text-white hover:text-purple-400 font-semibold flex items-center gap-2">
+            <FaUser /> {menuOpen && 'Perfil'}
+          </a>
+          <a href="#" className="text-white hover:text-purple-400 font-semibold flex items-center gap-2">
+            <FaCalendar /> {menuOpen && 'Sesiones'}
+          </a>
+          <a href="#" className="text-white hover:text-purple-400 font-semibold flex items-center gap-2">
+            <FaHistory /> {menuOpen && 'Historial'}
+          </a>
+          <a href="#" className="text-white hover:text-purple-400 font-semibold flex items-center gap-2">
+            <FaEdit /> {menuOpen && 'Notas'}
+          </a>
+        </nav>
+        <button
+          className="mt-auto py-2 px-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all"
+          onClick={handleLogout}
+        >
+          {menuOpen ? 'Cerrar sesión' : '⎋'}
+        </button>
+      </div>
+      <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
