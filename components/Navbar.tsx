@@ -30,6 +30,9 @@ export default function Navbar() {
             <Link href="/library" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">
               Biblioteca
             </Link>
+              <Link href="/mentor/dashboard" className="text-gray-300 hover:text-white transition-colors text-sm font-medium">
+                Panel Mentor
+              </Link>
           </div>
 
           {/* Auth Section */}
@@ -77,6 +80,18 @@ export default function Navbar() {
                       <div className="text-gray-400 text-xs">Panel ejecutivo</div>
                     </div>
                   </Link>
+
+                    {/* Mentor Login */}
+                    <Link
+                      href="/mentor/login"
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-slate-700 transition-colors border-b border-slate-700"
+                    >
+                      <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                      <div>
+                        <div className="text-white text-sm font-medium">Login Mentor</div>
+                        <div className="text-gray-400 text-xs">Acceso mentor</div>
+                      </div>
+                    </Link>
 
                   {/* Mentor Access */}
                   <Link
