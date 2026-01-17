@@ -76,6 +76,25 @@ test.describe('CV Analysis Purchase Flow', () => {
     
     // Verify total is $7 (without E-book)
     await expect(page.locator('text=/Total.*\\$7/i')).toBeVisible()
+
+    // Step 10: Click checkout and handle Stripe payment
+    await checkoutButton.click()
+
+    // Espera redirección a Stripe Checkout
+    await page.waitForURL(/checkout.stripe.com/)
+
+    // Completa el formulario de Stripe Checkout
+    // (Selector puede variar según integración, ajustar si es necesario)
+    await page.frameLocator('iframe[name^="__privateStripeFrame"]').locator('input[name="cardnumber"]').fill('4242 4242 4242 4242')
+    await page.frameLocator('iframe[name^="__privateStripeFrame"]').locator('input[name="exp-date"]').fill('12/34')
+    await page.frameLocator('iframe[name^="__privateStripeFrame"]').locator('input[name="cvc"]').fill('123')
+    await page.frameLocator('iframe[name^="__privateStripeFrame"]').locator('input[name="postal"]').fill('12345')
+    // Click pagar/submit
+    await page.frameLocator('iframe[name^="__privateStripeFrame"]').locator('button[type="submit"]').click()
+
+    // Espera redirección de vuelta a la app (success page)
+    await page.waitForURL(/\/success\?session_id=/)
+    await expect(page.locator('text=/Pago exitoso|¡Gracias por tu compra!/i')).toBeVisible()
   })
 
   test('should complete purchase WITH E-book and show correct total', async ({ page }) => {
@@ -136,6 +155,25 @@ test.describe('CV Analysis Purchase Flow', () => {
     // Step 14: Add again for final purchase
     await page.locator('button:has-text("Agregar al Carrito")').click()
     await expect(page.locator('text=/Total.*\\$12/i')).toBeVisible()
+
+    // Step 15: Click checkout and handle Stripe payment
+    const checkoutButton = page.locator('button:has-text("Pagar con Stripe")')
+    await expect(checkoutButton).toBeVisible()
+    await checkoutButton.click()
+
+    // Espera redirección a Stripe Checkout
+    await page.waitForURL(/checkout.stripe.com/)
+
+    // Completa el formulario de Stripe Checkout
+    await page.frameLocator('iframe[name^="__privateStripeFrame"]').locator('input[name="cardnumber"]').fill('4242 4242 4242 4242')
+    await page.frameLocator('iframe[name^="__privateStripeFrame"]').locator('input[name="exp-date"]').fill('12/34')
+    await page.frameLocator('iframe[name^="__privateStripeFrame"]').locator('input[name="cvc"]').fill('123')
+    await page.frameLocator('iframe[name^="__privateStripeFrame"]').locator('input[name="postal"]').fill('12345')
+    await page.frameLocator('iframe[name^="__privateStripeFrame"]').locator('button[type="submit"]').click()
+
+    // Espera redirección de vuelta a la app (success page)
+    await page.waitForURL(/\/success\?session_id=/)
+    await expect(page.locator('text=/Pago exitoso|¡Gracias por tu compra!/i')).toBeVisible()
   })
 
   test('should show validation errors on empty form', async ({ page }) => {
