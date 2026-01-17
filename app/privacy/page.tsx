@@ -50,6 +50,7 @@ interface DeletionRequest {
 }
 
 export default function PrivacyCenter() {
+  const [mounted, setMounted] = useState(false)
   const { user } = useAuth()
   const [activeConsents, setActiveConsents] = useState<ConsentPreferences | null>(null)
   const [consentHistory, setConsentHistory] = useState<ConsentHistoryItem[]>([])
@@ -60,10 +61,14 @@ export default function PrivacyCenter() {
   const [deleteReason, setDeleteReason] = useState('')
 
   useEffect(() => {
-    if (user) {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (mounted && user) {
       loadPrivacyData()
     }
-  }, [user])
+  }, [mounted, user])
 
   const loadPrivacyData = async () => {
     if (!user) return
@@ -222,6 +227,14 @@ export default function PrivacyCenter() {
     } catch {
       return '0.0.0.0'
     }
+  }
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    )
   }
 
   if (!user) {
