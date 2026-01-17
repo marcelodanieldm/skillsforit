@@ -9,6 +9,12 @@ type CareerScore = { cv_score: number; soft_skills_score: number; interview_read
 type ActionPlanResponse = { roadmap_status: string; career_score: CareerScore; mentor_tasks: MentorTask[]; ai_recommendations: string[] }
 
 export default function UserDashboardPage() {
+    // Logout handler
+    const handleLogout = () => {
+      localStorage.removeItem('user_token');
+      localStorage.removeItem('user_email');
+      window.location.href = '/user/login';
+    };
   const [data, setData] = useState<ActionPlanResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -89,9 +95,19 @@ export default function UserDashboardPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 p-6 md:p-10">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mb-2">
-          Hola, Usuario! 👋
-        </h1>
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white">
+              Hola, Usuario! 👋
+            </h1>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="py-2 px-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all"
+          >
+            Cerrar sesión
+          </button>
+        </div>
         <h2 className="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-6">Mi Progreso</h2>
 
         {/* Career Score - Key Motivator for Virtuous Cycle */}
