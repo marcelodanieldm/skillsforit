@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Calendar, Clock, Info, RefreshCw } from 'lucide-react'
 import AvailabilityCalendar from '@/components/mentor/AvailabilityCalendar'
@@ -55,8 +56,11 @@ export default function MentorAvailabilityPage() {
   }
 
   useEffect(() => {
-    fetchAvailability()
-  }, [])
+    fetchAvailability();
+    return () => {
+      setIsLoading(false); // Limpiar estado al desmontar
+    };
+  }, []);
 
   const handleAddSlot = (dayOfWeek: number) => {
     setSelectedDay(dayOfWeek)
@@ -132,12 +136,12 @@ export default function MentorAvailabilityPage() {
           {menuOpen ? '⏴' : '⏵'}
         </button>
         <nav className="flex flex-col gap-4">
-          <a href="/mentor/dashboard" className="text-white hover:text-purple-400 font-semibold flex items-center gap-2">
+          <Link href="/mentor/dashboard" className="text-white hover:text-purple-400 font-semibold flex items-center gap-2">
             <Calendar /> {menuOpen && 'Dashboard'}
-          </a>
-          <a href="/mentor/availability" className="text-white hover:text-purple-400 font-semibold flex items-center gap-2">
+          </Link>
+          <Link href="/mentor/availability" className="text-white hover:text-purple-400 font-semibold flex items-center gap-2">
             <Clock /> {menuOpen && 'Disponibilidad'}
-          </a>
+          </Link>
         </nav>
         <button
           className="mt-auto py-2 px-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all"
