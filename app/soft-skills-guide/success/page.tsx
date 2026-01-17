@@ -31,7 +31,7 @@ interface PurchasedProduct {
   icon: React.ReactNode
 }
 
-export default function SuccessPage() {
+function SuccessContent() {
   const searchParams = useSearchParams()
   const sessionId = searchParams?.get('session')
   
