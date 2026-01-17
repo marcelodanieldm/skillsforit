@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { ShoppingCart, CheckCircle, XCircle, Loader2 } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
-export default function RecoverCartPage() {
+function RecoverCartContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
@@ -176,5 +176,20 @@ export default function RecoverCartPage() {
         )}
       </motion.div>
     </div>
+  )
+}
+
+export default function RecoverCartPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-blue-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading cart...</p>
+        </div>
+      </div>
+    }>
+      <RecoverCartContent />
+    </Suspense>
   )
 }
