@@ -17,6 +17,15 @@ interface AvailabilitySlot {
 }
 
 export default function MentorAvailabilityPage() {
+    // Estado para menú lateral
+    const [menuOpen, setMenuOpen] = useState(true);
+
+    // Logout handler
+    const handleLogout = () => {
+      localStorage.removeItem('mentor_token');
+      localStorage.removeItem('mentor_user');
+      window.location.href = '/mentor/login';
+    };
   const [slots, setSlots] = useState<AvailabilitySlot[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -118,8 +127,32 @@ export default function MentorAvailabilityPage() {
   const daysWithAvailability = new Set(slots.map((s) => s.day_of_week)).size
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-slate-950 text-white flex">
+      {/* Menú lateral */}
+      <div className={`bg-slate-800 border-r border-purple-700 p-4 flex flex-col transition-all duration-300 ${menuOpen ? 'w-64' : 'w-16'} min-h-full`}>
+        <button
+          className="mb-6 text-purple-400 hover:text-white focus:outline-none"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          {menuOpen ? '⏴' : '⏵'}
+        </button>
+        <nav className="flex flex-col gap-4">
+          <a href="/mentor/dashboard" className="text-white hover:text-purple-400 font-semibold flex items-center gap-2">
+            <Calendar /> {menuOpen && 'Dashboard'}
+          </a>
+          <a href="/mentor/availability" className="text-white hover:text-purple-400 font-semibold flex items-center gap-2">
+            <Clock /> {menuOpen && 'Disponibilidad'}
+          </a>
+        </nav>
+        <button
+          className="mt-auto py-2 px-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all"
+          onClick={handleLogout}
+        >
+          {menuOpen ? 'Cerrar sesión' : '⎋'}
+        </button>
+      </div>
+      <div className="flex-1">
+        <div className="max-w-7xl mx-auto p-6">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
