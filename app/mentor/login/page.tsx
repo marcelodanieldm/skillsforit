@@ -29,7 +29,7 @@ export default function MentorLoginPage() {
       }
       localStorage.setItem('mentor_token', data.token);
       localStorage.setItem('mentor_user', JSON.stringify(data.user));
-      router.push('/mentor/dashboard');
+      router.push(`/mentor/dashboard?id=${data.user.id}`);
     } catch (err: any) {
       setError(err.message || 'Error de autenticación.');
     } finally {
