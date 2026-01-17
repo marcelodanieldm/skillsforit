@@ -51,23 +51,23 @@ export default function Navbar() {
             <AnimatePresence>
               {showAuthMenu && (
                 <motion.div
-                                    {/* IT User Login */}
-                                    <Link
-                                      href="/user/login"
-                                      className="flex items-center gap-3 px-4 py-3 hover:bg-slate-700 transition-colors border-b border-slate-700"
-                                    >
-                                      <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                                      <div>
-                                        <div className="text-white text-sm font-medium">Login Usuario IT</div>
-                                        <div className="text-gray-400 text-xs">Acceso IT de prueba</div>
-                                      </div>
-                                    </Link>
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
                   className="absolute right-0 mt-2 w-56 bg-slate-800 border border-slate-700 rounded-lg shadow-xl overflow-hidden"
                 >
+                  {/* IT User Login */}
+                  <Link
+                    href="/user/login"
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-slate-700 transition-colors border-b border-slate-700"
+                  >
+                    <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                    <div>
+                      <div className="text-white text-sm font-medium">Login Usuario IT</div>
+                      <div className="text-gray-400 text-xs">Acceso IT de prueba</div>
+                    </div>
+                  </Link>
                   {/* General Login */}
                   <Link
                     href="/auth/signin"
