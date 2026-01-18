@@ -61,10 +61,12 @@ export const sendEmail = async (options: EmailOptions) => {
   }
 }
 
+// Puedes pasar password temporal como argumento opcional
 export const sendAnalysisReport = async (
   email: string,
   name: string,
-  reportPath: string
+  reportPath: string,
+  tempPassword?: string
 ) => {
   const html = `
     <!DOCTYPE html>
@@ -73,51 +75,51 @@ export const sendAnalysisReport = async (
       <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .header { background: linear-gradient(135deg, #3b82f6 0%, #a21caf 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
         .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-        .button { display: inline-block; background: #667eea; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+        .button { display: inline-block; background: #3b82f6; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; font-weight: bold; }
         .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
-        .highlight { background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0; }
+        .highlight { background: #e0f2fe; padding: 15px; border-left: 4px solid #3b82f6; margin: 20px 0; }
+        .premium { background: #fffbe6; padding: 15px; border-left: 4px solid #fbbf24; margin: 20px 0; }
       </style>
     </head>
     <body>
       <div class="container">
         <div class="header">
-          <h1>🎉 ¡Tu Análisis de CV está listo!</h1>
+          <h1>🚀 ¡Tu Informe de Soft Skills está listo!</h1>
         </div>
         <div class="content">
           <p>Hola <strong>${name}</strong>,</p>
-          
-          <p>Tu CV ha sido analizado exitosamente por nuestra IA especializada en perfiles IT. El reporte completo está adjunto a este email.</p>
-          
+          <p>¡Felicitaciones por completar tu simulador de entrevistas! Adjuntamos tu informe personalizado con el análisis de tus respuestas, fortalezas y áreas de mejora para destacar en procesos IT.</p>
           <div class="highlight">
-            <strong>📊 Tu reporte incluye:</strong>
+            <strong>¿Qué encontrarás en tu informe?</strong>
             <ul>
-              <li>Score ATS y análisis de compatibilidad</li>
-              <li>Identificación de 15+ mejoras específicas</li>
-              <li>Comparación antes/después de cada sección</li>
-              <li>Recomendaciones personalizadas</li>
-              <li>Keywords optimizadas para tu profesión</li>
+              <li>Gráfica radar de tus competencias blandas</li>
+              <li>Red Flags y recomendaciones personalizadas</li>
+              <li>Ejemplos de respuestas ideales (si adquiriste premium)</li>
+              <li>Consejos para entrevistas en Google, Amazon y más</li>
             </ul>
           </div>
 
+          <div style="background:#f1f5f9;padding:18px 20px;border-radius:8px;margin:24px 0 18px 0;">
+            <strong>🔑 Tus credenciales de acceso a SkillsForIT:</strong><br>
+            <span style="display:block;margin-top:8px;">Usuario: <b>${email}</b></span>
+            <span style="display:block;">Contraseña temporal: <b>${tempPassword ? tempPassword : 'La que elegiste al registrarte'}</b></span>
+            <span style="display:block;margin-top:8px;font-size:13px;color:#64748b;">Puedes cambiar tu contraseña desde el dashboard en cualquier momento.</span>
+          </div>
           <p><strong>📎 El archivo PDF está adjunto a este email.</strong></p>
-          
-          <p>También puedes acceder a tu dashboard en cualquier momento:</p>
-          
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="button">
-            Ver Dashboard
-          </a>
-
-          <p>Si tienes alguna pregunta o necesitas ayuda para implementar las mejoras, no dudes en responder a este email.</p>
-          
-          <p>¡Mucho éxito en tu búsqueda laboral!</p>
-          
-          <p>Saludos,<br><strong>El equipo de SkillsForIT</strong></p>
+          <div class="premium">
+            <strong>¿Quieres mejorar aún más?</strong><br>
+            Desbloquea <b>Respuestas Perfectas</b> y accede a ejemplos premium de cómo responder cada pregunta como un candidato top. <a href="${process.env.NEXT_PUBLIC_APP_URL}/soft-skills-simulator" style="color:#a21caf;text-decoration:underline;">Haz clic aquí para ver la oferta</a>.
+          </div>
+          <a href="${process.env.NEXT_PUBLIC_APP_URL}/user/dashboard" class="button">Ir a mi Dashboard</a>
+          <p>¿Dudas o feedback? Responde este email y te ayudamos a potenciar tu perfil.</p>
+          <p>¡Éxitos en tu próxima entrevista!</p>
+          <p>Abrazo,<br><strong>El equipo de SkillsForIT</strong></p>
         </div>
         <div class="footer">
           <p>© 2026 SkillsForIT - Tu aliado en el mercado IT</p>
-          <p>Este email contiene tu reporte de análisis de CV. Guárdalo para futuras referencias.</p>
+          <p>Este email contiene tu informe de soft skills. Guárdalo para futuras referencias.</p>
         </div>
       </div>
     </body>
@@ -126,11 +128,11 @@ export const sendAnalysisReport = async (
 
   return sendEmail({
     to: email,
-    subject: '🚀 Tu Análisis de CV SkillsForIT está listo',
+    subject: '🚀 Tu Informe de Soft Skills está listo',
     html,
     attachments: [
       {
-        filename: 'CV-Analysis-Report.pdf',
+        filename: 'SoftSkills-Report.pdf',
         path: reportPath,
       },
     ],

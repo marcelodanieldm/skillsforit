@@ -28,7 +28,7 @@ import {
   PieChart,
   Pie,
   Cell
-} from 'recharts'
+
 
 interface RecoveryAnalytics {
   // Carritos

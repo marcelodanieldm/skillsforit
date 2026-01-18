@@ -45,7 +45,7 @@
   - Revenue by service type (pie chart)
   - Daily revenue trend (line chart)
   - Revenue by country grid
-  - Uses Recharts for data visualization
+
   - Responsive design with Framer Motion animations
 
 ## 🎨 Dashboard Features
@@ -263,9 +263,9 @@ With this dashboard, the CEO can:
 
 ## 🔧 Technical Implementation
 
-### Charts Library: Recharts
+
 ```bash
-npm install recharts
+
 ```
 
 ### Chart Components Used

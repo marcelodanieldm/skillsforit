@@ -1,20 +1,10 @@
-import OpenAI from 'openai'
+
 import { AnalysisResult } from './database'
 import { buildAdvancedCVPrompt } from './cv-auditor'
-import { semanticCache } from './semantic-cache'
 
-function getOpenAI() {
-  return new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  })
-}
 
 /**
- * Analyze CV with AI (with Semantic Caching)
- * 
- * This function now uses semantic caching to reduce API costs by 30%.
- * - If similar CV found in cache (>95% similarity), returns cached result
- * - Otherwise, calls OpenAI API and caches the result
+ * Analyze CV with AI (Hugging Face only, no semantic cache)
  */
 export async function analyzeCVWithAI(
   cvText: string,
@@ -22,28 +12,13 @@ export async function analyzeCVWithAI(
   country: string,
   purpose?: string
 ): Promise<AnalysisResult> {
-  // Use semantic cache
-  const { result, cached, similarity } = await semanticCache.getOrAnalyze(
-    cvText,
-    profession,
-    country,
-    async (text, prof, count) => {
-      // This function only runs on cache MISS
-      return await performActualAnalysis(text, prof, count, purpose)
-    }
-  )
-
-  if (cached) {
-    console.log(`♻️ [AI Analysis] Returned cached result (similarity: ${similarity?.toFixed(4)})`)
-  } else {
-    console.log('🤖 [AI Analysis] Performed fresh analysis with OpenAI')
-  }
-
-  return result
+  return await performActualAnalysis(cvText, profession, country, purpose)
 }
 
+
+
 /**
- * Perform actual OpenAI analysis (called only on cache miss)
+ * Realiza el análisis de CV usando la Inference API de Hugging Face (Mistral-7B-Instruct-v0.2)
  */
 async function performActualAnalysis(
   cvText: string,
@@ -51,47 +26,55 @@ async function performActualAnalysis(
   country: string,
   purpose?: string
 ): Promise<AnalysisResult> {
-  // Use advanced 50-criteria prompt system
   const prompt = buildAdvancedCVPrompt(cvText, profession, country, purpose);
+  const apiKey = process.env.HUGGINGFACE_API_KEY;
+  if (!apiKey) throw new Error('Falta la variable HUGGINGFACE_API_KEY en el entorno');
 
-  try {
-    const openai = getOpenAI()
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o', // Use GPT-4o for advanced analysis
-      messages: [
-        {
-          role: 'system',
-          content: 'You are an expert IT recruiter with 15+ years of experience evaluating CVs for technical roles. You perform comprehensive audits based on 50+ professional criteria.'
-        },
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      response_format: { type: 'json_object' },
-      temperature: 0.3, // Lower temperature for more consistent, analytical responses
-      max_tokens: 4000, // Increased for comprehensive 50-criteria analysis
+  const response = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({
+      inputs: prompt,
+      parameters: { max_new_tokens: 1024, temperature: 0.3 },
+      options: { wait_for_model: true }
     })
+  });
 
-    const result = completion.choices[0].message.content
-    if (!result) {
-      throw new Error('No se recibió respuesta de OpenAI')
-    }
-
-    const analysis: AnalysisResult = JSON.parse(result)
-    
-    // Validate the structure
-    if (!analysis.score || !analysis.atsScore || !analysis.problems || !analysis.improvements) {
-      throw new Error('Respuesta de IA incompleta')
-    }
-
-    return analysis
-  } catch (error: any) {
-    console.error('Error analyzing CV with AI:', error)
-    
-    // Fallback to mock analysis if AI fails
-    return getMockAnalysis()
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error('Hugging Face API error: ' + errorText);
   }
+  const data = await response.json();
+  // El modelo devuelve un array con un objeto { generated_text }
+  const content = Array.isArray(data) ? data[0]?.generated_text : data?.generated_text;
+  if (!content) throw new Error('La respuesta de Hugging Face no contiene texto generado');
+
+  // Intentar parsear el JSON si el modelo lo devuelve como bloque de código
+  let parsed: any;
+  let clean = content.trim();
+  if (clean.startsWith('```json')) {
+    clean = clean.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+  } else if (clean.startsWith('```')) {
+    clean = clean.replace(/^```\s*/, '').replace(/\s*```$/, '');
+  }
+  try {
+    parsed = JSON.parse(clean);
+  } catch {
+    // Si no es JSON, devolver todo como recomendación
+    parsed = { recommendations: [clean] };
+  }
+  return {
+    score: parsed.overallScore || parsed.score || 0,
+    atsScore: parsed.atsScore || parsed.scores?.atsCompatibility || 0,
+    problems: parsed.problems || parsed.criticalIssues || [],
+    improvements: parsed.improvements || [],
+    strengths: parsed.strengths || [],
+    recommendations: parsed.recommendations || []
+  };
 }
 
 // Mock analysis for development/fallback

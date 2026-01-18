@@ -304,41 +304,46 @@ export async function auditCVWithFallback(
   tokensUsed: number
   success: boolean
 }> {
-  const { getLLMStrategyManager } = await import('../llm-strategy')
-  const manager = getLLMStrategyManager()
-
+  // Hugging Face only implementation
   const prompt = generateCVAuditPrompt(
     cvText,
     options?.targetRole,
     options?.targetCountry,
     options?.targetIndustry
   )
-
-  const response = await manager.complete({
-    prompt,
-    systemPrompt: UNIFIED_SYSTEM_PROMPT,
-    temperature: 0.3,  // Low temperature for consistent structured output
-    maxTokens: 3000,
-    jsonMode: true     // Enable JSON mode if provider supports it
-  })
-
-  if (!response.success) {
+  const apiKey = process.env.HUGGINGFACE_API_KEY;
+  if (!apiKey) throw new Error('Falta la variable HUGGINGFACE_API_KEY en el entorno');
+  const start = Date.now();
+  const hfResponse = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({
+      inputs: prompt,
+      parameters: { max_new_tokens: 1500, temperature: 0.3 },
+    })
+  });
+  const latencyMs = Date.now() - start;
+  if (!hfResponse.ok) {
     return {
       result: null,
-      provider: response.provider,
-      latencyMs: response.latencyMs,
-      tokensUsed: response.tokensUsed,
+      provider: 'huggingface',
+      latencyMs,
+      tokensUsed: 0,
       success: false
     }
   }
-
-  const normalized = normalizeCVAuditResult(response.content, response.provider)
-
+  const data = await hfResponse.json();
+  const content = Array.isArray(data) && data[0]?.generated_text ? data[0].generated_text : (data.generated_text || '');
+  const normalized = normalizeCVAuditResult(content, 'huggingface');
   return {
     result: normalized,
-    provider: response.provider,
-    latencyMs: response.latencyMs,
-    tokensUsed: response.tokensUsed,
+    provider: 'huggingface',
+    latencyMs,
+    tokensUsed: 0, // Hugging Face free API does not return token usage
     success: normalized !== null
   }
 }

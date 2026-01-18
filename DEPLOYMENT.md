@@ -6,7 +6,7 @@
 
 #### 1. **Tipos TypeScript** ✅
 - ✅ Creado `types/canvas-confetti.d.ts` - Declaraciones de tipos para canvas-confetti
-- ✅ Creado `types/recharts.d.ts` - Declaraciones completas de tipos para recharts
+
 - ✅ Actualizado `tsconfig.json`:
   - `strict: false` para evitar errores estrictos en build
   - Agregado `types/**/*.d.ts` al include array
@@ -45,11 +45,10 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
 STRIPE_WEBHOOK_SECRET=
 ```
 
-#### LLM Providers (Al menos uno requerido)
+
+#### AI/LLM Provider (Requerido)
 ```env
-OPENAI_API_KEY=
-ANTHROPIC_API_KEY=
-GOOGLE_AI_API_KEY=
+HUGGINGFACE_API_KEY=
 ```
 
 #### Email (Opcional)
@@ -97,7 +96,7 @@ Los errores de `Cannot find module 'next/server'` en VS Code son falsos positivo
 ```
 types/
   ├── canvas-confetti.d.ts (nuevo)
-  └── recharts.d.ts (nuevo)
+
 
 components/
   ├── JobStatus.tsx (corregido)

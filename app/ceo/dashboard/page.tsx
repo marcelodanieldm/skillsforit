@@ -13,21 +13,7 @@ import {
   FaLightbulb
 } from 'react-icons/fa'
 import { 
-  LineChart, 
-  Line, 
-  BarChart,
-  Bar,
-  FunnelChart,
-  Funnel,
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
-  ResponsiveContainer,
-  Cell,
-  LabelList
-} from 'recharts'
+} 
 import { FunnelAnalyticsWidget } from '@/components/ceo/FunnelAnalyticsWidget'
 import { FunnelVisualizer } from '@/components/ceo/FunnelVisualizer'
 import { PriceManagement } from '@/components/ceo/PriceManagement'
@@ -417,39 +403,7 @@ export default function CEODashboard() {
             Proyecciones de Ingresos: Realista vs Optimista
           </h2>
 
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={combinedData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="month" stroke="#9ca3af" />
-              <YAxis stroke="#9ca3af" />
-              <Tooltip
-                contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #4b5563', borderRadius: '8px' }}
-                labelStyle={{ color: '#f3f4f6' }}
-              />
-              <Legend />
-              <Line 
-                type="monotone" 
-                dataKey="Actual" 
-                stroke="#10b981" 
-                strokeWidth={3}
-                dot={{ fill: '#10b981', r: 5 }}
-              />
-              <Line 
-                type="monotone" 
-                dataKey="Realista" 
-                stroke="#8b5cf6" 
-                strokeWidth={2}
-                strokeDasharray="5 5"
-              />
-              <Line 
-                type="monotone" 
-                dataKey="Optimista" 
-                stroke="#ec4899" 
-                strokeWidth={2}
-                strokeDasharray="5 5"
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <div className="h-96 flex items-center justify-center text-gray-400">[Gráfico removido]</div>
 
           {/* Insights */}
           {projections && projections.insights.length > 0 && (
@@ -480,21 +434,7 @@ export default function CEODashboard() {
               LTV por Segmento
             </h2>
 
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={ltv}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="segment" stroke="#9ca3af" />
-                <YAxis stroke="#9ca3af" />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #4b5563', borderRadius: '8px' }}
-                />
-                <Bar dataKey="ltv" fill="#3b82f6" name="LTV ($)">
-                  {ltv.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="h-80 flex items-center justify-center text-gray-400">[Gráfico removido]</div>
 
             <div className="mt-6 space-y-3">
               {ltv.map((segment, index) => (

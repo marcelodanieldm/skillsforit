@@ -468,7 +468,7 @@ flowchart LR
 - **AI**: OpenAI GPT-4 para análisis de CV
 - **PDF**: jsPDF para generación de reportes
 - **Email**: Nodemailer para notificaciones
-- **Charts**: Recharts para visualizaciones
+
 - **Database**: In-Memory (producción debería usar PostgreSQL/MongoDB)
 
 ### Variables de Entorno Requeridas

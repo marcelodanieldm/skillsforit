@@ -602,7 +602,7 @@ fetch('/api/analytics/product')
 ### Stack Tecnológico
 
 - **Frontend:** Next.js 14 + TypeScript + Tailwind CSS
-- **Gráficos:** Recharts (LineChart, BarChart, PieChart, AreaChart)
+
 - **Animaciones:** Framer Motion
 - **Iconos:** React Icons
 - **Datos:** APIs RESTful (real-time + cache)

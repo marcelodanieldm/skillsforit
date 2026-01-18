@@ -6,7 +6,6 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { 
-  analyzeResponse, 
   generateFullReport, 
   censorReport,
   SOFT_SKILL_QUESTIONS,
@@ -207,13 +206,10 @@ export async function POST(request: NextRequest) {
           )
         }
 
-        const analysis = await analyzeResponse(question, answer)
-
+        // analyzeResponse is deprecated and not implemented
         return NextResponse.json({
-          success: true,
-          questionId,
-          analysis
-        })
+          error: 'analyze-single is not implemented. Use the main simulator flow.'
+        }, { status: 501 })
       }
 
       default:

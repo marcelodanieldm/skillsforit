@@ -12,21 +12,7 @@ import {
   FaFilter,
   FaTrophy
 } from 'react-icons/fa'
-import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer
-} from 'recharts'
+
 
 interface AnalyticsData {
   kpis: {
@@ -185,6 +171,31 @@ export default function CEODashboard() {
         </motion.div>
 
         {/* KPIs Grid */}
+                {/* Info box: KPIs explanation */}
+                <div className="mb-4 p-4 bg-slate-900/30 border-l-4 border-slate-400 rounded">
+                  <strong>¿Qué significa cada KPI?</strong><br />
+                  <ul className="list-disc ml-6">
+                    <li><b>Ingresos Totales:</b> Todo el dinero generado hasta ahora.</li>
+                    <li><b>Clientes Únicos:</b> Número de personas que han comprado.</li>
+                    <li><b>Promedio por Cliente:</b> Gasto promedio por cliente.</li>
+                    <li><b>Proyección Mensual:</b> Estimación de ingresos para el mes actual.</li>
+                  </ul>
+                </div>
+                {/* Info box: Revenue by Service Type explanation */}
+                <div className="mb-4 p-4 bg-purple-900/30 border-l-4 border-purple-400 rounded">
+                  <strong>¿Qué significa "Ingresos por Tipo de Servicio"?</strong><br />
+                  Muestra cuánto dinero y cuántas ventas provienen de cada servicio (CV Analysis vs. Mentorship). Ayuda a identificar cuál servicio es más popular y rentable.
+                </div>
+                {/* Info box: Daily Revenue explanation */}
+                <div className="mb-4 p-4 bg-green-900/30 border-l-4 border-green-400 rounded">
+                  <strong>¿Qué significa "Ingresos Diarios"?</strong><br />
+                  Muestra cuánto dinero se gana cada día (últimos 30 días). Permite detectar tendencias, estacionalidad o el impacto de campañas.
+                </div>
+                {/* Info box: Revenue by Profession explanation */}
+                <div className="mb-4 p-4 bg-yellow-900/30 border-l-4 border-yellow-400 rounded">
+                  <strong>¿Qué significa "Ingresos por Profesión"?</strong><br />
+                  Muestra las profesiones de los clientes que más ingresos generan. Ayuda a identificar los segmentos más valiosos y enfocar el marketing.
+                </div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -253,27 +264,8 @@ export default function CEODashboard() {
               <FaBriefcase className="text-purple-400" />
               Ingresos por Tipo de Servicio
             </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={[
-                    { name: 'CV Analysis', value: data.revenueByType.cvAnalysis.revenue },
-                    { name: 'Mentorship', value: data.revenueByType.mentorship.revenue }
-                  ]}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  <Cell fill="#8b5cf6" />
-                  <Cell fill="#3b82f6" />
-                </Pie>
-                <Tooltip formatter={(value) => formatCurrency(value as number)} />
-              </PieChart>
-            </ResponsiveContainer>
+
+            <div className="text-gray-400 text-center py-12">[Gráfico removido]</div>
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-purple-400">
@@ -301,29 +293,8 @@ export default function CEODashboard() {
               <FaChartLine className="text-green-400" />
               Ingresos Diarios (Últimos 30 días)
             </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={data.dailyRevenue}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis 
-                  dataKey="date" 
-                  stroke="#9ca3af"
-                  tickFormatter={formatDate}
-                />
-                <YAxis stroke="#9ca3af" tickFormatter={(value) => `$${value}`} />
-                <Tooltip 
-                  formatter={(value) => formatCurrency(value as number)}
-                  labelFormatter={formatDate}
-                  contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569' }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="revenue" 
-                  stroke="#10b981" 
-                  strokeWidth={2}
-                  dot={{ fill: '#10b981' }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+
+            <div className="text-gray-400 text-center py-12">[Gráfico removido]</div>
           </motion.div>
         </div>
 
@@ -346,26 +317,8 @@ export default function CEODashboard() {
             </div>
           </div>
 
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={data.revenueByProfession}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis 
-                dataKey="profession" 
-                stroke="#9ca3af"
-                angle={-45}
-                textAnchor="end"
-                height={100}
-              />
-              <YAxis stroke="#9ca3af" tickFormatter={(value) => `$${value}`} />
-              <Tooltip 
-                formatter={(value) => formatCurrency(value as number)}
-                contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569' }}
-              />
-              <Legend />
-              <Bar dataKey="revenue" fill="#8b5cf6" name="Ingresos" />
-              <Bar dataKey="count" fill="#3b82f6" name="Clientes" />
-            </BarChart>
-          </ResponsiveContainer>
+
+          <div className="text-gray-400 text-center py-12">[Gráfico removido]</div>
 
           {/* Top 3 Professions Table */}
           <div className="mt-6 grid md:grid-cols-3 gap-4">
@@ -399,6 +352,11 @@ export default function CEODashboard() {
         </motion.div>
 
         {/* Revenue by Country */}
+                {/* Info box: Revenue by Country explanation */}
+                <div className="mb-4 p-4 bg-blue-900/30 border-l-4 border-blue-400 rounded">
+                  <strong>¿Qué significa "Ingresos por País"?</strong><br />
+                  Muestra los países que más ingresos y clientes aportan. Útil para decidir dónde enfocar esfuerzos y posibles expansiones.
+                </div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

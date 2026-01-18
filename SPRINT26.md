@@ -1403,7 +1403,7 @@ curl -X PUT https://skillsforit.com/api/ceo/services \
 - **Frontend**: Next.js 14, TypeScript, Framer Motion, Tailwind CSS
 - **Backend**: Next.js API Routes, Supabase PostgreSQL
 - **Payments**: Stripe API (v2024-12-18.acacia)
-- **Analytics**: Custom SQL views, Recharts
+- **Analytics**: Custom SQL views
 - **Auth**: Supabase Auth con RLS policies
 
 ---

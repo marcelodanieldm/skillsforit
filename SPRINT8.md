@@ -77,7 +77,7 @@ assumptions: {
 ```
 
 **Frontend**:
-- **Componente**: LineChart de Recharts
+
 - **Archivo**: `app/ceo/dashboard/page.tsx`
 - **Funcionalidades**:
   - Combina histórico + proyecciones en un solo gráfico
@@ -165,7 +165,7 @@ ltv = $180 × (1 / 0.12) = $1,500
 ```
 
 **Frontend**:
-- **Componente**: BarChart de Recharts
+
 - **Visualización**:
   - Barras con colores diferenciados por segmento
   - Cards con métricas detalladas (usuarios, churn, lifetime)

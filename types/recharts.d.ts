@@ -1,4 +1,4 @@
-declare module 'recharts' {
+
   import { ComponentType, ReactElement, CSSProperties } from 'react';
 
   export interface PieLabelRenderProps {

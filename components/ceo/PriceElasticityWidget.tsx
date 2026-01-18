@@ -11,19 +11,7 @@ import {
   CheckCircle,
   Activity
 } from 'lucide-react'
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  Area,
-  AreaChart,
-  ReferenceLine
-} from 'recharts'
+
 
 interface PriceElasticityData {
   price: number
@@ -261,52 +249,7 @@ export function PriceElasticityWidget() {
           <BarChart3 className="w-4 h-4" />
           Comparativa: Precio vs. Volumen de Ventas
         </h4>
-        <ResponsiveContainer width="100%" height={250}>
-          <AreaChart data={chartData}>
-            <defs>
-              <linearGradient id="volumeGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.8}/>
-                <stop offset="95%" stopColor="#6366f1" stopOpacity={0.1}/>
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-            <XAxis 
-              dataKey="price" 
-              stroke="#94a3b8"
-              tickFormatter={(value) => `$${value.toFixed(0)}`}
-            />
-            <YAxis 
-              stroke="#94a3b8"
-              tickFormatter={(value) => `${value} ventas`}
-            />
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: '#1e293b', 
-                border: '1px solid #4f46e5',
-                borderRadius: '8px'
-              }}
-              formatter={(value: any, name: string) => {
-                if (name === 'volume') return [`${value} ventas`, 'Volumen']
-                return [value, name]
-              }}
-              labelFormatter={(label) => `Precio: $${label}`}
-            />
-            <ReferenceLine 
-              x={selectedService?.base_price || 0} 
-              stroke="#6366f1" 
-              strokeDasharray="3 3"
-              label={{ value: 'Actual', fill: '#6366f1', fontSize: 12 } as any}
-            />
-            <Area 
-              type="monotone" 
-              dataKey="volume" 
-              stroke="#6366f1" 
-              strokeWidth={2}
-              fillOpacity={1} 
-              fill="url(#volumeGradient)" 
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+        <div className="h-64 flex items-center justify-center text-gray-400">[Gráfico removido]</div>
       </div>
 
       {/* Chart: Price vs Revenue */}
@@ -315,49 +258,7 @@ export function PriceElasticityWidget() {
           <DollarSign className="w-4 h-4" />
           Comparativa: Precio vs. Revenue Mensual
         </h4>
-        <ResponsiveContainer width="100%" height={250}>
-          <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-            <XAxis 
-              dataKey="price" 
-              stroke="#94a3b8"
-              tickFormatter={(value) => `$${value.toFixed(0)}`}
-            />
-            <YAxis 
-              stroke="#94a3b8"
-              tickFormatter={(value) => `$${(value / 1000).toFixed(1)}k`}
-            />
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: '#1e293b', 
-                border: '1px solid #10b981',
-                borderRadius: '8px'
-              }}
-              formatter={(value: any) => [`$${value.toFixed(0)}`, 'Revenue']}
-              labelFormatter={(label) => `Precio: $${label}`}
-            />
-            <ReferenceLine 
-              x={selectedService?.base_price || 0} 
-              stroke="#10b981" 
-              strokeDasharray="3 3"
-              label={{ value: 'Actual', fill: '#10b981', fontSize: 12 }}
-            />
-            <ReferenceLine 
-              x={bestRevenuePoint?.price || 0} 
-              stroke="#fbbf24" 
-              strokeDasharray="5 5"
-              label={{ value: 'Óptimo', fill: '#fbbf24', fontSize: 12 }}
-            />
-            <Line 
-              type="monotone" 
-              dataKey="revenue" 
-              stroke="#10b981" 
-              strokeWidth={3}
-              dot={{ fill: '#10b981', r: 4 }}
-              activeDot={{ r: 6 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        <div className="h-64 flex items-center justify-center text-gray-400">[Gráfico removido]</div>
       </div>
 
       {/* Insights */}

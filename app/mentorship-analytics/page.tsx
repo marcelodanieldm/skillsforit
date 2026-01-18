@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { FaGlobe, FaDollarSign, FaUsers, FaChartLine, FaLightbulb } from 'react-icons/fa'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
+
 
 interface CountryConversion {
   country: string

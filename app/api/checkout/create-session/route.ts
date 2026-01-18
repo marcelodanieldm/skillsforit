@@ -23,6 +23,11 @@ const PRODUCTS = {
     name: '🎯 Sesión de Mentoría 1:1',
     price: 15_00, // $15.00 en centavos
     description: '30 minutos con experto + simulacro de entrevista'
+  },
+  'perfect-answer-generator': {
+    name: '🤖 Generador de Respuestas Perfectas',
+    price: 3_00, // $3.00 en centavos
+    description: 'Ejemplos premium de respuestas perfectas para entrevistas, usando el método STAR y mejores prácticas de Google/Amazon.'
   }
 }
 

@@ -29,6 +29,8 @@ import {
   FaBook
 } from 'react-icons/fa'
 import Link from 'next/link'
+import { SOFT_SKILLS_QUESTIONS } from '@/lib/prompts/soft-skills-analyzer'
+import { useCallback } from 'react'
 
 // =====================================================
 // TIPOS
@@ -219,6 +221,7 @@ export default function SoftSkillsSimulatorPage() {
   const [email, setEmail] = useState('')
   const [isUnlocking, setIsUnlocking] = useState(false)
   const [fullReport, setFullReport] = useState<any>(null)
+  const [hasPremium, setHasPremium] = useState(false)
   const [chatHistory, setChatHistory] = useState<Array<{
     type: 'question' | 'answer' | 'feedback'
     content: string
@@ -772,6 +775,51 @@ export default function SoftSkillsSimulatorPage() {
   // RENDER: UNLOCKED REPORT + UPSELLS
   // =====================================================
 
+  // Handler for Stripe checkout (upsell)
+  const handlePremiumCheckout = useCallback(async () => {
+    const emailToUse = fullReport?.email || email || prompt('Ingresa tu email para recibir el acceso:')?.trim();
+    if (!emailToUse) return alert('Debes ingresar un email válido.');
+    const res = await fetch('/api/checkout/create-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: emailToUse,
+        source: 'soft-skills-simulator',
+        items: [ { productId: 'perfect-answer-generator', quantity: 1 } ]
+      })
+    });
+    const data = await res.json();
+    if (data?.url) {
+      window.location.href = data.url;
+    } else {
+      alert('Error al iniciar el pago. Intenta de nuevo.');
+    }
+  }, [fullReport, email]);
+
+  // Handler for PDF download (with or without premium)
+  const handleDownloadPDF = useCallback(async () => {
+    // If premium, pass ideal answers
+    let premiumAnswers: string[] | undefined = undefined;
+    if (hasPremium) {
+      premiumAnswers = SOFT_SKILLS_QUESTIONS.map(q => q.idealAnswer);
+    }
+    // Call API to generate PDF (implement endpoint or adapt existing one)
+    const res = await fetch('/api/soft-skills/generate-pdf', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId,
+        premiumAnswers
+      })
+    });
+    const data = await res.json();
+    if (data?.url) {
+      window.open(data.url, '_blank');
+    } else {
+      alert('No se pudo generar el PDF.');
+    }
+  }, [sessionId, hasPremium]);
+
   if (phase === 'unlock' && fullReport) {
     return (
       <div className="min-h-screen bg-gray-900 text-white py-12 px-4">
@@ -913,7 +961,39 @@ export default function SoftSkillsSimulatorPage() {
             </div>
           </div>
 
-          {/* Footer CTA */}
+          {/* Premium Upsell CTA */}
+          <div className="mt-12 bg-gradient-to-br from-yellow-50 via-white to-blue-50 dark:from-slate-800 dark:to-slate-900 rounded-2xl p-8 shadow-xl border border-yellow-200 dark:border-slate-700 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-yellow-700 dark:text-yellow-300 mb-4">
+              🎯 Generador de respuestas perfectas
+            </h2>
+            <p className="text-lg text-gray-700 dark:text-gray-200 mb-6 max-w-2xl mx-auto">
+              ¿Quieres ver <b>cómo respondería un candidato perfecto</b> a cada pregunta, usando el método STAR y las mejores prácticas de entrevistas de Google y Amazon?<br />
+              <span className="font-semibold text-yellow-800 dark:text-yellow-200">Desbloquea ejemplos premium y lleva tus respuestas al siguiente nivel.</span>
+            </p>
+            {!hasPremium ? (
+              <button
+                onClick={handlePremiumCheckout}
+                className="mt-4 px-8 py-5 bg-gradient-to-r from-yellow-400 to-pink-500 hover:from-yellow-500 hover:to-pink-600 text-white text-xl font-bold rounded-full shadow-lg transition-all flex items-center justify-center gap-3"
+              >
+                🔓 Desbloquear respuestas perfectas por <span className="font-bold">$3 USD</span>
+              </button>
+            ) : (
+              <div className="text-green-600 font-bold text-lg mb-2">¡Acceso premium activado!</div>
+            )}
+            <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+              Pago único, acceso inmediato. Procesado por Stripe.
+            </p>
+          </div>
+
+          {/* PDF Download Button (shows premium if purchased) */}
+          <div className="mt-8 text-center">
+            <button
+              onClick={handleDownloadPDF}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl transition-colors flex items-center justify-center gap-2"
+            >
+              <FaArrowRight /> Descargar Reporte PDF {hasPremium && <span className="ml-2 bg-yellow-400 text-yellow-900 px-2 py-1 rounded">Premium</span>}
+            </button>
+          </div>
           <div className="mt-8 text-center">
             <Link
               href="/"
