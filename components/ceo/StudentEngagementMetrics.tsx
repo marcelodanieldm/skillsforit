@@ -9,19 +9,7 @@ import {
   FaChartLine,
   FaExclamationTriangle 
 } from 'react-icons/fa'
-import { 
-  LineChart, 
-  Line, 
-  BarChart,
-  Bar,
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
-  ResponsiveContainer,
-  Cell
-} from 'recharts'
+
 
 interface TaskCompletionData {
   completionRate: number
@@ -269,31 +257,7 @@ export default function StudentEngagementMetrics({ token }: StudentEngagementMet
       </div>
 
       {/* DAU Trend Chart */}
-      <div className="bg-gray-700 rounded-lg p-6">
-        <h3 className="text-lg font-bold mb-4">Tendencia DAU (Última Semana)</h3>
-        <ResponsiveContainer width="100%" height={200}>
-          <LineChart data={dauTrendData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey="day" stroke="#9CA3AF" />
-            <YAxis stroke="#9CA3AF" />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: '#1F2937',
-                border: '1px solid #374151',
-                borderRadius: '8px'
-              }}
-            />
-            <Line
-              type="monotone"
-              dataKey="users"
-              stroke="#3B82F6"
-              strokeWidth={3}
-              dot={{ fill: '#3B82F6', r: 5 }}
-              activeDot={{ r: 7 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+      <div className="bg-gray-700 rounded-lg p-6 h-64 flex items-center justify-center text-gray-400">[Gráfico removido]</div>
 
       {/* Timestamp */}
       <p className="text-xs text-gray-500 text-center">

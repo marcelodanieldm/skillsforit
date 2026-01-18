@@ -11,7 +11,7 @@
  * 5. Red Flags (falta de ownership, victimización, etc.)
  */
 
-import { getLLMStrategyManager } from '../llm-strategy'
+// import { getLLMStrategyManager } from '../llm-strategy'
 
 export interface STARMethodScore {
   situation: number      // 0-100: ¿Describe el contexto claramente?
@@ -152,8 +152,6 @@ export async function analyzeSoftSkillsResponse(
   try {
     const question = SOFT_SKILLS_QUESTIONS[questionNumber - 1]
     const wordCount = userResponse.trim().split(/\s+/).length
-    
-    // Validación básica
     if (wordCount < 20) {
       // Respuesta muy corta → análisis predeterminado negativo
       return {
@@ -206,7 +204,7 @@ export async function analyzeSoftSkillsResponse(
         ]
       }
     }
-    
+
     // Prompt con contexto
     const prompt = `
 PREGUNTA DE ENTREVISTA:
@@ -270,36 +268,48 @@ SCHEMA JSON:
 
 Devuelve SOLO el JSON sin markdown.`
 
-    // Llamada a LLM con fallback
-    const manager = getLLMStrategyManager()
-    const response = await manager.complete({
-      prompt,
-      systemPrompt: SOFT_SKILLS_ANALYSIS_PROMPT,
-      temperature: 0.4,  // Relativamente determinístico pero con algo de creatividad
-      maxTokens: 2000,
-      jsonMode: true
-    })
-    
-    if (!response.success) {
-      console.error('[SoftSkills] LLM failed:', response.error)
-      return null
+    // Llamada directa a Hugging Face Inference API (Mistral-7B-Instruct-v0.2)
+    const apiKey = process.env.HUGGINGFACE_API_KEY;
+    if (!apiKey) throw new Error('Falta la variable HUGGINGFACE_API_KEY en el entorno');
+
+    const response = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        inputs: prompt,
+        parameters: { max_new_tokens: 1024, temperature: 0.3 },
+        options: { wait_for_model: true }
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error('Hugging Face API error: ' + errorText);
     }
-    
-    // Parse y validación
-    let parsed: any
+    const data = await response.json();
+    // El modelo devuelve un array con un objeto { generated_text }
+    const content = Array.isArray(data) ? data[0]?.generated_text : data?.generated_text;
+    if (!content) throw new Error('La respuesta de Hugging Face no contiene texto generado');
+
+    // Intentar parsear el JSON si el modelo lo devuelve como bloque de código
+    let parsed: any;
+    let clean = content.trim();
+    if (clean.startsWith('```json')) {
+      clean = clean.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+    } else if (clean.startsWith('```')) {
+      clean = clean.replace(/^```\s*/, '').replace(/\s*```$/, '');
+    }
     try {
-      let cleaned = response.content.trim()
-      if (cleaned.startsWith('```json')) {
-        cleaned = cleaned.replace(/^```json\s*/, '').replace(/\s*```$/, '')
-      }
-      parsed = JSON.parse(cleaned)
-    } catch (error) {
-      console.error('[SoftSkills] JSON parse error:', error)
-      console.error('[SoftSkills] Raw response:', response.content.substring(0, 500))
-      return null
+      parsed = JSON.parse(clean);
+    } catch {
+      // Si no es JSON, devolver todo como recomendación
+      parsed = { recommendations: [clean] };
     }
-    
-    // Construir resultado final
+
     const analysis: SoftSkillsAnalysis = {
       responseId: `soft-skills-${Date.now()}`,
       timestamp: new Date().toISOString(),
@@ -308,13 +318,11 @@ Devuelve SOLO el JSON sin markdown.`
       userResponse,
       wordCount,
       ...parsed
-    }
-    
-    return analysis
-    
+    };
+    return analysis;
   } catch (error) {
-    console.error('[SoftSkills] Analysis error:', error)
-    return null
+    console.error('[SoftSkills] Analysis error:', error);
+    return null;
   }
 }
 

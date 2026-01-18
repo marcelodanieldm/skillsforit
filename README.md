@@ -163,22 +163,17 @@ Comprehensive analytics dashboard with revenue insights and profession-based fil
 - ✅ Problems identification with severity levels
 - ✅ Strengths and recommendations
 
-**📧 Email System:**
-- ✅ Automatic email delivery after payment
-- ✅ Professional HTML email template
-- ✅ PDF attachment with full report
-- ✅ Nodemailer integration
+- ✅ Hugging Face Inference API (Mistral-7B-Instruct-v0.2) integration
+- Hugging Face API key required for AI analysis
 
-**📄 PDF Report Generation:**
-- ✅ Professional PDF layout with jsPDF
-- ✅ Includes scores, problems, improvements
-- ✅ Before/after examples
-
-#### Sprint 3: Mentorship System ✅
-
-**👨‍🏫 Mentor Features:**
-- ✅ Mentor registration with bio, expertise, and hourly rate
-- ✅ Availability calendar (day/time slots configuration)
+# Required API Keys:
+# - STRIPE_SECRET_KEY (from https://stripe.com)
+# - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+# - STRIPE_WEBHOOK_SECRET
+# - HUGGINGFACE_API_KEY (from https://huggingface.co/settings/tokens)
+# - EMAIL_HOST, EMAIL_USER, EMAIL_PASSWORD
+# Hugging Face
+HUGGINGFACE_API_KEY=your_huggingface_api_key_here
 - ✅ Rating and review system
 - ✅ LinkedIn profile integration
 - ✅ Mentor dashboard with upcoming/completed sessions
@@ -188,7 +183,7 @@ Comprehensive analytics dashboard with revenue insights and profession-based fil
 
 **📅 Booking System (Calendly-like):**
 - ✅ Browse mentors by expertise
-- ✅ Filter mentors by skills
+# Email
 - ✅ View mentor ratings and reviews
 - ✅ 7-day calendar view
 - ✅ 10-minute time slot selection
@@ -197,9 +192,9 @@ Comprehensive analytics dashboard with revenue insights and profession-based fil
 - ✅ Stripe payment for mentorship sessions
 - ✅ Google Meet link generation
 - ✅ Confirmation page with meeting details
-
-**📝 Session Notes (Core User Story):**
-- ✅ **View previous session notes** before new meeting
+3. **AI analyzes CV** → Hugging Face Inference API processes content
+│ AI Analysis │ ◄───► Hugging Face Inference API (Mistral-7B-Instruct-v0.2)
+- Hugging Face API key required for AI analysis
 - ✅ Add session notes with:
   - Content summary
   - Topics discussed
@@ -249,7 +244,7 @@ Comprehensive analytics dashboard with revenue insights and profession-based fil
 - ✅ Aggregate calculations (totals, averages, percentages)
 
 **🎨 Dashboard Features:**
-- ✅ Recharts integration for professional charts
+
 - ✅ Responsive grid layouts
 - ✅ Color-coded KPIs (green=$, blue=users, purple=avg, yellow=projection)
 - ✅ Hover tooltips with formatted data

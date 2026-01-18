@@ -502,7 +502,7 @@ Email: Enviar contenido específico para juniors (tips CV, entrevistas)
 
 ## 📚 Recursos
 
-- [Recharts Documentation](https://recharts.org/)
+
 - [Conversion Funnel Best Practices](https://www.optimizely.com/optimization-glossary/conversion-funnel/)
 - [User Segmentation Strategies](https://www.hubspot.com/marketing-statistics)
 

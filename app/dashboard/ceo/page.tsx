@@ -8,10 +8,7 @@ import {
   FaClock, FaCoins, FaStar, FaBriefcase, FaTrophy,
   FaArrowUp, FaArrowDown, FaCircle, FaDownload, FaCalendar
 } from 'react-icons/fa'
-import { 
-  LineChart, Line, BarChart, Bar, AreaChart, Area, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
-} from 'recharts'
+
 
 export const dynamic = 'force-dynamic'
 
@@ -313,20 +310,7 @@ export default function CEODashboard() {
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
                 Evolución CAC vs LTV
               </h3>
-              <ResponsiveContainer width="100%" height={250}>
-                <LineChart data={historicalData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis dataKey="month" stroke="#9ca3af" />
-                  <YAxis stroke="#9ca3af" />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px' }}
-                    labelStyle={{ color: '#fff' }}
-                  />
-                  <Legend />
-                  <Line type="monotone" dataKey="cac" stroke="#ef4444" strokeWidth={3} name="CAC ($)" />
-                  <Line type="monotone" dataKey="ltv" stroke="#10b981" strokeWidth={3} name="LTV ($)" />
-                </LineChart>
-              </ResponsiveContainer>
+              <div className="h-64 flex items-center justify-center text-gray-400">[Gráfico removido]</div>
             </div>
           </div>
         </motion.div>
@@ -575,18 +559,7 @@ export default function CEODashboard() {
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
                 Tasa de Éxito por País
               </h3>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={historicalData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis dataKey="month" stroke="#9ca3af" />
-                  <YAxis stroke="#9ca3af" />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px' }}
-                    labelStyle={{ color: '#fff' }}
-                  />
-                  <Bar dataKey="successRate" fill="#10b981" radius={[8, 8, 0, 0]} name="Éxito (%)" />
-                </BarChart>
-              </ResponsiveContainer>
+              <div className="h-64 flex items-center justify-center text-gray-400">[Gráfico removido]</div>
             </div>
           </div>
         </motion.div>

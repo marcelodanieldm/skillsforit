@@ -7,13 +7,6 @@
  * 3. Leadership & Conflict Resolution Indicators
  */
 
-import OpenAI from 'openai'
-
-function getOpenAI() {
-  return new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  })
-}
 
 // =====================================================
 // TIPOS E INTERFACES
@@ -53,7 +46,6 @@ export interface RedFlag {
   category: string
   severity: 'low' | 'medium' | 'high'
   description: string
-  impact: string
   solution: string // Bloqueado hasta registro
 }
 
@@ -197,45 +189,8 @@ Responde en JSON con esta estructura exacta:
 /**
  * Analiza una respuesta individual
  */
-export async function analyzeResponse(
-  question: SoftSkillQuestion,
-  answer: string
-): Promise<{
-  starAnalysis: STARAnalysis
-  communicationPattern: CommunicationPattern
-  scores: Record<string, number>
-  redFlags: RedFlag[]
-  strengths: string[]
-  insights: string[]
-}> {
-  try {
-    const openai = getOpenAI()
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        { role: 'system', content: ANALYSIS_SYSTEM_PROMPT },
-        { role: 'user', content: ANALYSIS_USER_PROMPT(question.question, answer, question.category) }
-      ],
-      response_format: { type: 'json_object' },
-      temperature: 0.3,
-      max_tokens: 2000
-    })
-
-    const result = JSON.parse(completion.choices[0].message.content || '{}')
-    
-    return {
-      starAnalysis: result.starAnalysis,
-      communicationPattern: result.communicationPattern,
-      scores: result.scores,
-      redFlags: result.redFlags || [],
-      strengths: result.strengths || [],
-      insights: result.insights || []
-    }
-  } catch (error) {
-    console.error('Error analyzing response:', error)
-    return getMockAnalysis(question.category)
-  }
-}
+// Deprecated: analyzeResponse is no longer used. All analysis is now handled by Hugging Face in prompts/soft-skills-analyzer.ts
+// export async function analyzeResponse(...) { ... }
 
 /**
  * Genera reporte completo de todas las respuestas
@@ -265,29 +220,53 @@ export async function generateFullReport(
     const wordCount = response.answer.split(/\s+/).length
     totalWords += wordCount
 
-    const analysis = await analyzeResponse(question, response.answer)
-    analyses[response.questionId] = analysis.starAnalysis
+    // Migrated: Use Hugging Face-based analysis
+    // Import analyzeSoftSkillsResponse from prompts/soft-skills-analyzer
+    const { analyzeSoftSkillsResponse } = await import('./prompts/soft-skills-analyzer');
+    const analysis = await analyzeSoftSkillsResponse(
+      SOFT_SKILL_QUESTIONS.find(q => q.id === response.questionId)?.id === 'q1_conflict' ? 1 :
+      SOFT_SKILL_QUESTIONS.find(q => q.id === response.questionId)?.id === 'q2_pressure' ? 2 : 3,
+      response.answer
+    );
+    if (!analysis) continue;
+    analyses[response.questionId] = analysis.starScore;
 
     // Agregar scores
-    totalLeadership += analysis.scores.leadership || 0
-    totalCommunication += analysis.scores.communication || 0
-    totalConflict += analysis.scores.conflictResolution || 0
-    totalProblem += analysis.scores.problemSolving || 0
-    totalEQ += analysis.scores.emotionalIntelligence || 0
-    totalAdaptability += analysis.scores.adaptability || 0
+    totalLeadership += analysis.leadershipScore || 0;
+    totalCommunication += analysis.communicationStyle.confidence || 0;
+    totalConflict += analysis.conflictResolutionScore || 0;
+    totalProblem += 0; // Not available in new schema
+    totalEQ += 0; // Not available in new schema
+    totalAdaptability += 0; // Not available in new schema
 
     // Agregar red flags y fortalezas
-    allRedFlags.push(...analysis.redFlags)
-    allStrengths.push(...analysis.strengths)
+    // Map Hugging Face red flags to local RedFlag type
+    if (analysis.redFlags && Array.isArray(analysis.redFlags)) {
+      for (const rf of analysis.redFlags) {
+        allRedFlags.push({
+          category: rf.category || '',
+          severity: rf.severity === 'critical' ? 'high' : (rf.severity || 'low'),
+          description: rf.description || '',
+          // impact removed to match schema
+          solution: rf.fix || ''
+        });
+      }
+    }
+    allStrengths.push(...(analysis.strengths?.map(s => s.description) || []));
 
     // Guardar patrón de comunicación dominante
-    if (!dominantPattern || analysis.communicationPattern.confidence > dominantPattern.confidence) {
-      dominantPattern = analysis.communicationPattern
+    if (!dominantPattern || analysis.communicationStyle.confidence > dominantPattern.confidence) {
+      dominantPattern = {
+        style: analysis.communicationStyle.type,
+        confidence: analysis.communicationStyle.confidence,
+        indicators: analysis.communicationStyle.indicators,
+        recommendation: analysis.communicationStyle.improvement
+      };
     }
 
     // Generar recomendaciones basadas en análisis
-    if (analysis.starAnalysis.overallScore < 60) {
-      allRecommendations.push(`Mejora tu respuesta sobre "${question.category}" usando la estructura STAR completa`)
+    if ((analysis.starScore?.overall || 0) < 60) {
+      allRecommendations.push(`Mejora tu respuesta sobre "${question.category}" usando la estructura STAR completa`);
     }
   }
 

@@ -1,3 +1,25 @@
+  // Bloqueo de días/semana/fines de semana
+  const [blockLoading, setBlockLoading] = useState(false);
+  const [blockError, setBlockError] = useState('');
+
+  const handleBlock = async (type: 'day' | 'week' | 'weekend', days?: number[]) => {
+    setBlockLoading(true);
+    setBlockError('');
+    try {
+      const res = await fetch('/api/mentor/availability/block', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mentorId, blockType: type, days })
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error);
+      await fetchAvailability();
+    } catch (err: any) {
+      setBlockError(err.message || 'Error al bloquear');
+    } finally {
+      setBlockLoading(false);
+    }
+  };
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -253,6 +275,28 @@ export default function MentorAvailabilityPage() {
             </div>
           </motion.div>
 
+          {/* Controles de bloqueo */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            <button
+              className="bg-slate-800 border border-slate-700 px-4 py-2 rounded-lg text-sm hover:bg-slate-700 transition"
+              disabled={blockLoading}
+              onClick={() => handleBlock('week')}
+            >Bloquear toda la semana</button>
+            <button
+              className="bg-slate-800 border border-slate-700 px-4 py-2 rounded-lg text-sm hover:bg-slate-700 transition"
+              disabled={blockLoading}
+              onClick={() => handleBlock('weekend')}
+            >Bloquear fines de semana</button>
+            {[0,1,2,3,4,5,6].map(d => (
+              <button
+                key={d}
+                className="bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg text-xs hover:bg-slate-700 transition"
+                disabled={blockLoading}
+                onClick={() => handleBlock('day', [d])}
+              >Bloquear {['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'][d]}</button>
+            ))}
+          </div>
+          {blockError && <div className="text-red-500 text-sm mb-4">{blockError}</div>}
           {/* Calendar */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -18,8 +18,12 @@ import { sessionsDb } from '@/lib/database'
  * }
  */
 
-export async function GET(request: NextRequest, context: { params: { sessionId: string } }) {
-  const { sessionId } = context.params
+
+export async function GET(request: NextRequest) {
+  // Extract sessionId from the URL pathname
+  const url = new URL(request.url)
+  const parts = url.pathname.split('/')
+  const sessionId = parts[parts.length - 1]
   if (!sessionId) {
     return NextResponse.json({ error: 'sessionId requerido' }, { status: 400 })
   }

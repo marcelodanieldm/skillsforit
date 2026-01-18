@@ -1,12 +1,21 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { db } from '@/lib/database'
+import dynamic from 'next/dynamic'
+const UserMentorias = dynamic(() => import('@/components/UserMentorias'), { ssr: false })
 import { motion } from 'framer-motion'
 import { FaBook, FaCalendar, FaCheckCircle, FaCloudUploadAlt, FaTasks, FaUserGraduate } from 'react-icons/fa'
 
 type MentorTask = { id: number; task: string; completed: boolean }
 type CareerScore = { cv_score: number; soft_skills_score: number; interview_readiness: number; total: number }
 type ActionPlanResponse = { roadmap_status: string; career_score: CareerScore; mentor_tasks: MentorTask[]; ai_recommendations: string[] }
+
+type UserReport = {
+  id: string;
+  createdAt: string;
+  reportUrl: string;
+}
 
 export default function UserDashboardPage() {
     // Logout handler
@@ -18,6 +27,7 @@ export default function UserDashboardPage() {
   const [data, setData] = useState<ActionPlanResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [reports, setReports] = useState<UserReport[]>([])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,6 +38,18 @@ export default function UserDashboardPage() {
         if (!res.ok) throw new Error('No se pudo cargar tu roadmap')
         const json = await res.json()
         setData(json)
+        // Obtener email del usuario (mock)
+        const email = localStorage.getItem('user_email') || 'usuario@example.com'
+        // Buscar reportes en la "base de datos" (solo en el cliente para MVP)
+        // En producción, esto sería una llamada a la API
+        // @ts-ignore
+        const all = db?.all ? db.all() : []
+        const userReports = all.filter((r: any) => r.email === email && r.reportUrl).map((r: any) => ({
+          id: r.id,
+          createdAt: r.createdAt?.toISOString?.() || '',
+          reportUrl: r.reportUrl
+        }))
+        setReports(userReports)
       } catch (e: any) {
         setError(e.message)
       } finally {
@@ -161,6 +183,22 @@ export default function UserDashboardPage() {
               </div>
               <p className="text-slate-600 dark:text-slate-300 mb-4">Re-subí tu CV si tenés créditos y revisá tus reportes anteriores.</p>
               <a href="/upload" className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg">Re-subir CV</a>
+
+              {/* Reportes generados */}
+              {reports.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold mb-2">Mis Informes Generados</h3>
+                  <ul className="space-y-2">
+                    {reports.map(r => (
+                      <li key={r.id} className="flex items-center gap-2">
+                        <a href={r.reportUrl} target="_blank" rel="noopener" className="text-blue-600 hover:underline font-mono text-sm">
+                          📄 Informe {r.id.slice(-6)} ({r.createdAt?.slice(0,10)})
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </motion.div>
 
             {/* Biblioteca de Activos */}
@@ -248,6 +286,7 @@ export default function UserDashboardPage() {
           </div>
         )}
 
+        <UserMentorias />
         <div className="mt-8 text-xs text-slate-500 flex items-center gap-2">
           <FaUserGraduate />
           Interfaz diseñada para reducir ansiedad y centralizar tu estrategia de carrera.

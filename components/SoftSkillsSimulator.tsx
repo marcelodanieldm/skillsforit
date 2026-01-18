@@ -372,21 +372,70 @@ export default function SoftSkillsSimulator() {
           )}
         </div>
 
+
         {/* Radar Chart Results */}
         {simulatorStep.step === 'results' && radarData && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="mt-8"
-          >
-            <SoftSkillsRadarChart
-              labels={radarData.labels}
-              scores={radarData.scores}
-              level={finalLevel}
-              animate={true}
-            />
-          </motion.div>
+          <>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="mt-8"
+            >
+              <SoftSkillsRadarChart
+                labels={radarData.labels}
+                scores={radarData.scores}
+                level={finalLevel}
+                animate={true}
+              />
+            </motion.div>
+
+            {/* Generador de respuestas perfectas */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+              className="mt-12 bg-gradient-to-br from-yellow-50 via-white to-blue-50 dark:from-slate-800 dark:to-slate-900 rounded-2xl p-8 shadow-xl border border-yellow-200 dark:border-slate-700 text-center"
+            >
+              <h2 className="text-3xl md:text-4xl font-bold text-yellow-700 dark:text-yellow-300 mb-4">
+                🎯 Generador de respuestas perfectas
+              </h2>
+              <p className="text-lg text-gray-700 dark:text-gray-200 mb-6 max-w-2xl mx-auto">
+                ¿Quieres ver <b>cómo respondería un candidato perfecto</b> a cada pregunta, usando el método STAR y las mejores prácticas de entrevistas de Google y Amazon?<br />
+                <span className="font-semibold text-yellow-800 dark:text-yellow-200">Desbloquea ejemplos premium y lleva tus respuestas al siguiente nivel.</span>
+              </p>
+              <button
+                onClick={async () => {
+                  // Stripe Checkout for perfect-answer-generator ($3)
+                  const email = prompt('Ingresa tu email para recibir el acceso:')?.trim();
+                  if (!email) return alert('Debes ingresar un email válido.');
+                  const res = await fetch('/api/checkout/create-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      email,
+                      source: 'soft-skills-simulator',
+                      items: [
+                        { productId: 'perfect-answer-generator', quantity: 1 }
+                      ]
+                    })
+                  });
+                  const data = await res.json();
+                  if (data?.url) {
+                    window.location.href = data.url;
+                  } else {
+                    alert('Error al iniciar el pago. Intenta de nuevo.');
+                  }
+                }}
+                className="mt-4 px-8 py-5 bg-gradient-to-r from-yellow-400 to-pink-500 hover:from-yellow-500 hover:to-pink-600 text-white text-xl font-bold rounded-full shadow-lg transition-all flex items-center justify-center gap-3"
+              >
+                🔓 Desbloquear respuestas perfectas por <span className="font-bold">$3 USD</span>
+              </button>
+              <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                Pago único, acceso inmediato. Procesado por Stripe.
+              </p>
+            </motion.div>
+          </>
         )}
 
         {/* Lead Capture Form - Sprint 39 Integration */}

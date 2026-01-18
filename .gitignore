@@ -1,3 +1,6 @@
+# Ignore local environment files
+.env.local
+.env.local.example
 # dependencies
 /node_modules
 /.pnp

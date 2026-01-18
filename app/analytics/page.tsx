@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+
 import type { FunnelMetrics, UserSegment } from '@/lib/analytics'
 
 export default function AnalyticsDashboard() {
@@ -154,35 +154,7 @@ export default function AnalyticsDashboard() {
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
             🔄 Embudo de Conversión
           </h2>
-          <div className="h-96">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={funnelChartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="stage" />
-                <YAxis />
-                <Tooltip
-                  content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      const data = payload[0].payload
-                      return (
-                        <div className="bg-white p-4 rounded-lg shadow-xl border border-gray-200">
-                          <p className="font-bold text-gray-900 mb-2">{data.stage}</p>
-                          <p className="text-sm text-gray-600">Visitors: <span className="font-semibold">{data.visitors}</span></p>
-                          <p className="text-sm text-gray-600">Conversions: <span className="font-semibold">{data.conversions}</span></p>
-                          <p className="text-sm text-green-600">Conv. Rate: <span className="font-semibold">{data.conversionRate}%</span></p>
-                          <p className="text-sm text-red-600">Drop-off: <span className="font-semibold">{data.dropOffRate}%</span></p>
-                        </div>
-                      )
-                    }
-                    return null
-                  }}
-                />
-                <Legend />
-                <Bar dataKey="visitors" fill="#8b5cf6" name="Visitors" />
-                <Bar dataKey="conversions" fill="#10b981" name="Conversions" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          <div className="h-96 flex items-center justify-center text-gray-400">[Gráfico removido]</div>
 
           {/* Drop-off highlights */}
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -207,28 +179,7 @@ export default function AnalyticsDashboard() {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
               👥 Distribución por Segmento
             </h2>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={distributionData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {distributionData.map((entry, index) => {
-                      const segment = entry.name.split(' ')[1] as UserSegment
-                      return <Cell key={`cell-${index}`} fill={segmentColors[segment]} />
-                    })}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+            <div className="h-80 flex items-center justify-center text-gray-400">[Gráfico removido]</div>
             
             <div className="mt-4 space-y-2">
               {distributionData.map((entry, index) => {
@@ -256,36 +207,7 @@ export default function AnalyticsDashboard() {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
               📈 Conversión por Segmento
             </h2>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={segmentConversion}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="segment" />
-                  <YAxis />
-                  <Tooltip
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        const data = payload[0].payload
-                        return (
-                          <div className="bg-white p-4 rounded-lg shadow-xl border border-gray-200">
-                            <p className="font-bold text-gray-900 mb-2">
-                              {segmentEmojis[data.segment as UserSegment]} {data.segment}
-                            </p>
-                            <p className="text-sm text-gray-600">Total: <span className="font-semibold">{data.total}</span></p>
-                            <p className="text-sm text-gray-600">Converted: <span className="font-semibold">{data.converted}</span></p>
-                            <p className="text-sm text-green-600">Rate: <span className="font-semibold">{data.conversionRate.toFixed(1)}%</span></p>
-                          </div>
-                        )
-                      }
-                      return null
-                    }}
-                  />
-                  <Legend />
-                  <Bar dataKey="total" fill="#6b7280" name="Total Usuarios" />
-                  <Bar dataKey="converted" fill="#10b981" name="Convertidos" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+            <div className="h-80 flex items-center justify-center text-gray-400">[Gráfico removido]</div>
 
             <div className="mt-6 space-y-3">
               {segmentConversion.map((segment, index) => (

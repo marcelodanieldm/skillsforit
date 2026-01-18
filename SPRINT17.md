@@ -22,7 +22,7 @@ Implementar la **capa de telemetría avanzada** para que el CEO tome decisiones 
 ### 1️⃣ Historia: Frontend - Analíticas de Embudo con HOC
 
 **User Story**:
-> "Como CEO, quiero una vista de 'Analíticas de Embudo' que renderice gráficos de barras comparando Visitas vs. Pagos vs. Activaciones (Upload de CV), para identificar fugas de usuarios en tiempo real. Utilizar Recharts y aplicar el patrón HOC (Higher Order Component) para proteger esta ruta con permisos de administrador."
+
 
 **Criterios de Aceptación**:
 - ✅ Gráfico de barras comparativo con 3 etapas
@@ -81,7 +81,7 @@ export default withAuth(FunnelAnalytics, {
 
 **Visualizaciones**:
 
-1. **Gráfico de Barras Comparativo** (Recharts):
+
 ```typescript
 <BarChart data={comparisonChart}>
   <Bar dataKey="count">
@@ -558,7 +558,7 @@ flowchart TD
     M --> N[Respuesta JSON]
     N --> D
     
-    D --> O[Renderizar Gráficos Recharts]
+
     O --> P[Mostrar Insights]
     
     style C fill:#8b5cf6
@@ -573,7 +573,7 @@ flowchart TD
 |------------|------------|-----------|
 | **Frontend** | React + Next.js | UI y routing |
 | **Auth HOC** | Higher Order Component | Protección de rutas |
-| **Charts** | Recharts | Visualización de datos |
+
 | **Backend** | Next.js API Routes | Endpoints REST |
 | **Cache** | In-Memory (Redis en prod) | Vista materializada |
 | **Analytics** | Custom TypeScript | Cálculos de MRR/LTV |
@@ -1018,7 +1018,7 @@ Implementado sistema completo de observabilidad para CEO Dashboard:
 Frontend:
 - HOC withAuth para protección de rutas con roles
 - Vista de Analíticas de Embudo (/ceo/analytics)
-- Gráficos comparativos Visitas vs Pagos vs Activaciones (Recharts)
+
 - Identificación de fugas con severidad y recomendaciones
 - Dashboard de MRR con tendencia histórica
 - LTV por segmento con highlighting

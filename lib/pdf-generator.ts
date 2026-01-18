@@ -3,9 +3,11 @@ import path from 'path'
 import { writeFile, mkdir } from 'fs/promises'
 import { AnalysisResult, CVAnalysis } from './database'
 
+// premiumAnswers: array of ideal answers (one per question) if user purchased upsell
 export async function generatePDFReport(
   analysis: CVAnalysis,
-  analysisResult: AnalysisResult
+  analysisResult: AnalysisResult,
+  premiumAnswers?: string[]
 ): Promise<string> {
   const doc = new jsPDF()
   
@@ -128,7 +130,37 @@ export async function generatePDFReport(
     const afterLines = doc.splitTextToSize(improvement.after, 160)
     doc.text(afterLines, 25, yPos)
     yPos += afterLines.length * 4 + 6
-  })
+
+    })
+
+    // Premium Answers Section (if provided)
+    if (premiumAnswers && premiumAnswers.length > 0) {
+      if (yPos > 200) {
+        doc.addPage()
+        yPos = 20
+      }
+      doc.setFontSize(14)
+      doc.setFont('helvetica', 'bold')
+      doc.setTextColor(255, 193, 7) // gold
+      doc.text('💎 Respuestas Perfectas (Premium)', 20, yPos)
+      yPos += 10
+      doc.setFontSize(10)
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(...textColor)
+      premiumAnswers.forEach((ans, idx) => {
+        if (yPos > 250) {
+          doc.addPage()
+          yPos = 20
+        }
+        doc.setFont('helvetica', 'bold')
+        doc.text(`Pregunta ${idx + 1}:`, 20, yPos)
+        yPos += 5
+        doc.setFont('helvetica', 'italic')
+        const lines = doc.splitTextToSize(ans, 170)
+        doc.text(lines, 25, yPos)
+        yPos += lines.length * 5 + 6
+      })
+    }
 
   // New page for recommendations
   doc.addPage()

@@ -361,6 +361,18 @@ export default function UploadPage() {
         )}
 
         {/* Trust indicators */}
+                {/* Acceso directo al auditor de CV */}
+                <div className="mt-12 flex justify-center">
+                  <a
+                    href="/cv-audit"
+                    className="inline-block px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold text-lg rounded-full shadow-lg transition-all flex items-center gap-2"
+                    target="_self"
+                    rel="noopener noreferrer"
+                  >
+                    Optimizar mi cv ya
+                    <FaArrowRight />
+                  </a>
+                </div>
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import OpenAI from 'openai'
 import { SOFT_SKILLS_QUESTIONS } from '@/lib/prompts/soft-skills-analyzer'
+import { getHuggingFaceProvider } from '@/lib/llm-strategy'
 
-function getOpenAI() {
-  return new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-  })
-}
+// function getOpenAI() {
+//   return new OpenAI({
+//     apiKey: process.env.OPENAI_API_KEY
+//   })
+// }
 
 export async function POST(request: NextRequest) {
-  const openai = getOpenAI()
+  const huggingface = getHuggingFaceProvider()
   
   try {
     const formData = await request.formData()
@@ -131,43 +131,39 @@ Responde en JSON:
 `
     }
 
-    // Call GPT-4 for analysis
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'system',
-          content: 'Eres un experto en entrevistas técnicas y evaluación de soft skills. Respondes siempre en JSON válido.'
-        },
-        {
-          role: 'user',
-          content: analysisPrompt
-        }
-      ],
-      temperature: 0.3,
-      response_format: { type: 'json_object' }
+    // Call Hugging Face for analysis
+    const { content, error } = await huggingface.complete({
+      prompt: analysisPrompt,
+      temperature: 0.7,
+      maxTokens: 512
     })
+    if (error) {
+      return NextResponse.json({ error }, { status: 500 })
+    }
 
-    const analysis = JSON.parse(completion.choices[0].message.content || '{}')
+    let parsed: any = {}
+    try {
+      parsed = JSON.parse(content || '{}')
+    } catch {}
 
     // Build response based on channel
     const response = {
       wordCount,
       channel,
       ...(channel === 'text' ? {
-        grammarScore: analysis.grammarScore || 70,
-        vocabularyScore: analysis.vocabularyScore || 70,
-        starCompliance: analysis.starCompliance || 65,
-        overallScore: analysis.overallScore || 70
+        grammarScore: parsed.grammarScore || 70,
+        vocabularyScore: parsed.vocabularyScore || 70,
+        starCompliance: parsed.starCompliance || 65,
+        overallScore: parsed.overallScore || 70
       } : {
-        toneScore: analysis.toneScore || 70,
-        fillerWordsCount: analysis.fillerWordsCount || 5,
-        starCompliance: analysis.starCompliance || 65,
-        overallScore: analysis.overallScore || 70
+        toneScore: parsed.toneScore || 70,
+        fillerWordsCount: parsed.fillerWordsCount || 5,
+        starCompliance: parsed.starCompliance || 65,
+        overallScore: parsed.overallScore || 70
       }),
-      redFlags: analysis.redFlags || [],
-      strengths: analysis.strengths || [],
-      improvements: analysis.improvements || []
+      redFlags: parsed.redFlags || [],
+      strengths: parsed.strengths || [],
+      improvements: parsed.improvements || []
     }
 
     console.log('[Hybrid Analysis] Success:', {

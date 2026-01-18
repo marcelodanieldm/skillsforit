@@ -11,19 +11,7 @@ import {
   FaSync,
   FaClock
 } from 'react-icons/fa'
-import { 
-  BarChart, 
-  Bar, 
-  LineChart,
-  Line,
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
-  ResponsiveContainer,
-  Cell
-} from 'recharts'
+
 
 interface FunnelMetrics {
   visits: number
@@ -216,26 +204,7 @@ function FunnelAnalytics() {
             Comparación: Visitas vs Pagos vs Activaciones
           </h2>
 
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={comparisonChart}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="stage" stroke="#9ca3af" />
-              <YAxis stroke="#9ca3af" />
-              <Tooltip
-                contentStyle={{ 
-                  backgroundColor: '#1f2937', 
-                  border: '1px solid #4b5563', 
-                  borderRadius: '8px' 
-                }}
-                labelStyle={{ color: '#f3f4f6' }}
-              />
-              <Bar dataKey="count" name="Usuarios">
-                {comparisonChart.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="h-96 flex items-center justify-center text-gray-400">[Gráfico removido]</div>
 
           {/* Metrics Cards */}
           {funnelMetrics && (
@@ -374,26 +343,7 @@ function FunnelAnalytics() {
                 </div>
 
                 {mrr.history && mrr.history.length > 0 && (
-                  <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={mrr.history}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                      <XAxis dataKey="month" stroke="#9ca3af" />
-                      <YAxis stroke="#9ca3af" />
-                      <Tooltip
-                        contentStyle={{ 
-                          backgroundColor: '#1f2937', 
-                          border: '1px solid #4b5563' 
-                        }}
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="totalMRR" 
-                        stroke="#10b981" 
-                        strokeWidth={2}
-                        name="MRR"
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
+                  <div className="h-52 flex items-center justify-center text-gray-400">[Gráfico removido]</div>
                 )}
               </>
             )}

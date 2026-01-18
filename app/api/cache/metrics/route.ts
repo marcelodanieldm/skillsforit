@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { semanticCache } from '@/lib/semantic-cache'
+// import { semanticCache } from '@/lib/semantic-cache'
 import { AuthService } from '@/lib/auth'
 
 /**
@@ -23,20 +23,10 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Get cache metrics
-    const metrics = semanticCache.getMetrics()
-
+    // Semantic cache no longer available
     return NextResponse.json({
-      success: true,
-      metrics,
-      insights: [
-        metrics.hitRate > 30
-          ? `🎯 Cache is performing well (${metrics.hitRate.toFixed(1)}% hit rate)`
-          : `⚠️ Cache hit rate is low (${metrics.hitRate.toFixed(1)}%)`,
-        `💰 Saved $${metrics.costSavings.toFixed(2)} in API costs`,
-        `⚡ Cache hits are ${Math.round(metrics.averageMissTime / metrics.averageHitTime)}x faster than API calls`,
-        `📊 ${metrics.cacheSize} unique CV patterns cached`,
-      ],
+      success: false,
+      error: 'Semantic cache has been removed. Metrics not available.',
       timestamp: new Date().toISOString(),
     })
   } catch (error: any) {
@@ -66,12 +56,10 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    // Clear cache
-    semanticCache.clearCache()
-
+    // Semantic cache no longer available
     return NextResponse.json({
-      success: true,
-      message: 'Cache cleared successfully',
+      success: false,
+      message: 'Semantic cache has been removed. No cache to clear.'
     })
   } catch (error: any) {
     console.error('Error clearing cache:', error)

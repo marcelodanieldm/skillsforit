@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getLLMStrategyManager } from '@/lib/llm-strategy'
+import { getHuggingFaceProvider } from '@/lib/llm-strategy'
 
 /**
  * Health Check API
@@ -16,12 +16,20 @@ export async function GET(request: NextRequest) {
   const startTime = Date.now()
 
   try {
-    // Get LLM Strategy Manager
-    const llmManager = getLLMStrategyManager()
 
-    // Run health checks (async, all in parallel)
-    await llmManager.runHealthChecks()
-    const llmStatus = await llmManager.getHealthStatus()
+    // Health check for Hugging Face provider
+    const huggingface = getHuggingFaceProvider()
+    let hfHealthy = true
+    let hfLatency = 0
+    try {
+      const hfStart = Date.now()
+      // Simple prompt to check health
+      const result = await huggingface.complete({ prompt: 'ping', maxTokens: 5 })
+      hfLatency = Date.now() - hfStart
+      if (!result.success) hfHealthy = false
+    } catch (e) {
+      hfHealthy = false
+    }
 
     // Database health check (simple query)
     let databaseHealthy = true
@@ -38,7 +46,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Overall system status
-    const allLLMsHealthy = Object.values(llmStatus).some(status => status.isHealthy)
+    const llmStatus = {
+      huggingface: {
+        healthy: hfHealthy,
+        latencyMs: hfLatency
+      }
+    }
+    const allLLMsHealthy = Object.values(llmStatus).some(status => status.healthy)
     const overallHealthy = allLLMsHealthy && databaseHealthy
 
     const totalLatency = Date.now() - startTime
@@ -52,8 +66,8 @@ export async function GET(request: NextRequest) {
           status: allLLMsHealthy ? 'healthy' : 'degraded',
           providers: Object.entries(llmStatus).map(([name, status]) => ({
             name,
-            isHealthy: status.isHealthy,
-            lastCheck: status.lastCheck.toISOString()
+            isHealthy: status.healthy,
+            // lastCheck: status.lastCheck.toISOString() // Remove or update if not present
           }))
         },
         database: {
@@ -83,25 +97,4 @@ export async function GET(request: NextRequest) {
   }
 }
 
-/**
- * POST endpoint to manually trigger health checks
- */
-export async function POST(request: NextRequest) {
-  try {
-    const llmManager = getLLMStrategyManager()
-    await llmManager.runHealthChecks()
 
-    return NextResponse.json({
-      success: true,
-      message: 'Health checks triggered successfully'
-    })
-  } catch (error: any) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: error.message
-      },
-      { status: 500 }
-    )
-  }
-}
