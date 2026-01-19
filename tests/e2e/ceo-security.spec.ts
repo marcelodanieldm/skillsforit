@@ -55,7 +55,7 @@ test.describe('CEO Dashboard - Security Tests', () => {
     expect(response.status()).toBe(403)
     
     const data = await response.json()
-    expect(data.error).toContain('No autorizado')
+    expect(data.error).toContain('Sesión no encontrada')
   })
 
   test('Usuario sin token no puede acceder a endpoints CEO', async ({ request }) => {
