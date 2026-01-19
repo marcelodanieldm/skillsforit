@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { sessionsDb, usersDb } from '@/lib/database';
 import { sendEmail } from '@/lib/email';
 
-  const { sessionId, action } = await req.json();
+export async function POST(request: Request) {
+  const { sessionId, action } = await request.json();
   const session = sessionsDb.findById(sessionId);
   if (!session) return NextResponse.json({ error: 'Sesión no encontrada.' }, { status: 404 });
   let status = '';

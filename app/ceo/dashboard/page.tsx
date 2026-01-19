@@ -11,9 +11,7 @@ import {
   FaLock,
   FaSignOutAlt,
   FaLightbulb
-} from 'react-icons/fa'
-import { 
-} 
+} from 'react-icons/fa';
 import { FunnelAnalyticsWidget } from '@/components/ceo/FunnelAnalyticsWidget'
 import { FunnelVisualizer } from '@/components/ceo/FunnelVisualizer'
 import { PriceManagement } from '@/components/ceo/PriceManagement'

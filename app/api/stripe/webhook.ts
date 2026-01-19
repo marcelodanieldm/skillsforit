@@ -5,7 +5,7 @@ import { mentorshipSubscriptionsDb } from '@/lib/mentorship_subscriptions';
 import { mentorsDb, sessionsDb } from '@/lib/database';
 import { sendEmail } from '@/lib/email';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2023-10-16' });
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-12-15.clover' });
 
 export async function POST(req: NextRequest) {
   const sig = req.headers.get('stripe-signature')!;

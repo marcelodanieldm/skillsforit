@@ -155,19 +155,9 @@ export default function MentorshipAnalyticsPage() {
               </div>
             ) : (
               <>
-                {/* Chart */}
-                <div className="mb-8">
-                  <ResponsiveContainer width="100%" height={400}>
-                    <BarChart data={conversionData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="country" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="conversionRate" fill="#8b5cf6" name="Conversión %" />
-                      <Bar dataKey="averageSessionsPerUser" fill="#10b981" name="Sesiones/Usuario" />
-                    </BarChart>
-                  </ResponsiveContainer>
+                {/* Chart removido: dependía de recharts */}
+                <div className="mb-8 flex items-center justify-center min-h-[200px] text-gray-400">
+                  <span>Gráfico no disponible</span>
                 </div>
 
                 {/* Data Table */}

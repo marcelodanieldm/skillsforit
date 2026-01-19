@@ -14,20 +14,6 @@ import {
   RefreshCw,
   AlertCircle
 } from 'lucide-react'
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell
 
 
 interface RecoveryAnalytics {
@@ -288,31 +274,10 @@ export function CartRecoveryWidget() {
             <BarChart3 className="w-4 h-4" />
             Distribución de Carritos
           </h4>
-          <ResponsiveContainer width="100%" height={200}>
-            <PieChart>
-              <Pie
-                data={statusData}
-                cx="50%"
-                cy="50%"
-                innerRadius={50}
-                outerRadius={80}
-                paddingAngle={5}
-                dataKey="value"
-              >
-                {statusData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: '#1e293b', 
-                  border: '1px solid #475569',
-                  borderRadius: '8px'
-                }}
-              />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
+            {/* Gráfico removido: dependía de recharts */}
+            <div className="flex items-center justify-center min-h-[200px] text-gray-400">
+              <span>Gráfico no disponible</span>
+            </div>
         </div>
 
         {/* Email Performance Funnel */}
@@ -321,21 +286,10 @@ export function CartRecoveryWidget() {
             <Mail className="w-4 h-4" />
             Funnel de Emails
           </h4>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={emailPerformanceData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-              <XAxis dataKey="name" stroke="#94a3b8" tick={{ fontSize: 12 }} />
-              <YAxis stroke="#94a3b8" />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: '#1e293b', 
-                  border: '1px solid #475569',
-                  borderRadius: '8px'
-                }}
-              />
-              <Bar dataKey="value" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+            {/* Gráfico removido: dependía de recharts */}
+            <div className="flex items-center justify-center min-h-[200px] text-gray-400">
+              <span>Gráfico no disponible</span>
+            </div>
         </div>
       </div>
 
