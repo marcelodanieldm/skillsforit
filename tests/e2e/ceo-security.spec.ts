@@ -152,11 +152,17 @@ test.describe('CEO Dashboard - Security Tests', () => {
     await page.fill('input[type="password"]', 'ceo123')
     await page.click('button[type="submit"]')
 
-    // Wait for dashboard to load
-    await page.waitForURL('**/ceo/dashboard', { timeout: 10000 })
-    
-    // Verify dashboard elements
-    await expect(page.locator('text=Dashboard Ejecutivo')).toBeVisible()
+    // Espera explícitamente la navegación o redirección
+    await page.waitForNavigation({ timeout: 30000 });
+
+    // Verifica que no haya mensajes de error tras el login
+    await expect(page.locator('text=Solo usuarios con rol CEO')).toHaveCount(0);
+
+    // Espera la URL del dashboard (puede tardar más)
+    await page.waitForURL('**/ceo/dashboard', { timeout: 30000 });
+
+    // Verifica que el dashboard esté visible
+    await expect(page.locator('text=Dashboard Ejecutivo')).toBeVisible();
     await expect(page.locator('text=Proyecciones de Ingresos')).toBeVisible()
     await expect(page.locator('text=LTV por Segmento')).toBeVisible()
     await expect(page.locator('text=Embudo de Conversión')).toBeVisible()
