@@ -17,9 +17,32 @@ test.describe('Login y Logout - Usuario Estándar', () => {
     await expect(page).toHaveURL(/\/auth\/login$/)
 
     // Paso 2: Ingresar credenciales
-    await page.fill('input[name="email"]', 'usuario@test.com')
-    await page.fill('input[name="password"]', 'testpassword')
-    await page.click('button:has-text("Iniciar sesión")')
+    // Diagnóstico: captura errores de consola y screenshot antes de esperar el input
+    const consoleErrors = [];
+    page.on('console', msg => {
+      if (msg.type() === 'error') consoleErrors.push(msg.text());
+    });
+    await page.screenshot({ path: 'diagnostic-user-login.png', fullPage: true });
+    const emailInput = page.locator('input[name="email"]');
+    const isVisible = await emailInput.isVisible();
+    console.log('¿Input email visible?:', isVisible);
+    if (!isVisible) {
+      console.log('Errores de consola:', consoleErrors);
+      // Print page HTML for debugging
+      const html = await page.content();
+      console.log('HTML actual de la página:', html);
+      // Log network requests/responses
+      page.on('request', request => {
+        console.log('Request:', request.method(), request.url());
+      });
+      page.on('response', response => {
+        console.log('Response:', response.status(), response.url());
+      });
+    }
+    await expect(emailInput).toBeVisible();
+    await emailInput.fill('usuario@test.com');
+    await page.fill('input[name="password"]', 'testpassword');
+    await page.click('button:has-text("Iniciar sesión")');
 
     // Paso 3: Validar acceso
     await page.waitForURL(/\/dashboard|\/home|\/panel/)

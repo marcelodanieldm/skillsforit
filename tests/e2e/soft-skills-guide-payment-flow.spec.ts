@@ -17,6 +17,7 @@ test.describe('Soft Skills Guide - Pago con Stripe', () => {
     await expect(page).toHaveURL(/\/soft-skills-guide\/checkout$/)
 
     // Paso 2: Completar formulario de compra
+    await page.waitForSelector('input[name="name"]', { state: 'visible' })
     await page.fill('input[name="name"]', 'Test Usuario Soft Skills')
     await page.fill('input[name="email"]', `softskills-test-${Date.now()}@example.com`)
 

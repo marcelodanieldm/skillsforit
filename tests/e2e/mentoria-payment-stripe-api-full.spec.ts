@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test'
+import { v4 as uuidv4 } from 'uuid';
+import { mentorsDb } from '../../lib/database';
 
 /**
  * E2E Test: Mentoría - Pago con Stripe (Validación avanzada)
@@ -28,6 +30,24 @@ async function getStripeCheckoutSession(sessionId: string) {
 
 test.describe('Mentoría - Pago con Stripe (Validación Stripe y Backend)', () => {
   test('debe completar el pago y validar integración', async ({ page, request }) => {
+    // Seed mentor for test reliability
+    const mentorId = uuidv4();
+    mentorsDb.create({
+      id: mentorId,
+      userId: uuidv4(),
+      name: 'Mentor E2E',
+      email: 'mentor-e2e@example.com',
+      bio: 'Mentor de prueba para E2E',
+      expertise: ['Frontend', 'Career Growth'],
+      linkedinUrl: 'https://linkedin.com/in/mentor-e2e',
+      hourlyRate: 20,
+      totalSessions: 0,
+      rating: 5,
+      reviewCount: 0,
+      availability: [
+        { dayOfWeek: 1, startTime: '09:00', endTime: '17:00', timezone: 'America/New_York' }
+      ]
+    });
     // Paso 1: Ir a la página de mentores
     await page.goto('/mentors')
     await expect(page).toHaveURL(/\/mentors$/)

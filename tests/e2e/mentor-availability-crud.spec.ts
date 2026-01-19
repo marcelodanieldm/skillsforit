@@ -20,9 +20,22 @@ test.describe('Mentor - Gestión de Disponibilidad y Validación IT', () => {
     // Paso 1: Login mentor
     await page.goto('/mentor/auth/login')
     await expect(page).toHaveURL(/\/mentor\/auth\/login$/)
-    await page.fill('input[name="email"]', mentorEmail)
-    await page.fill('input[name="password"]', mentorPassword)
-    await page.click('button:has-text("Iniciar sesión")')
+    // Diagnóstico: captura errores de consola y screenshot antes de esperar el input
+    const consoleErrors = [];
+    page.on('console', msg => {
+      if (msg.type() === 'error') consoleErrors.push(msg.text());
+    });
+    await page.screenshot({ path: 'diagnostic-mentor-availability-login.png', fullPage: true });
+    const emailInput = page.locator('input[name="email"]');
+    const isVisible = await emailInput.isVisible();
+    console.log('¿Input email visible?:', isVisible);
+    if (!isVisible) {
+      console.log('Errores de consola:', consoleErrors);
+    }
+    await expect(emailInput).toBeVisible();
+    await emailInput.fill(mentorEmail);
+    await page.fill('input[name="password"]', mentorPassword);
+    await page.click('button:has-text("Iniciar sesión")');
     await page.waitForURL(/\/mentor\/dashboard/)
     await expect(page.locator('text=/Bienvenido|Mentor|Panel/i')).toBeVisible()
 
