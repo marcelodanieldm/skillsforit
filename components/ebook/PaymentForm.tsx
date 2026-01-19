@@ -36,9 +36,12 @@ function PaymentFormInner({ amount, productName, productType, metadata = {}, onS
 
     try {
       // Determine API endpoint based on product type
-      const endpoint = productType === 'cv_audit_full'
-        ? '/api/cv-audit/create-payment-intent'
-        : '/api/ebook/create-payment-intent'
+      let endpoint = '/api/ebook/create-payment-intent';
+      if (productType === 'cv_audit_full') {
+        endpoint = '/api/cv-audit/create-payment-intent';
+      } else if (productType === 'mentoria') {
+        endpoint = '/api/mentor/create-payment-intent';
+      }
 
       // Create payment intent
       const requestBody: any = {
@@ -83,7 +86,11 @@ function PaymentFormInner({ amount, productName, productType, metadata = {}, onS
           onSuccess(paymentIntent)
         } else {
           // Fallback redirect
-          window.location.href = `/cv-audit/report?paymentIntentId=${paymentIntent.id}`
+          if (productType === 'mentoria') {
+            window.location.href = '/mentor/checkout/success';
+          } else {
+            window.location.href = `/cv-audit/report?paymentIntentId=${paymentIntent.id}`;
+          }
         }
       }
     } catch (err: any) {
