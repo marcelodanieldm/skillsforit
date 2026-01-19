@@ -136,6 +136,19 @@ test.describe('API Endpoints Validation', () => {
   })
 
   test('should get analytics metrics', async ({ request }) => {
+    // Crea un evento previo para poblar la base de datos
+    await request.post('http://localhost:3000/api/events', {
+      data: {
+        eventType: 'page_view',
+        page: '/upload',
+        sessionId: `test-session-${Date.now()}`,
+        metadata: {
+          device: 'desktop',
+          referrer: 'https://google.com'
+        }
+      }
+    });
+
     const response = await request.get('http://localhost:3000/api/events')
     
     expect(response.status()).toBe(200)
