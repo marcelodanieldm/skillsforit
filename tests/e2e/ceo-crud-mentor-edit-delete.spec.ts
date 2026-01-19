@@ -19,6 +19,7 @@ test.describe('CEO - Edición y Eliminación de Mentor', () => {
     // Paso 1: Login CEO
     await page.goto('/ceo/auth/login')
     await expect(page).toHaveURL(/\/ceo\/auth\/login$/)
+    await page.waitForSelector('input[name="email"]', { state: 'visible' })
     await page.fill('input[name="email"]', 'ceo@test.com')
     await page.fill('input[name="password"]', 'testpassword')
     await page.click('button:has-text("Iniciar sesión")')
@@ -28,6 +29,7 @@ test.describe('CEO - Edición y Eliminación de Mentor', () => {
     // Paso 2: Crear nuevo mentor
     await page.click('button:has-text("Nuevo Mentor")')
     await page.fill('input[name="name"]', 'Mentor E2E')
+    await page.waitForSelector('input[name="email"]', { state: 'visible' })
     await page.fill('input[name="email"]', mentorEmail)
     await page.fill('input[name="password"]', mentorPassword)
     await page.click('button:has-text("Guardar")')
