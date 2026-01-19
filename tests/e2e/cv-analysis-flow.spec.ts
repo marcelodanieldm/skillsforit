@@ -29,6 +29,8 @@ test.describe('CV Analysis Purchase Flow', () => {
 
   test('should complete CV analysis purchase without E-book', async ({ page }) => {
     // Step 1: Navigate to upload page
+    await page.goto('/')
+    await page.waitForSelector('a[href="/upload"]', { state: 'visible' })
     await page.click('a[href="/upload"]')
     await expect(page).toHaveURL('/upload')
 
