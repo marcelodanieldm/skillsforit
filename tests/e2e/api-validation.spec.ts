@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { db } from '../../lib/database'
 
 /**
  * E2E Test: API Endpoints Validation
@@ -32,6 +33,21 @@ test.describe('API Endpoints Validation', () => {
   })
 
   test('should create checkout session with valid data', async ({ request }) => {
+    // Crear análisis previo en la base de datos mock
+    db.create({
+      id: 'test-cv-123',
+      email: 'test@example.com',
+      name: 'Test User',
+      country: 'España',
+      profession: 'Frontend Developer',
+      cvFileName: 'cv.pdf',
+      cvFilePath: '/fake/path/cv.pdf',
+      paymentStatus: 'pending',
+      analysisStatus: 'pending',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
     const response = await request.post('http://localhost:3000/api/checkout', {
       data: {
         cvId: 'test-cv-123',
@@ -48,6 +64,21 @@ test.describe('API Endpoints Validation', () => {
   })
 
   test('should create checkout with E-book line item', async ({ request }) => {
+    // Crear análisis previo en la base de datos mock
+    db.create({
+      id: 'test-cv-456',
+      email: 'test@example.com',
+      name: 'Test User',
+      country: 'España',
+      profession: 'Frontend Developer',
+      cvFileName: 'cv.pdf',
+      cvFilePath: '/fake/path/cv.pdf',
+      paymentStatus: 'pending',
+      analysisStatus: 'pending',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
     const response = await request.post('http://localhost:3000/api/checkout', {
       data: {
         cvId: 'test-cv-456',
@@ -60,7 +91,6 @@ test.describe('API Endpoints Validation', () => {
     expect(response.status()).toBe(200)
     const data = await response.json()
     expect(data.sessionId).toBeTruthy()
-    
     // Verify metadata includes E-book flag
     // Note: We can't directly check Stripe session, but we verify the endpoint works
   })
