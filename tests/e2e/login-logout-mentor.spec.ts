@@ -17,9 +17,22 @@ test.describe('Login y Logout - Mentor', () => {
     await expect(page).toHaveURL(/\/mentor\/auth\/login$/)
 
     // Paso 2: Ingresar credenciales
-    await page.fill('input[name="email"]', 'mentor@test.com')
-    await page.fill('input[name="password"]', 'testpassword')
-    await page.click('button:has-text("Iniciar sesión")')
+    // Diagnóstico: captura errores de consola y screenshot antes de esperar el input
+    const consoleErrors = [];
+    page.on('console', msg => {
+      if (msg.type() === 'error') consoleErrors.push(msg.text());
+    });
+    await page.screenshot({ path: 'diagnostic-mentor-login.png', fullPage: true });
+    const emailInput = page.locator('input[name="email"]');
+    const isVisible = await emailInput.isVisible();
+    console.log('¿Input email visible?:', isVisible);
+    if (!isVisible) {
+      console.log('Errores de consola:', consoleErrors);
+    }
+    await expect(emailInput).toBeVisible();
+    await emailInput.fill('mentor@test.com');
+    await page.fill('input[name="password"]', 'testpassword');
+    await page.click('button:has-text("Iniciar sesión")');
 
     // Paso 3: Validar acceso
     await page.waitForURL(/\/mentor\/dashboard|\/mentor\/panel/)

@@ -32,9 +32,22 @@ test.describe('Ebook - Pago con Stripe (Validación Stripe y Backend)', () => {
     await expect(page).toHaveURL(/\/ebook\/checkout$/)
 
     // Paso 2: Completar formulario de compra
-    await page.fill('input[name="name"]', 'Test Usuario Ebook')
-    const testEmail = `ebook-stripe-${Date.now()}@example.com`
-    await page.fill('input[name="email"]', testEmail)
+    // Diagnóstico: captura errores de consola y screenshot antes de esperar el input
+    const consoleErrors = [];
+    page.on('console', msg => {
+      if (msg.type() === 'error') consoleErrors.push(msg.text());
+    });
+    await page.screenshot({ path: 'diagnostic-ebook-stripe-checkout.png', fullPage: true });
+    const nameInput = page.locator('input[name="name"]');
+    const isVisible = await nameInput.isVisible();
+    console.log('¿Input name visible?:', isVisible);
+    if (!isVisible) {
+      console.log('Errores de consola:', consoleErrors);
+    }
+    await expect(nameInput).toBeVisible();
+    await nameInput.fill('Test Usuario Ebook');
+    const testEmail = `ebook-stripe-${Date.now()}@example.com`;
+    await page.fill('input[name="email"]', testEmail);
 
     // Paso 3: Click en pagar con Stripe
     const checkoutButton = page.locator('button:has-text("Pagar con Stripe")')

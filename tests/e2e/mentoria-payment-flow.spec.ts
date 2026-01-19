@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test'
+import { v4 as uuidv4 } from 'uuid';
+import { mentorsDb } from '../../lib/database';
 
 /**
  * E2E Test: Mentoría - Pago con Stripe
@@ -13,14 +15,43 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Mentoría - Pago con Stripe', () => {
   test('debe completar el pago de mentoría exitosamente', async ({ page }) => {
+    // Seed mentor for test reliability
+    const mentorId = uuidv4();
+    mentorsDb.create({
+      id: mentorId,
+      userId: uuidv4(),
+      name: 'Mentor E2E',
+      email: 'mentor-e2e@example.com',
+      bio: 'Mentor de prueba para E2E',
+      expertise: ['Frontend', 'Career Growth'],
+      linkedinUrl: 'https://linkedin.com/in/mentor-e2e',
+      hourlyRate: 20,
+      totalSessions: 0,
+      rating: 5,
+      reviewCount: 0,
+      availability: [
+        { dayOfWeek: 1, startTime: '09:00', endTime: '17:00', timezone: 'America/New_York' }
+      ]
+    });
     // Paso 1: Ir a la página de mentores
     await page.goto('/mentors')
     await expect(page).toHaveURL(/\/mentors$/)
 
     // Paso 2: Seleccionar el primer mentor disponible
-    const mentorCard = page.locator('[data-testid="mentor-card"]').first()
-    await expect(mentorCard).toBeVisible()
-    await mentorCard.click()
+    // Diagnóstico: captura screenshot, cuenta y errores de consola antes de esperar mentor-card
+    const consoleErrors = [];
+    page.on('console', msg => {
+      if (msg.type() === 'error') consoleErrors.push(msg.text());
+    });
+    await page.screenshot({ path: 'diagnostic-mentoria-mentor-list.png', fullPage: true });
+    const mentorCards = await page.locator('[data-testid="mentor-card"]').count();
+    console.log('Cantidad de mentor-card:', mentorCards);
+    if (mentorCards === 0) {
+      console.log('Errores de consola:', consoleErrors);
+    }
+    const mentorCard = page.locator('[data-testid="mentor-card"]').first();
+    await expect(mentorCard).toBeVisible();
+    await mentorCard.click();
 
     // Paso 3: Agendar sesión (rellenar formulario)
     await expect(page).toHaveURL(/\/mentors\/book/)

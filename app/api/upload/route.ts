@@ -24,10 +24,20 @@ export async function POST(request: NextRequest) {
     const country = formData.get('country') as string;
     const profession = formData.get('profession') as string;
 
+
     if (!file || !name || !email || !country || !profession) {
       console.log("[UPLOAD] Missing required fields", { file, name, email, country, profession });
       return NextResponse.json(
         { error: 'Todos los campos son requeridos' },
+        { status: 400 }
+      );
+    }
+
+    // Validar tipo de archivo PDF
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      console.log("[UPLOAD] Invalid file type", { fileType: file.type, fileName: file.name });
+      return NextResponse.json(
+        { error: 'Solo se permiten archivos PDF' },
         { status: 400 }
       );
     }
