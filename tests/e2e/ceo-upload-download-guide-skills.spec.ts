@@ -18,6 +18,7 @@ test.describe('CEO - Subida y Descarga de PDF Guide Skills', () => {
     // Paso 1: Login CEO
     await page.goto('/ceo/auth/login')
     await expect(page).toHaveURL(/\/ceo\/auth\/login$/)
+    await page.waitForSelector('input[name="email"]', { state: 'visible' })
     await page.fill('input[name="email"]', 'ceo@test.com')
     await page.fill('input[name="password"]', 'testpassword')
     await page.click('button:has-text("Iniciar sesión")')
