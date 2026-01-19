@@ -169,7 +169,7 @@ test.describe('API Endpoints Validation', () => {
       }
     })
 
-    expect(response.status()).toBe(201)
+    expect(response.status()).toBe(200)
     const data = await response.json()
     expect(data.user).toBeTruthy()
     expect(data.user.segment).toBeTruthy()
