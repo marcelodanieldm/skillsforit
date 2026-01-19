@@ -1,4 +1,14 @@
-  // Bloqueo de días/semana/fines de semana
+"use client";
+
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Calendar, Clock, Info, RefreshCw } from 'lucide-react';
+import AvailabilityCalendar from '@/components/mentor/AvailabilityCalendar';
+import AddAvailabilityModal from '@/components/mentor/AddAvailabilityModal';
+
+// Bloqueo de días/semana/fines de semana
+export default function MentorAvailabilityPage() {
   const [blockLoading, setBlockLoading] = useState(false);
   const [blockError, setBlockError] = useState('');
 
@@ -17,29 +27,19 @@
     } catch (err: any) {
       setBlockError(err.message || 'Error al bloquear');
     } finally {
-      setBlockLoading(false);
+      // cualquier cleanup si es necesario
     }
   };
-'use client'
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { Calendar, Clock, Info, RefreshCw } from 'lucide-react'
-import AvailabilityCalendar from '@/components/mentor/AvailabilityCalendar'
-import AddAvailabilityModal from '@/components/mentor/AddAvailabilityModal'
-
-interface AvailabilitySlot {
-  id: string
-  mentor_id: string
-  day_of_week: number
-  start_time: string
-  end_time: string
-  slot_duration_minutes: number
-  is_active: boolean
-}
-
-export default function MentorAvailabilityPage() {
+  interface AvailabilitySlot {
+    id: string;
+    mentor_id: string;
+    day_of_week: number;
+    start_time: string;
+    end_time: string;
+    slot_duration_minutes: number;
+    is_active: boolean;
+  }
     // Estado para menú lateral
     const [menuOpen, setMenuOpen] = useState(true);
 
