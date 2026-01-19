@@ -11,7 +11,7 @@ import { test, expect } from '@playwright/test'
  */
 
 test.describe('Usuario IT - Descarga de PDF Guide Skills', () => {
-  test('debe poder descargar el PDF desde el dashboard', async ({ page, context, tmpPath }) => {
+  test('debe poder descargar el PDF desde el dashboard', async ({ page, context }) => {
     // Paso 1: Login usuario IT
     await page.goto('/auth/login')
     await expect(page).toHaveURL(/\/auth\/login$/)
