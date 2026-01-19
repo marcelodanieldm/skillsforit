@@ -51,6 +51,7 @@ test.describe('Usuario IT - Administración de reservas de sesiones', () => {
   test('no puede reservar más sesiones de las permitidas (negativo)', async ({ page }) => {
     // Login
     await page.goto('/auth/login')
+    await page.waitForSelector('input[name="email"]', { state: 'visible' })
     await page.fill('input[name="email"]', userEmail)
     await page.fill('input[name="password"]', userPassword)
     await page.click('button:has-text("Iniciar sesión")')
