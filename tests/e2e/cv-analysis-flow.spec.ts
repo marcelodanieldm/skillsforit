@@ -269,8 +269,11 @@ test.describe('CV Analysis Purchase Flow', () => {
     await page.reload()
 
     // Verify trust signals present
+    await page.waitForSelector('text=/Pago 100% seguro/i', { state: 'visible' })
     await expect(page.locator('text=/Pago 100% seguro/i')).toBeVisible()
+    await page.waitForSelector('text=/Entrega inmediata/i', { state: 'visible' })
     await expect(page.locator('text=/Entrega inmediata/i')).toBeVisible()
+    await page.waitForSelector('text=/Garantía/i', { state: 'visible' })
     await expect(page.locator('text=/Garantía/i')).toBeVisible()
   })
 })
