@@ -17,6 +17,7 @@ test.describe('Ebook - Pago con Stripe', () => {
     await expect(page).toHaveURL(/\/ebook\/checkout$/)
 
     // Paso 2: Completar formulario de compra
+    await page.waitForSelector('input[name="name"]', { state: 'visible' })
     await page.fill('input[name="name"]', 'Test Usuario Ebook')
     await page.fill('input[name="email"]', `ebook-test-${Date.now()}@example.com`)
 
