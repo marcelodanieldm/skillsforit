@@ -176,7 +176,6 @@ SkillsForIT es una plataforma SaaS para auditoría de CV, mentoría profesional 
 - [Diagrama de flujo](FLOW.md)
 - [User Journey](USER_JOURNEY.md)
 - [DER y modelo de datos](DATABASE_SCHEMA_README.md)
-- [Sprints y features](SPRINT4.md), [SPRINT5.md], [SPRINT8.md], [SPRINT31.md]
 - [Casos de prueba y QA](tests/email-templates.test.js), [tests/e2e/email-templates.e2e.spec.ts)
 - [Guía de despliegue](DEPLOYMENT.md)
 - [Diagrama visual de flujo de usuario](docs/diagramas-flujo.md)
@@ -211,7 +210,6 @@ SkillsForIT es una plataforma SaaS para auditoría de CV, mentoría profesional 
 - [Diagrama de flujo](FLOW.md)
 - [User Journey](USER_JOURNEY.md)
 - [DER y modelo de datos](DATABASE_SCHEMA_README.md)
-- [Sprints y features](SPRINT4.md), [SPRINT5.md], [SPRINT8.md], [SPRINT31.md]
 - [Casos de prueba y QA](tests/email-templates.test.js), [tests/e2e/email-templates.e2e.spec.ts)
 - [Guía de despliegue](DEPLOYMENT.md)
 - [Diagrama visual de flujo de usuario](docs/diagramas-flujo.md)
