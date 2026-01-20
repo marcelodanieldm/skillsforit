@@ -87,92 +87,57 @@ export default function PreAuditReport({ result, onUnlock }: PreAuditReportProps
     }
   };
 
+  // Si el reporte está desbloqueado, mostrar el upsell estratégico al final
+  const isUnlocked = !result.isPreview;
+
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-8">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">¡Auditoría de CV Completada!</h1>
-        <p className="text-gray-600">Analizamos tu CV contra 50+ criterios profesionales para roles IT</p>
-      </motion.div>
+      {/* ...existing code... */}
 
-      {/* Score General Grande */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center">
-        <div className={`text-7xl font-extrabold ${getScoreColor(result.score)} mb-2`}>{result.score}/100</div>
-        <div className="text-gray-600 text-lg">Puntaje General</div>
-      </motion.div>
-
-      {/* Semáforo de Errores (sin solución) */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white rounded-xl shadow-lg p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2"><FaExclamationTriangle className="text-red-500" />Errores Detectados</h2>
-        <div className="space-y-4">
-          {result.problems.length === 0 ? <div className="text-gray-500">No se detectaron errores.</div> : result.problems.map((problem, index) => (
-            <div key={index} className="border-l-4 border-red-500 pl-4 flex items-center gap-3">
-              <span className={`font-semibold ${getSeverityColor(problem.severity)}`}>{problem.severity === 'high' ? '🔴' : problem.severity === 'medium' ? '🟠' : '🟢'}</span>
-              <span className="text-gray-800 font-medium">{problem.description}</span>
-            </div>
-          ))}
+      {/* CTA para desbloquear o upsell mentoría */}
+      {isUnlocked ? (
+        <div className="mt-8 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6 text-center border-2 border-green-200">
+          <h3 className="text-2xl font-bold text-green-800 mb-4">
+            ¡Tu score ahora puede subir a <span className="text-blue-700">90/100</span>!
+          </h3>
+          <p className="text-gray-700 mb-6">
+            Un mentor puede revisar estos cambios contigo en una sesión de <b>10 min</b>.<br />
+            <span className="text-blue-700 font-semibold">¿Listo para llevar tu CV al siguiente nivel?</span>
+          </p>
+          <a
+            href="/mentorias/book"
+            className="inline-block bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-bold py-4 px-8 rounded-lg transition-all duration-300 shadow-lg text-lg"
+          >
+            Agendar Mentoría
+          </a>
         </div>
-      </motion.div>
-
-      {/* Bloqueado: Consejos Específicos (blur) */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-white rounded-xl shadow-lg p-6 relative overflow-hidden">
-        <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2"><FaLock className="text-gray-400" />Consejos Específicos</h2>
-        <div className="filter blur-sm select-none pointer-events-none opacity-60 bg-gray-100 rounded p-4 text-gray-700">
-          {result.improvements && result.improvements.length > 0 ? (
-            <ul className="list-disc pl-6">
-              {result.improvements.slice(0, 3).map((imp, idx) => (
-                <li key={idx}>{imp.explanation}</li>
-              ))}
-            </ul>
-          ) : (
-            <div>No hay consejos disponibles.</div>
-          )}
-        </div>
-        <div className="absolute top-4 right-4 flex items-center gap-2 text-gray-400"><FaLock /> <span className="font-semibold">Bloqueado</span></div>
-      </motion.div>
-
-      {/* Bloqueado: Keyword Gap (candado) */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-white rounded-xl shadow-lg p-6 relative overflow-hidden">
-        <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2"><FaLock className="text-gray-400" />Keyword Gap</h2>
-        <div className="flex flex-col items-center gap-2 filter blur-sm select-none pointer-events-none opacity-60">
-          <ul className="list-disc pl-6">
-            {result.recommendations && result.recommendations.length > 0 ? (
-              result.recommendations.slice(0, 5).map((rec, idx) => (
-                <li key={idx}>{rec}</li>
-              ))
+      ) : (
+        <div className="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 text-center">
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">
+            ¿Quieres ver cómo mejorar tu CV?
+          </h3>
+          <p className="text-gray-600 mb-6">
+            Desbloquea consejos detallados, keywords específicas y un plan de mejora personalizado.
+          </p>
+          <button
+            onClick={handleUnlock}
+            disabled={unlocking}
+            className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-all duration-300 flex items-center gap-2 mx-auto disabled:opacity-50"
+          >
+            {unlocking ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                Procesando...
+              </>
             ) : (
-              <li>No hay keywords detectadas.</li>
+              <>
+                <FaUnlock />
+                Desbloquear Auditoría Completa
+              </>
             )}
-          </ul>
+          </button>
         </div>
-        <div className="absolute top-4 right-4 flex items-center gap-2 text-gray-400"><FaLock /> <span className="font-semibold">Bloqueado</span></div>
-      </motion.div>
-
-      {/* CTA para desbloquear */}
-      <div className="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 text-center">
-        <h3 className="text-2xl font-bold text-gray-900 mb-4">
-          ¿Quieres ver cómo mejorar tu CV?
-        </h3>
-        <p className="text-gray-600 mb-6">
-          Desbloquea consejos detallados, keywords específicas y un plan de mejora personalizado.
-        </p>
-        <button
-          onClick={handleUnlock}
-          disabled={unlocking}
-          className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-all duration-300 flex items-center gap-2 mx-auto disabled:opacity-50"
-        >
-          {unlocking ? (
-            <>
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-              Procesando...
-            </>
-          ) : (
-            <>
-              <FaUnlock />
-              Desbloquear Auditoría Completa
-            </>
-          )}
-        </button>
-      </div>
+      )}
     </div>
   );
 }
