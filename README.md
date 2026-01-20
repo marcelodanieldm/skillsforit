@@ -33,6 +33,11 @@ SkillsForIT es una plataforma SaaS para auditoría de CV, mentoría profesional 
 - Integración Stripe para pagos y webhooks
 - PDF automático y entrega por email
 - Arquitectura modular y escalable
+- Simulador de entrevista técnica con IA (OpenAI GPT-4):
+  - Selección de tipo de entrevista (Frontend, Backend, DevOps, QA, Data, Soft Skills)
+  - Preguntas dinámicas y adaptativas
+  - Feedback inmediato y detallado (puntuación, recomendaciones, áreas de mejora)
+  - Historial de simulaciones en dashboard
 
 ---
 ## 📊 Dashboards
@@ -66,6 +71,7 @@ SkillsForIT es una plataforma SaaS para auditoría de CV, mentoría profesional 
 - Mentoría: Registro → Selección mentor → Agenda → Pago → Google Meet → Feedback → Historial
 - Entrega de productos: Compra → Pago → Email con link de descarga
 - Upsell: Email y dashboard sugieren productos relevantes tras cada compra
+- Simulador de entrevista: Acceso → Selección de tipo → Simulación con IA → Feedback inmediato (puntuación, recomendaciones, áreas de mejora) → Historial en dashboard
 
 ---
 ## 🔗 Links de Productos
@@ -74,6 +80,7 @@ SkillsForIT es una plataforma SaaS para auditoría de CV, mentoría profesional 
 - CEO dashboard: https://skillsforit.com/admin/dashboard
 - Mentoría: https://skillsforit.com/mentors
 - Upload CV: https://skillsforit.com/upload
+- Simulador de entrevista: https://skillsforit.com/interview-simulator
 
 ---
 ## ⚙️ Instalación
@@ -176,10 +183,12 @@ SkillsForIT es una plataforma SaaS para auditoría de CV, mentoría profesional 
 - [DER de la base de datos](docs/der-base-datos.md)
 - [Ejemplos de UI de dashboards](docs/ui-ejemplos.md)
   
-### Diagramas de flujos de usuario por rol
 - [Flujo CEO](docs/flujo-ceo.md)
 - [Flujo Usuario IT](docs/flujo-user-it.md)
 - [Flujo Mentor](docs/flujo-mentor.md)
+
+### Diagrama de flujo del simulador de entrevista
+- [Flujo Simulador de Entrevista](docs/flujo-simulador-entrevista.md)
 
 - [Envío de email transaccional](docs/proceso-interno-email.md)
 - [Pago y webhook Stripe](docs/proceso-interno-pago.md)
@@ -226,12 +235,18 @@ SkillsForIT es una plataforma SaaS para auditoría de CV, mentoría profesional 
 - Integración Stripe para pagos y webhooks
 - PDF automático y entrega por email
 - Arquitectura modular y escalable
+- Simulador de entrevista técnica con IA (OpenAI GPT-4):
+  - Selección de tipo de entrevista (Frontend, Backend, DevOps, QA, Data, Soft Skills)
+  - Preguntas dinámicas y adaptativas
+  - Feedback inmediato y detallado (puntuación, recomendaciones, áreas de mejora)
+  - Historial de simulaciones en dashboard
 
 ## 🚦 Flujos de Productos
 - Auditoría de CV: Upload → Pago → Análisis IA → PDF → Email → Dashboard
 - Mentoría: Registro → Selección mentor → Agenda → Pago → Google Meet → Feedback → Historial
 - Entrega de productos: Compra → Pago → Email con link de descarga
 - Upsell: Email y dashboard sugieren productos relevantes tras cada compra
+- Simulador de entrevista: Acceso → Selección de tipo → Simulación con IA → Feedback inmediato (puntuación, recomendaciones, áreas de mejora) → Historial en dashboard
 
 ## 🔗 Links de Productos
 - Landing: https://skillsforit.com/
@@ -239,6 +254,7 @@ SkillsForIT es una plataforma SaaS para auditoría de CV, mentoría profesional 
 - CEO dashboard: https://skillsforit.com/admin/dashboard
 - Mentoría: https://skillsforit.com/mentors
 - Upload CV: https://skillsforit.com/upload
+- Simulador de entrevista: https://skillsforit.com/interview-simulator
 
 ## ⚙️ Instalación
 1. Clona el repositorio:
@@ -952,11 +968,4 @@ npm run dev
 - **Previous session notes** automatically shown to mentor before new session with same mentee
 - Session notes include: content, topics, action items, next steps
 - All bookings require Stripe payment confirmation
-- Meeting links are generated automatically
-
----
-
-**MVP Status**: ✅ Fully Functional SaaS with Mentorship
-**Revenue Ready**: ✅ Yes - Can process CV analysis ($7) and mentorship payments ($10-$100)
-**Automated**: ✅ Complete automation from payment to delivery
-**Mentorship Ready**: ✅ Full booking, payment, and session notes system
+- Meeting links are generated automáticamente
