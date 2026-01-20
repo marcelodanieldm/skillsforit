@@ -129,6 +129,72 @@ SkillsForIT es una plataforma SaaS para auditoría de CV, mentoría profesional 
 ---
 ## 🧪 QA y Casos de Prueba
 
+### Testing E2E automatizado con Playwright
+
+Suite completa de tests E2E con Playwright que valida los flujos críticos de negocio: Upload CV, Cart, Checkout, Payment, Analysis, Mentoría, Soft Skills Guide, Ebook, Seguridad y más.
+
+#### Email templates cubiertos
+- mentoriaWelcome: Email de bienvenida a mentoría
+- productDelivery: Entrega de producto digital (E-book, guía, etc.)
+- cvAnalysisConfirmation: Confirmación de pago y análisis de CV
+- cvAnalysisResult: Entrega de resultado de análisis de CV
+- mentorshipSessionConfirmation: Confirmación de sesión de mentoría
+- cartRecovery: Recuperación de carrito abandonado
+- sessionReminder: Recordatorio de sesión de mentoría
+- upsellOffer: Oferta de upsell personalizada
+- feedbackRequest: Solicitud de feedback post-compra/sesión
+
+#### Ejemplos de payload para email templates
+
+```json
+// mentoriaWelcome
+{"to":"test@mailtrap.io","password":"demo123","dashboardUrl":"https://skillsforit.vercel.app/dashboard"}
+// productDelivery
+{"to":"test@mailtrap.io","productName":"Curso React","downloadUrl":"https://skillsforit.vercel.app/ebook/soft-skills-guide"}
+// cvAnalysisConfirmation
+{"to":"test@mailtrap.io","analysisId":"A12345"}
+// cvAnalysisResult
+{"to":"test@mailtrap.io","analysisId":"A12345","resultUrl":"https://skillsforit.vercel.app/cv-audit/result"}
+// mentorshipSessionConfirmation
+{"to":"test@mailtrap.io","mentorName":"Ana Mentor","sessionDate":"2026-01-21 18:00","sessionUrl":"https://skillsforit.vercel.app/session","userName":"Carlos"}
+// cartRecovery
+{"to":"test@mailtrap.io","recoveryUrl":"https://skillsforit.vercel.app/cart","productName":"Curso React"}
+// sessionReminder
+{"to":"test@mailtrap.io","mentorName":"Ana Mentor","sessionDate":"2026-01-22 10:00","sessionUrl":"https://skillsforit.vercel.app/session","userName":"Carlos"}
+// upsellOffer
+{"to":"test@mailtrap.io","userName":"Carlos","productName":"Mentoría Premium","discount":"20%","offerUrl":"https://skillsforit.vercel.app/upsell"}
+// feedbackRequest
+{"to":"test@mailtrap.io","userName":"Carlos","productName":"Curso React","mentorName":"Ana Mentor","feedbackUrl":"https://skillsforit.vercel.app/feedback"}
+```
+
+Cada payload es enviado al endpoint `/api/email-templates/test` y validado en Mailtrap.
+
+#### Criterios de aceptación generales
+- Todos los flujos críticos deben ejecutarse sin errores en ambiente de staging y producción.
+- Los emails deben enviarse y recibirse correctamente (verificable en Mailtrap).
+- Los pagos deben procesarse correctamente y reflejarse en la base de datos.
+- Los dashboards deben mostrar la información esperada según el rol.
+- Los archivos (PDF, E-book) deben generarse y entregarse al usuario.
+- Los endpoints protegidos deben validar roles y autenticación.
+- Los formularios deben validar datos y mostrar errores claros.
+- El usuario debe poder iniciar y cerrar sesión correctamente.
+- Los datos sensibles no deben filtrarse en respuestas de error.
+- Los reportes de Playwright deben estar disponibles tras cada ejecución.
+
+#### Casos de prueba automatizados por módulo y flujo
+
+- Email y Notificaciones: envío y validación de todos los templates.
+- CV Audit: compra, análisis, PDF, E-book, validaciones.
+- Mentoría: reserva, pago, integración Stripe, errores.
+- Soft Skills Guide: compra, pago, integración Stripe.
+- Ebook: compra, pago, integración Stripe.
+- Usuario IT: reservas, descargas, restricciones.
+- CEO Dashboard: subida/descarga de PDF, seguridad, CRUD mentor.
+- Login y Seguridad: login/logout por rol, protección de accesos.
+- API y Backend: validación de endpoints, eventos, segmentación.
+
+Para más detalles y ejemplos, consulta tests/README.md.
+
 ---
 ## 🚀 Instalación y Especificaciones de Playwright
 
@@ -275,7 +341,7 @@ Cada caso de prueba valida tanto el resultado esperado (flujo exitoso, emails en
 - [Diagrama de flujo](FLOW.md)
 - [User Journey](USER_JOURNEY.md)
 - [DER y modelo de datos](DATABASE_SCHEMA_README.md)
-- [Casos de prueba y QA](tests/email-templates.test.js), [tests/e2e/email-templates.e2e.spec.ts)
+- [Casos de prueba y QA](tests/email-templates.test.js), [tests/e2e/email-templates.e2e.spec.ts]
 - [Guía de despliegue](DEPLOYMENT.md)
 - [Diagrama visual de flujo de usuario](docs/diagramas-flujo.md)
 - [DER de la base de datos](docs/der-base-datos.md)
@@ -309,7 +375,7 @@ Cada caso de prueba valida tanto el resultado esperado (flujo exitoso, emails en
 - [Diagrama de flujo](FLOW.md)
 - [User Journey](USER_JOURNEY.md)
 - [DER y modelo de datos](DATABASE_SCHEMA_README.md)
-- [Casos de prueba y QA](tests/email-templates.test.js), [tests/e2e/email-templates.e2e.spec.ts)
+- [Casos de prueba y QA](tests/email-templates.test.js), [tests/e2e/email-templates.e2e.spec.ts]
 - [Guía de despliegue](DEPLOYMENT.md)
 - [Diagrama visual de flujo de usuario](docs/diagramas-flujo.md)
 - [DER de la base de datos](docs/der-base-datos.md)
@@ -441,7 +507,7 @@ SkillsForIT es una plataforma SaaS para auditoría de CV, mentoría profesional 
 - [Diagrama de flujo](FLOW.md)
 - [User Journey](USER_JOURNEY.md)
 - [DER y modelo de datos](DATABASE_SCHEMA_README.md)
-- [Casos de prueba y QA](tests/email-templates.test.js), [tests/e2e/email-templates.e2e.spec.ts)
+- [Casos de prueba y QA](tests/email-templates.test.js), [tests/e2e/email-templates.e2e.spec.ts]
 - [Guía de despliegue](DEPLOYMENT.md)
 - **Email/Password**: Autenticación tradicional con validación de roles
 - **Google OAuth**: Inicio de sesión con cuenta de Google (NextAuth.js)
@@ -881,7 +947,7 @@ El proyecto escucha estos eventos de Stripe:
 #### 📋 Checklist de Configuración
 
 - [ ] Cuenta de Stripe creada
-- [ ] Modo de prueba activado en Dashboard
+- [ ] Modo de prueba activado en Stripe Dashboard
 - [ ] Claves API copiadas a `.env.local`
 - [ ] Stripe CLI instalado y autenticado
 - [ ] Webhook local configurado y funcionando

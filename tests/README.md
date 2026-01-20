@@ -4,6 +4,195 @@
 
 Suite completa de tests E2E con Playwright que valida el flujo crítico de negocio: **Upload CV → Cart → Checkout → Payment → Analysis**.
 
+## Ejemplos de payload para email templates
+
+```json
+// mentoriaWelcome
+{
+  "to": "test@mailtrap.io",
+  "password": "demo123",
+  "dashboardUrl": "https://skillsforit.vercel.app/dashboard"
+}
+// productDelivery
+{
+  "to": "test@mailtrap.io",
+  "productName": "Curso React",
+  "downloadUrl": "https://skillsforit.vercel.app/ebook/soft-skills-guide"
+}
+// cvAnalysisConfirmation
+{
+  "to": "test@mailtrap.io",
+  "analysisId": "A12345"
+}
+// cvAnalysisResult
+{
+  "to": "test@mailtrap.io",
+  "analysisId": "A12345",
+  "resultUrl": "https://skillsforit.vercel.app/cv-audit/result"
+}
+// mentorshipSessionConfirmation
+{
+  "to": "test@mailtrap.io",
+  "mentorName": "Ana Mentor",
+  "sessionDate": "2026-01-21 18:00",
+  "sessionUrl": "https://skillsforit.vercel.app/session",
+  "userName": "Carlos"
+}
+// cartRecovery
+{
+  "to": "test@mailtrap.io",
+  "recoveryUrl": "https://skillsforit.vercel.app/cart",
+  "productName": "Curso React"
+}
+// sessionReminder
+{
+  "to": "test@mailtrap.io",
+  "mentorName": "Ana Mentor",
+  "sessionDate": "2026-01-22 10:00",
+  "sessionUrl": "https://skillsforit.vercel.app/session",
+  "userName": "Carlos"
+}
+// upsellOffer
+{
+  "to": "test@mailtrap.io",
+  "userName": "Carlos",
+  "productName": "Mentoría Premium",
+  "discount": "20%",
+  "offerUrl": "https://skillsforit.vercel.app/upsell"
+}
+// feedbackRequest
+{
+  "to": "test@mailtrap.io",
+  "userName": "Carlos",
+  "productName": "Curso React",
+  "mentorName": "Ana Mentor",
+  "feedbackUrl": "https://skillsforit.vercel.app/feedback"
+}
+```
+
+Cada payload es enviado al endpoint `/api/email-templates/test` y validado en Mailtrap.
+
+## Criterios de aceptación generales
+
+- Todos los flujos críticos deben ejecutarse sin errores en ambiente de staging y producción.
+- Los emails deben enviarse y recibirse correctamente (verificable en Mailtrap).
+- Los pagos deben procesarse correctamente y reflejarse en la base de datos.
+- Los dashboards deben mostrar la información esperada según el rol.
+- Los archivos (PDF, E-book) deben generarse y entregarse al usuario.
+- Los endpoints protegidos deben validar roles y autenticación.
+- Los formularios deben validar datos y mostrar errores claros.
+- El usuario debe poder iniciar y cerrar sesión correctamente.
+- Los datos sensibles no deben filtrarse en respuestas de error.
+- Los reportes de Playwright deben estar disponibles tras cada ejecución.
+
+## Archivos de prueba Playwright
+
+- email-templates.e2e.spec.ts
+- e2e/user-reservations-positive-negative.spec.ts
+- e2e/user-download-guide-skills.spec.ts
+- e2e/user-download-guide-skills-email.spec.ts
+- e2e/soft-skills-guide-payment-stripe-api.spec.ts
+- e2e/soft-skills-guide-payment-flow.spec.ts
+- e2e/mentoria-payment-stripe-validation.spec.ts
+- e2e/mentoria-payment-stripe-api.spec.ts
+- e2e/mentoria-payment-stripe-api-full.spec.ts
+- e2e/mentoria-payment-flow.spec.ts
+- e2e/mentor-availability-crud.spec.ts
+- e2e/login-logout-user.spec.ts
+- e2e/login-logout-mentor.spec.ts
+- e2e/login-logout-admin.spec.ts
+- e2e/email-templates.e2e.spec.ts
+- e2e/ebook-payment-stripe-api.spec.ts
+- e2e/ebook-payment-flow.spec.ts
+- e2e/cv-analysis-flow.spec.ts
+- e2e/ceo-upload-download-guide-skills.spec.ts
+- e2e/ceo-security.spec.ts
+- e2e/ceo-crud-mentor-access.spec.ts
+- e2e/ceo-crud-mentor-edit-delete.spec.ts
+- e2e/api-validation.spec.ts
+
+## Casos de prueba automatizados por módulo y flujo
+
+### Email y Notificaciones
+- **email-templates.e2e.spec.ts**
+  - Criterios de aceptación:
+    - Cada tipo de email se envía correctamente y llega a la bandeja de pruebas.
+    - El endpoint responde con éxito (`success: true`).
+  - Email templates cubiertos:
+    - mentoriaWelcome
+    - productDelivery
+    - cvAnalysisConfirmation
+    - cvAnalysisResult
+    - mentorshipSessionConfirmation
+    - cartRecovery
+    - sessionReminder
+    - upsellOffer
+    - feedbackRequest
+
+### CV Audit
+- **cv-analysis-flow.spec.ts**
+  - Criterios de aceptación:
+    - El usuario puede subir un CV válido y completar el flujo de compra.
+    - El PDF generado contiene observaciones técnicas y score.
+    - El E-book se entrega si fue adquirido.
+    - Los errores de formulario se muestran correctamente.
+
+### Mentoría
+- **mentoria-payment-flow.spec.ts**
+  - Criterios de aceptación:
+    - El usuario puede reservar y pagar una sesión de mentoría.
+    - La sesión queda agendada y el usuario recibe confirmación.
+    - Los pagos fallidos muestran mensajes claros.
+- **mentoria-payment-stripe-api.spec.ts / mentoria-payment-stripe-api-full.spec.ts / mentoria-payment-stripe-validation.spec.ts**
+  - Criterios de aceptación:
+    - Stripe procesa el pago y el backend lo registra.
+    - Los flujos de error y validación funcionan correctamente.
+
+### Soft Skills Guide
+- **soft-skills-guide-payment-flow.spec.ts / soft-skills-guide-payment-stripe-api.spec.ts**
+  - Criterios de aceptación:
+    - El usuario puede comprar y descargar el Soft Skills Guide.
+    - El pago se procesa y se valida en backend.
+
+### Ebook
+- **ebook-payment-flow.spec.ts / ebook-payment-stripe-api.spec.ts**
+  - Criterios de aceptación:
+    - El usuario puede comprar y descargar el E-book.
+    - El pago se procesa y se valida en backend.
+
+### Usuario IT
+- **user-reservations-positive-negative.spec.ts**
+  - Criterios de aceptación:
+    - El usuario puede reservar, modificar y cancelar sesiones según su plan.
+    - No puede reservar fuera de condiciones o en horarios no disponibles.
+- **user-download-guide-skills.spec.ts / user-download-guide-skills-email.spec.ts**
+  - Criterios de aceptación:
+    - El usuario puede descargar el PDF desde el dashboard o vía email.
+
+### CEO Dashboard
+- **ceo-upload-download-guide-skills.spec.ts**
+  - Criterios de aceptación:
+    - El CEO puede subir, descargar y reemplazar el PDF Guide Skills.
+- **ceo-security.spec.ts**
+  - Criterios de aceptación:
+    - Solo el CEO puede acceder a endpoints y dashboard protegidos.
+    - Los datos sensibles están protegidos y no se filtran.
+- **ceo-crud-mentor-access.spec.ts / ceo-crud-mentor-edit-delete.spec.ts**
+  - Criterios de aceptación:
+    - El CEO puede crear, editar, eliminar y validar acceso de mentores.
+
+### Login y Seguridad
+- **login-logout-user.spec.ts / login-logout-mentor.spec.ts / login-logout-admin.spec.ts**
+  - Criterios de aceptación:
+    - Cada tipo de usuario puede iniciar y cerrar sesión correctamente.
+    - Los accesos están protegidos según el rol.
+
+### API y Backend
+- **api-validation.spec.ts**
+  - Criterios de aceptación:
+    - Los endpoints validan datos, roles y errores correctamente.
+    - Los eventos y segmentaciones se registran y responden como se espera.
+
 ## 🚀 Quick Start
 
 ### Instalar Dependencias
