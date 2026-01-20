@@ -575,10 +575,7 @@ function CheckoutForm() {
                   <FaCheckCircle />
                   <span>Acceso inmediato</span>
                 </div>
-                <div className="flex items-center gap-2 text-green-600">
-                  <FaCheckCircle />
-                  <span>Garantía 30 días</span>
-                </div>
+                {/* Garantía eliminada */}
                 <div className="flex items-center gap-2 text-green-600">
                   <FaCheckCircle />
                   <span>Actualizaciones gratis</span>
