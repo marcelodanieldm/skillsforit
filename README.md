@@ -125,22 +125,80 @@ SkillsForIT es una plataforma SaaS para auditoría de CV, mentoría profesional 
 
 ---
 ## 🧪 QA y Casos de Prueba
+
+---
+## 🚀 Instalación y Especificaciones de Playwright
+
+### Instalación local
+1. Instala dependencias del proyecto:
+        ```bash
+        npm install
+        ```
+2. Instala los navegadores requeridos por Playwright:
+        ```bash
+        npx playwright install --with-deps
+        ```
+3. Ejecuta los tests E2E:
+        ```bash
+        npx playwright test
+        ```
+
+### Especificaciones
+- Playwright se ejecuta en Node.js 20+.
+- Los tests están en `tests/e2e/` y cubren flujos críticos de usuario.
+- Los reportes se generan en la carpeta `playwright-report/`.
+- Se recomienda usar Mailtrap para pruebas de email.
+
+### Integración continua (GitHub Actions)
+El flujo de trabajo `.github/workflows/playwright-e2e-daily.yml` ejecuta los tests E2E automáticamente cada día y en cada push/manual dispatch:
+
+```yaml
+name: Playwright E2E Tests (Daily)
+on:
+       schedule:
+              - cron: '0 3 * * *'
+       workflow_dispatch:
+jobs:
+       test:
+              runs-on: ubuntu-latest
+              steps:
+                     - name: Checkout repository
+                            uses: actions/checkout@v4
+                     - name: Setup Node.js
+                            uses: actions/setup-node@v4
+                            with:
+                                   node-version: '20'
+                     - name: Install dependencies
+                            run: npm ci
+                     - name: Install Playwright Browsers
+                            run: npx playwright install --with-deps
+                     - name: Run Playwright tests
+                            run: npx playwright test
+                     - name: Upload Playwright report
+                            if: always()
+                            uses: actions/upload-artifact@v4
+                            with:
+                                   name: playwright-report
+                                   path: playwright-report
+```
+
+Esto asegura que los tests E2E se ejecuten automáticamente y los reportes estén disponibles como artefactos en cada ejecución.
 ### Unitarios (Jest)
 - Envío de emails por cada flujo: mentoriaWelcome, productDelivery, cvAnalysisConfirmation, cvAnalysisResult, mentorshipSessionConfirmation, cartRecovery, sessionReminder, upsellOffer, feedbackRequest
 ### E2E (Playwright)
-- Prueba de envío de email para cada flujo desde el endpoint `/api/email-templates/test`
-- Validación de respuesta y éxito en Mailtrap
 
 #### Lista de Casos de Prueba
-- Envío de email de bienvenida mentoría
-- Entrega de producto digital
-- Confirmación de análisis de CV
-- Entrega de resultado de análisis de CV
-- Confirmación de sesión de mentoría
-- Recuperación de carrito abandonado
-- Recordatorio de sesión mentoría
-- Oferta de upsell personalizada
-- Solicitud de feedback post-compra/sesión
+
+### E2E (Playwright)
+
+| Feature                  | Flujo / Endpoint                        | Summary                                                                 | Resultado Esperado                                                                                 | Resultado Obtenido |
+|--------------------------|-----------------------------------------|-------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|--------------------|
+| Email Transaccional      | /api/email-templates/test               | Envía emails para todos los flujos (mentoría, producto, análisis, etc.) | El endpoint responde con éxito y el email llega a Mailtrap.                                        | Éxito, emails llegan a Mailtrap |
+| Auditoría de CV          | /upload, /cart, /checkout               | Compra y análisis de CV, upsell de E-book, pago, PDF y entrega.         | El usuario sube CV, paga, recibe PDF con observaciones y E-book si lo compra.                      | Flujo completo, PDF y E-book entregados |
+| Mentoría                 | /mentors, /mentors/book, /checkout      | Reserva y pago de sesión de mentoría con Stripe.                        | El usuario reserva, paga y es redirigido correctamente; la sesión queda agendada.                  | Flujo completo, sesión agendada |
+| Ebook                    | /ebook/checkout, /ebook/success         | Compra de E-book, formulario y pago con Stripe.                         | El usuario compra el E-book, paga y es redirigido a la página de éxito.                            | Flujo completo, confirmación de compra |
+
+Cada caso de prueba valida tanto el resultado esperado (flujo exitoso, emails enviados, archivos entregados) como el resultado real en ambiente de staging y producción.
 
 ---
 ## 🗂️ DER - Diagrama Entidad Relación
