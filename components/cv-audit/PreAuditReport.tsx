@@ -105,7 +105,7 @@ export default function PreAuditReport({ result, onUnlock }: PreAuditReportProps
             <span className="text-blue-700 font-semibold">¿Listo para llevar tu CV al siguiente nivel?</span>
           </p>
           <a
-            href="/mentorias/book"
+            href="/mentorias"
             className="inline-block bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-bold py-4 px-8 rounded-lg transition-all duration-300 shadow-lg text-lg"
           >
             Agendar Mentoría
