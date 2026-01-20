@@ -8,7 +8,8 @@ import {
   getAOVCalculator 
 } from '@/lib/checkout-flow'
 import { triggerDelivery, mapCartToDeliveryItems } from '@/lib/delivery-system'
-import { sendMentoriaWelcomeEmail, sendProductDeliveryEmail } from '@/lib/send-email'
+// @ts-ignore
+import { sendMentoriaWelcomeEmail, sendProductDeliveryEmail } from '../../lib/send-email';
 
 /**
  * Sprint 24: API de Procesamiento de Órdenes

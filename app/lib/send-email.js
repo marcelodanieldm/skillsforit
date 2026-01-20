@@ -1,6 +1,6 @@
-// Envío de emails para SkillsForIT
-const nodemailer = require('nodemailer');
-const templates = require('./email-templates');
+
+import nodemailer from 'nodemailer';
+import templates from './email-templates.js';
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-function sendMentoriaWelcomeEmail({ to, password, dashboardUrl }) {
+export function sendMentoriaWelcomeEmail({ to, password, dashboardUrl }) {
   return transporter.sendMail({
     from: process.env.EMAIL_USER,
     to,
@@ -20,7 +20,7 @@ function sendMentoriaWelcomeEmail({ to, password, dashboardUrl }) {
   });
 }
 
-function sendProductDeliveryEmail({ to, productName, downloadUrl }) {
+export function sendProductDeliveryEmail({ to, productName, downloadUrl }) {
   return transporter.sendMail({
     from: process.env.EMAIL_USER,
     to,
@@ -28,7 +28,7 @@ function sendProductDeliveryEmail({ to, productName, downloadUrl }) {
   });
 }
 
-function sendCVAnalysisConfirmation({ to, analysisId }) {
+export function sendCVAnalysisConfirmation({ to, analysisId }) {
   return transporter.sendMail({
     from: process.env.EMAIL_USER,
     to,
@@ -36,7 +36,7 @@ function sendCVAnalysisConfirmation({ to, analysisId }) {
   });
 }
 
-function sendCVAnalysisResult({ to, analysisId, resultUrl }) {
+export function sendCVAnalysisResult({ to, analysisId, resultUrl }) {
   return transporter.sendMail({
     from: process.env.EMAIL_USER,
     to,
@@ -44,7 +44,7 @@ function sendCVAnalysisResult({ to, analysisId, resultUrl }) {
   });
 }
 
-function sendMentorshipSessionConfirmation({ to, mentorName, sessionDate, sessionUrl }) {
+export function sendMentorshipSessionConfirmation({ to, mentorName, sessionDate, sessionUrl }) {
   return transporter.sendMail({
     from: process.env.EMAIL_USER,
     to,
@@ -52,7 +52,7 @@ function sendMentorshipSessionConfirmation({ to, mentorName, sessionDate, sessio
   });
 }
 
-function sendCartRecoveryEmail({ to, recoveryUrl }) {
+export function sendCartRecoveryEmail({ to, recoveryUrl }) {
   return transporter.sendMail({
     from: process.env.EMAIL_USER,
     to,
@@ -60,7 +60,7 @@ function sendCartRecoveryEmail({ to, recoveryUrl }) {
   });
 }
 
-function sendSessionReminderEmail({ to, sessionDate, sessionUrl }) {
+export function sendSessionReminderEmail({ to, sessionDate, sessionUrl }) {
   return transporter.sendMail({
     from: process.env.EMAIL_USER,
     to,
@@ -68,7 +68,7 @@ function sendSessionReminderEmail({ to, sessionDate, sessionUrl }) {
   });
 }
 
-function sendUpsellOfferEmail({ to, offerUrl }) {
+export function sendUpsellOfferEmail({ to, offerUrl }) {
   return transporter.sendMail({
     from: process.env.EMAIL_USER,
     to,
@@ -76,22 +76,10 @@ function sendUpsellOfferEmail({ to, offerUrl }) {
   });
 }
 
-function sendFeedbackRequestEmail({ to, feedbackUrl }) {
+export function sendFeedbackRequestEmail({ to, feedbackUrl }) {
   return transporter.sendMail({
     from: process.env.EMAIL_USER,
     to,
     ...templates.feedbackRequest({ to, feedbackUrl }),
   });
 }
-
-module.exports = {
-  sendMentoriaWelcomeEmail,
-  sendProductDeliveryEmail,
-  sendCVAnalysisConfirmation,
-  sendCVAnalysisResult,
-  sendMentorshipSessionConfirmation,
-  sendCartRecoveryEmail,
-  sendSessionReminderEmail,
-  sendUpsellOfferEmail,
-  sendFeedbackRequestEmail,
-};

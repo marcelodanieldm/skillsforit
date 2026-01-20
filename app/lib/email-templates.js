@@ -1,6 +1,6 @@
 // Plantillas de email para SkillsForIT
 
-module.exports = {
+const templates = {
   // 1. Bienvenida Mentoría
   mentoriaWelcome: ({ to, password, dashboardUrl }) => ({
     subject: '¡Bienvenido a SkillsForIT Mentoría! 🎉',
@@ -72,5 +72,28 @@ module.exports = {
       <a href="${recoveryUrl}">${recoveryUrl}</a>
       <p>Si tienes preguntas, estamos para ayudarte.</p>
     `
+  }),
+  sessionReminder: ({ to, sessionDate, sessionUrl }) => ({
+    subject: 'Recordatorio de sesión',
+    html: `
+      <h2>¡No olvides tu sesión!</h2>
+      <p>Fecha y hora: <b>${sessionDate}</b></p>
+      <p>Enlace: <a href="${sessionUrl}">${sessionUrl}</a></p>
+    `
+  }),
+  upsellOffer: ({ to, offerUrl }) => ({
+    subject: '¡Oferta especial para ti!',
+    html: `
+      <h2>¡Aprovecha esta oportunidad!</h2>
+      <p>Enlace: <a href="${offerUrl}">${offerUrl}</a></p>
+    `
+  }),
+  feedbackRequest: ({ to, feedbackUrl }) => ({
+    subject: '¿Cómo fue tu experiencia?',
+    html: `
+      <h2>¡Queremos tu opinión!</h2>
+      <p>Por favor, cuéntanos cómo fue tu experiencia.<br/>Enlace para feedback: <a href="${feedbackUrl}">${feedbackUrl}</a></p>
+    `
   })
-}
+};
+export default templates;
