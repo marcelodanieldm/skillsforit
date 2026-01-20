@@ -156,7 +156,6 @@ export default function PreAuditReport({ result, onUnlock }: PreAuditReportProps
         </p>
 
         <div className="bg-white rounded-lg p-4 mb-6 inline-block">
-          <div className="text-3xl font-bold text-green-600 mb-2">$7 USD</div>
           <div className="text-sm text-gray-600">Una sola vez • Acceso inmediato</div>
         </div>
 
@@ -173,7 +172,7 @@ export default function PreAuditReport({ result, onUnlock }: PreAuditReportProps
           ) : (
             <>
               <FaUnlock />
-              Desbloquear mi Auditoría Completa por $7
+              Desbloquear mi Auditoría Completa
             </>
           )}
         </button>
