@@ -1,3 +1,23 @@
+## QA - Casos de Prueba E2E
+
+Esta sección documenta los principales casos de prueba automatizados E2E (Playwright) ubicados en `tests/e2e`. Cada caso incluye: feature, épica, summary, resultado esperado y asserts principales.
+
+| Caso de Prueba | Feature | Épica | Summary | Resultado Esperado | Asserts |
+|---|---|---|---|---|---|
+| API Endpoints Validation<br/>(api-validation.spec.ts) | API REST, Validación de flujos | Auditoría de CV, Checkout, Analytics | Valida endpoints críticos: upload, checkout, webhook, events, users. | Rechazo de archivos inválidos, creación de sesión de pago, tracking de eventos, segmentación de usuario, validación de errores. | Status HTTP, contenido de respuesta, segmentación correcta, errores controlados |
+| CEO - CRUD Mentor y Acceso<br/>(ceo-crud-mentor-access.spec.ts) | Gestión de Mentores | Dashboard CEO | Crear mentor, validar persistencia, login y acceso de mentor. | Mentor creado, listado, acceso exitoso y logout. | Visibilidad en lista, acceso a dashboard, logout exitoso |
+| CEO - Edición y Eliminación de Mentor<br/>(ceo-crud-mentor-edit-delete.spec.ts) | Gestión de Mentores | Dashboard CEO | Crear, editar y eliminar mentor desde dashboard CEO. | Edición persistente, mentor eliminado de la lista. | Nombre editado visible, mentor no visible tras eliminar |
+| CEO - Seguridad y Acceso<br/>(ceo-security.spec.ts) | Seguridad, Roles | Dashboard CEO | Valida acceso a endpoints y dashboard CEO según rol/token. | Usuarios no autorizados reciben 403, CEO accede correctamente, datos sensibles protegidos. | Status 403/200, estructura de respuesta, visibilidad de dashboard |
+| CEO - Subida y Descarga de PDF<br/>(ceo-upload-download-guide-skills.spec.ts) | Gestión de Assets | Dashboard CEO | Subir y descargar PDF de Guide Skills, validar reemplazo. | PDF subido, descargado, reemplazado correctamente. | Mensaje de éxito, nombre de archivo, reemplazo efectivo |
+| ...otros casos en tests/e2e | Flujos completos | Todas las épicas | Cada archivo cubre un flujo E2E: pagos, login, reservas, emails, etc. | Flujo exitoso, errores controlados, integración real. | Status, contenido, side effects (emails, archivos, dashboard) |
+
+**Cómo ejecutar:**
+
+```bash
+npx playwright test tests/e2e
+```
+
+**Resultado esperado:** Todos los asserts deben cumplirse y los flujos reflejarse en el dashboard y logs del sistema.
 
 
 ## 🏁 Overview
