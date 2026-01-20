@@ -129,6 +129,44 @@ SkillsForIT es una plataforma SaaS para auditoría de CV, mentoría profesional 
 ---
 ## 🚀 Instalación y Especificaciones de Playwright
 
+### Ejemplos de comandos útiles
+- Ejecutar todos los tests:
+       ```bash
+       npx playwright test
+       ```
+- Ejecutar un test específico:
+       ```bash
+       npx playwright test tests/e2e/cv-analysis-flow.spec.ts
+       ```
+- Ver el reporte interactivo:
+       ```bash
+       npx playwright show-report
+       ```
+- Ejecutar solo tests con un tag:
+       ```bash
+       npx playwright test --grep @critical
+       ```
+
+### Troubleshooting (Solución de problemas)
+- Si los navegadores no se instalan correctamente:
+       ```bash
+       npx playwright install --with-deps
+       ```
+- Si los tests fallan por variables de entorno, revisa `.env.local` y asegúrate de tener credenciales válidas.
+- Usa `DEBUG=pw:api` para ver logs detallados:
+       ```bash
+       DEBUG=pw:api npx playwright test
+       ```
+- Si necesitas limpiar el cache de Playwright:
+       ```bash
+       npx playwright install --force
+       ```
+
+### Recursos útiles
+- [Documentación oficial de Playwright](https://playwright.dev/)
+- [Playwright Test Runner](https://playwright.dev/docs/test-intro)
+- [GitHub Actions para Playwright](https://playwright.dev/docs/ci)
+
 ### Instalación local
 1. Instala dependencias del proyecto:
         ```bash
