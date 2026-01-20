@@ -8,6 +8,7 @@ import {
   getAOVCalculator 
 } from '@/lib/checkout-flow'
 import { triggerDelivery, mapCartToDeliveryItems } from '@/lib/delivery-system'
+import { sendMentoriaWelcomeEmail, sendProductDeliveryEmail } from '@/lib/send-email'
 
 /**
  * Sprint 24: API de Procesamiento de Órdenes
@@ -244,6 +245,23 @@ export async function PUT(request: NextRequest) {
           delivery_errors: [{ error: deliveryError.message }]
         })
         .eq('id', order.id)
+    }
+
+    // Enviar email de bienvenida mentoría si corresponde
+    if (products.includes('mentoria')) {
+      await sendMentoriaWelcomeEmail({
+        to: email,
+        password: 'contraseña-temporal', // reemplazar por la real si aplica
+        dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/mentoria`
+      });
+    }
+    // Enviar email de entrega de producto si corresponde
+    if (products.includes('soft-skills-guide')) {
+      await sendProductDeliveryEmail({
+        to: email,
+        productName: 'Soft Skills Guide',
+        downloadUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/descarga/soft-skills-guide`
+      });
     }
 
     // Track purchase completion
