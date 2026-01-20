@@ -33,9 +33,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validar tipo de archivo PDF
-    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
-      console.log("[UPLOAD] Invalid file type", { fileType: file.type, fileName: file.name });
+    // Log file object and add extra defensive checks
+    console.log('[UPLOAD] file recibido:', file);
+    if (
+      !file ||
+      typeof file !== 'object' ||
+      typeof file.type !== 'string' ||
+      typeof file.name !== 'string' ||
+      (file.type !== 'application/pdf' && !file.name?.toLowerCase().endsWith('.pdf'))
+    ) {
+      console.log("[UPLOAD] Invalid file type or missing file", { file, fileType: file?.type, fileName: file?.name });
       return NextResponse.json(
         { error: 'Solo se permiten archivos PDF' },
         { status: 400 }
@@ -96,9 +103,9 @@ export async function POST(request: NextRequest) {
       fileUrl: publicUrl
     });
   } catch (error: any) {
-    console.error('[UPLOAD] Upload error:', error);
+    console.error('[UPLOAD] Upload error:', error, error?.stack);
     return NextResponse.json(
-      { error: 'Error al subir el archivo', details: error.message },
+      { error: 'Error al subir el archivo', details: error?.message },
       { status: 500 }
     );
   }
