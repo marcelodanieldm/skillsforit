@@ -11,14 +11,23 @@ function getSupabase() {
 
 export async function POST(request: NextRequest) {
   const supabase = getSupabase()
-  
+
   try {
     const formData = await request.formData()
     const file = formData.get('cv') as File
     const profession = formData.get('profession') as string
     const country = formData.get('country') as string
 
+    console.log('[CV Pre-Audit] Payload recibido:', {
+      fileType: file?.type,
+      fileName: file?.name,
+      fileSize: file?.size,
+      profession,
+      country
+    })
+
     if (!file || !profession || !country) {
+      console.error('[CV Pre-Audit] Faltan campos requeridos', { file, profession, country })
       return NextResponse.json(
         { error: 'Missing required fields: cv file, profession, country' },
         { status: 400 }
@@ -26,27 +35,54 @@ export async function POST(request: NextRequest) {
     }
 
     // Extract text from PDF (simplified - in production use pdf-parse)
-    const cvText = await extractTextFromFile(file)
+    let cvText = ''
+    try {
+      cvText = await extractTextFromFile(file)
+      console.log('[CV Pre-Audit] Texto extraído del CV:', cvText.slice(0, 200) + (cvText.length > 200 ? '...' : ''))
+    } catch (err) {
+      console.error('[CV Pre-Audit] Error extrayendo texto del archivo:', err)
+      throw err
+    }
 
     // Perform AI analysis
-    const fullAnalysis = await analyzeCVWithAI(cvText, profession, country)
+    let fullAnalysis
+    try {
+      fullAnalysis = await analyzeCVWithAI(cvText, profession, country)
+      console.log('[CV Pre-Audit] Resultado de análisis IA:', JSON.stringify(fullAnalysis, null, 2))
+    } catch (err) {
+      console.error('[CV Pre-Audit] Error en análisis IA:', err)
+      throw err
+    }
 
     // Create censored version for freemium
-    const preAuditResult = createPreAuditResult(fullAnalysis)
+    let preAuditResult
+    try {
+      preAuditResult = createPreAuditResult(fullAnalysis)
+      console.log('[CV Pre-Audit] Resultado pre-audit:', JSON.stringify(preAuditResult, null, 2))
+    } catch (err) {
+      console.error('[CV Pre-Audit] Error creando preAuditResult:', err)
+      throw err
+    }
 
     // Store the full analysis temporarily (24 hours)
     const analysisId = generateAnalysisId()
-    await supabase
-      .from('cv_analyses')
-      .insert({
-        id: analysisId,
-        cv_text: cvText,
-        profession,
-        country,
-        full_analysis: fullAnalysis,
-        created_at: new Date().toISOString(),
-        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-      })
+    try {
+      await supabase
+        .from('cv_analyses')
+        .insert({
+          id: analysisId,
+          cv_text: cvText,
+          profession,
+          country,
+          full_analysis: fullAnalysis,
+          created_at: new Date().toISOString(),
+          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+        })
+      console.log('[CV Pre-Audit] Análisis guardado en Supabase con ID:', analysisId)
+    } catch (err) {
+      console.error('[CV Pre-Audit] Error guardando en Supabase:', err)
+      throw err
+    }
 
     return NextResponse.json({
       analysisId,
@@ -54,9 +90,9 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error: any) {
-    console.error('[CV Pre-Audit] Error:', error)
+    console.error('[CV Pre-Audit] Error general:', error)
     return NextResponse.json(
-      { error: 'Failed to analyze CV' },
+      { error: 'Failed to analyze CV', details: error?.message || error },
       { status: 500 }
     )
   }

@@ -201,7 +201,7 @@ export default function CVAuditPage() {
             {/* Country */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                País donde buscas trabajo
+                Desde que país buscas trabajo
               </label>
               <select
                 value={country}
@@ -239,8 +239,17 @@ export default function CVAuditPage() {
             >
               {analyzing ? (
                 <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  Analizando tu CV...
+                  <div className="w-full flex flex-col items-center gap-2">
+                    <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden mb-2">
+                      <div className="h-2 bg-gradient-to-r from-blue-400 to-purple-500 animate-pulse w-full"></div>
+                    </div>
+                    <div className="flex items-center gap-2 text-blue-700 font-semibold">
+                      <FaRobot />
+                      {profession
+                        ? `Buscando Keywords críticas para ${profession}...`
+                        : 'Simulando filtros ATS...'}
+                    </div>
+                  </div>
                 </>
               ) : (
                 <>

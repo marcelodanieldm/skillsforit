@@ -12,7 +12,9 @@ export async function analyzeCVWithAI(
   country: string,
   purpose?: string
 ): Promise<AnalysisResult> {
-  return await performActualAnalysis(cvText, profession, country, purpose)
+  // Limitar el texto del CV a 4000 caracteres para evitar errores de contexto
+  const trimmedCVText = cvText.length > 4000 ? cvText.slice(0, 4000) : cvText;
+  return await performActualAnalysis(trimmedCVText, profession, country, purpose)
 }
 
 
@@ -30,7 +32,7 @@ async function performActualAnalysis(
   const apiKey = process.env.HUGGINGFACE_API_KEY;
   if (!apiKey) throw new Error('Falta la variable HUGGINGFACE_API_KEY en el entorno');
 
-  const response = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2', {
+  const response = await fetch('https://router.huggingface.co/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${apiKey}`,
@@ -38,9 +40,12 @@ async function performActualAnalysis(
       'Accept': 'application/json'
     },
     body: JSON.stringify({
-      inputs: prompt,
-      parameters: { max_new_tokens: 1024, temperature: 0.3 },
-      options: { wait_for_model: true }
+      model: 'openai/gpt-oss-120b',
+      messages: [
+        { role: 'user', content: prompt }
+      ],
+      max_tokens: 1024,
+      temperature: 0.3
     })
   });
 
@@ -49,8 +54,8 @@ async function performActualAnalysis(
     throw new Error('Hugging Face API error: ' + errorText);
   }
   const data = await response.json();
-  // El modelo devuelve un array con un objeto { generated_text }
-  const content = Array.isArray(data) ? data[0]?.generated_text : data?.generated_text;
+  // Para chat completions, el texto generado está en choices[0].message.content
+  const content = data?.choices?.[0]?.message?.content;
   if (!content) throw new Error('La respuesta de Hugging Face no contiene texto generado');
 
   // Intentar parsear el JSON si el modelo lo devuelve como bloque de código

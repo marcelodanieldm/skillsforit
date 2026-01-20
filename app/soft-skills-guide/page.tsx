@@ -48,6 +48,25 @@ interface Module {
 }
 
 export default function SoftSkillsGuidePage() {
+    // FAQS para la sección de preguntas frecuentes
+    const faqs = [
+      {
+        q: "¿Para quién es esta guía?",
+        a: "Para desarrolladores de todos los niveles que quieren mejorar sus soft skills, negociar mejor salario y destacar en entrevistas. Especialmente útil si sientes que tu talento técnico no se refleja en tu compensación."
+      },
+      {
+        q: "¿Qué formato tiene el contenido?",
+        a: "PDF descargable de 200+ páginas con ejercicios prácticos, scripts word-by-word, casos de estudio reales y plantillas listas para usar. Todo en español."
+      },
+      {
+        q: "¿Cuánto tiempo toma completar la guía?",
+        a: "Puedes leer todo en 7.5 horas, pero recomendamos tomarte 2-3 semanas para practicar los ejercicios. Los resultados llegan con la práctica."
+      },
+      {
+        q: "¿Realmente funciona para negociar salario?",
+        a: "Sí. Nuestros usuarios reportan un promedio de 28% de aumento salarial después de aplicar las técnicas. El ROI es de 280x ($10 invertidos vs $2,800 de aumento promedio)."
+      }
+    ];
   const [showDiagnostic, setShowDiagnostic] = useState(false)
   const { trackEvent } = useFunnelTracking()
   
@@ -193,10 +212,8 @@ export default function SoftSkillsGuidePage() {
             {/* Pricing CTA */}
             <div className="inline-block bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8 mb-8">
               <div className="text-center mb-6">
-                <div className="text-gray-500 line-through text-2xl mb-2">$20 USD</div>
-                <div className="text-6xl font-black text-purple-600 mb-2">$10 <span className="text-2xl">USD</span></div>
-                <div className="text-gray-600 dark:text-gray-400">Pago único - Acceso de por vida</div>
-              </div>
+                  <div className="text-gray-600 dark:text-gray-400">Pago único - Acceso de por vida</div>
+                </div>
               
               <Link href="/soft-skills-guide/checkout" onClick={handleCheckoutClick}>
                 <motion.button
@@ -209,8 +226,7 @@ export default function SoftSkillsGuidePage() {
               </Link>
               
               <div className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                <FaShieldAlt className="text-green-600" />
-                <span>Garantía de devolución de 30 días</span>
+                {/* Garantía eliminada */}
               </div>
             </div>
 
@@ -419,8 +435,6 @@ export default function SoftSkillsGuidePage() {
 
             <div className="inline-block bg-white rounded-2xl shadow-2xl p-8 text-gray-900 mb-8">
               <div className="text-center mb-6">
-                <div className="text-gray-500 line-through text-2xl mb-2">$20 USD</div>
-                <div className="text-6xl font-black text-purple-600 mb-2">$10 <span className="text-2xl">USD</span></div>
                 <div className="text-gray-600">Oferta limitada - 50% OFF</div>
               </div>
               
@@ -430,15 +444,12 @@ export default function SoftSkillsGuidePage() {
                   whileTap={{ scale: 0.95 }}
                   className="w-full px-12 py-5 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xl font-bold rounded-xl shadow-lg hover:shadow-2xl transition-all mb-4"
                 >
-                  Comprar Ahora - $10 USD
+                  Comprar Ahora
                 </motion.button>
               </Link>
               
               <div className="text-sm text-gray-600 space-y-2">
-                <div className="flex items-center justify-center gap-2">
-                  <FaShieldAlt className="text-green-600" />
-                  <span>Garantía de devolución de 30 días</span>
-                </div>
+                {/* Garantía eliminada */}
                 <div className="flex items-center justify-center gap-2">
                   <FaCheckCircle className="text-green-600" />
                   <span>Acceso inmediato después del pago</span>
@@ -467,28 +478,7 @@ export default function SoftSkillsGuidePage() {
           </div>
 
           <div className="space-y-6">
-            {[
-              {
-                q: "¿Para quién es esta guía?",
-                a: "Para desarrolladores de todos los niveles que quieren mejorar sus soft skills, negociar mejor salario y destacar en entrevistas. Especialmente útil si sientes que tu talento técnico no se refleja en tu compensación."
-              },
-              {
-                q: "¿Qué formato tiene el contenido?",
-                a: "PDF descargable de 200+ páginas con ejercicios prácticos, scripts word-by-word, casos de estudio reales y plantillas listas para usar. Todo en español."
-              },
-              {
-                q: "¿Cuánto tiempo toma completar la guía?",
-                a: "Puedes leer todo en 7.5 horas, pero recomendamos tomarte 2-3 semanas para practicar los ejercicios. Los resultados llegan con la práctica."
-              },
-              {
-                q: "¿Realmente funciona para negociar salario?",
-                a: "Sí. Nuestros usuarios reportan un promedio de 28% de aumento salarial después de aplicar las técnicas. El ROI es de 280x ($10 invertidos vs $2,800 de aumento promedio)."
-              },
-              {
-                q: "¿Qué pasa si no me gusta?",
-                a: "Garantía de devolución de 30 días, sin preguntas. Si no ves valor, te devolvemos el 100% de tu dinero."
-              }
-            ].map((faq, index) => (
+            {faqs.map((faq, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
