@@ -91,11 +91,43 @@ async function sendMail({ to, subject, html }) {
   }
 }
 
+async function sendSessionReminderEmail({ to, mentorName, sessionDate, sessionUrl, userName }) {
+  const template = await getEmailTemplate('sessionReminder');
+  const subject = template?.subject
+    .replace('[MENTOR]', mentorName)
+    .replace('[FECHA]', sessionDate)
+    .replace('[NOMBRE]', userName) || `Recordatorio: sesión mentoría con ${mentorName} el ${sessionDate}`;
+  let html = template?.html || `<h2>¡No olvides tu sesión!</h2><p>Mentor: <b>${mentorName}</b><br/>Fecha y hora: <b>${sessionDate}</b><br/>Usuario: <b>${userName}</b><br/>Enlace: <a href='${sessionUrl}'>${sessionUrl}</a></p>`;
+  html = fillTemplate(html, { MENTOR: mentorName, FECHA: sessionDate, LINK: sessionUrl, NOMBRE: userName });
+  return sendMail({ to, subject, html });
+}
+
+async function sendUpsellOfferEmail({ to, userName, productName, discount, offerUrl }) {
+  const template = await getEmailTemplate('upsellOffer');
+  const subject = template?.subject
+    .replace('[NOMBRE]', userName) || `¡Oferta especial para ti, ${userName}!`;
+  let html = template?.html || `<h2>¡Aprovecha esta oportunidad!</h2><p>Producto recomendado: <b>${productName}</b><br/>Descuento: <b>${discount}</b><br/>Enlace: <a href='${offerUrl}'>${offerUrl}</a></p>`;
+  html = fillTemplate(html, { NOMBRE: userName, PRODUCTO: productName, DESCUENTO: discount, LINK: offerUrl });
+  return sendMail({ to, subject, html });
+}
+
+async function sendFeedbackRequestEmail({ to, userName, productName, mentorName, feedbackUrl }) {
+  const template = await getEmailTemplate('feedbackRequest');
+  const subject = template?.subject
+    .replace('[NOMBRE]', userName) || `¿Cómo fue tu experiencia, ${userName}?`;
+  let html = template?.html || `<h2>¡Queremos tu opinión!</h2><p>Por favor, cuéntanos cómo fue tu experiencia con ${productName || mentorName}.<br/>Enlace para feedback: <a href='${feedbackUrl}'>${feedbackUrl}</a></p>`;
+  html = fillTemplate(html, { NOMBRE: userName, PRODUCTO: productName, MENTOR: mentorName, LINK: feedbackUrl });
+  return sendMail({ to, subject, html });
+}
+
 module.exports = {
   sendMentoriaWelcomeEmail,
   sendProductDeliveryEmail,
   sendCVAnalysisConfirmation,
   sendCVAnalysisResult,
   sendMentorshipSessionConfirmation,
-  sendCartRecoveryEmail
+  sendCartRecoveryEmail,
+  sendSessionReminderEmail,
+  sendUpsellOfferEmail,
+  sendFeedbackRequestEmail
 };

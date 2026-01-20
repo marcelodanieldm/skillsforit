@@ -11,11 +11,11 @@ const defaultTemplates = {
   },
   productDelivery: {
     subject: '¡Tu acceso a [PRODUCTO] está listo!',
-    html: `<h2>¡Gracias por tu compra!</h2><p>Puedes descargar tu producto aquí: <a href='[LINK]'>[LINK]</a></p>`
+    html: `<h2>¡Gracias por tu compra, [NOMBRE]!</h2><p>Puedes descargar tu producto aquí: <a href='[LINK]'>[LINK]</a></p>`
   },
   cvAnalysisConfirmation: {
     subject: '¡Pago recibido! Tu análisis de CV está en proceso',
-    html: `<h2>¡Gracias por confiar en SkillsForIT!</h2><p>Tu pago fue recibido correctamente. Estamos procesando tu análisis de CV.</p>`
+    html: `<h2>¡Gracias por confiar en SkillsForIT, [NOMBRE]!</h2><p>Tu pago fue recibido correctamente. Estamos procesando tu análisis de CV.</p>`
   },
   cvAnalysisResult: {
     subject: '¡Tu análisis de CV está listo!',
@@ -23,15 +23,56 @@ const defaultTemplates = {
   },
   mentorshipSessionConfirmation: {
     subject: '¡Sesión de mentoría confirmada!',
-    html: `<h2>¡Tu sesión está agendada!</h2><p>Mentor: <b>[MENTOR]</b><br/>Fecha y hora: <b>[FECHA]</b></p>`
+    html: `<h2>¡Tu sesión está agendada!</h2><p>Mentor: <b>[MENTOR]</b><br/>Fecha y hora: <b>[FECHA]</b><br/>Usuario: <b>[NOMBRE]</b></p>`
   },
   cartRecovery: {
-    subject: '¿Aún quieres [PRODUCTO]?',
+    subject: '¿Aún quieres [PRODUCTO], [NOMBRE]?',
     html: `<h2>¡No pierdas tu oportunidad!</h2><p>Puedes retomar tu compra aquí: <a href='[LINK]'>[LINK]</a></p>`
+  },
+  sessionReminder: {
+    subject: 'Recordatorio: sesión mentoría con [MENTOR] el [FECHA]',
+    html: `<h2>¡No olvides tu sesión!</h2><p>Mentor: <b>[MENTOR]</b><br/>Fecha y hora: <b>[FECHA]</b><br/>Usuario: <b>[NOMBRE]</b><br/>Enlace: <a href='[LINK]'>[LINK]</a></p>`
+  },
+  upsellOffer: {
+    subject: '¡Oferta especial para ti, [NOMBRE]!',
+    html: `<h2>¡Aprovecha esta oportunidad!</h2><p>Producto recomendado: <b>[PRODUCTO]</b><br/>Descuento: <b>[DESCUENTO]</b><br/>Enlace: <a href='[LINK]'>[LINK]</a></p>`
+  },
+  feedbackRequest: {
+    subject: '¿Cómo fue tu experiencia, [NOMBRE]?',
+    html: `<h2>¡Queremos tu opinión!</h2><p>Por favor, cuéntanos cómo fue tu experiencia con [PRODUCTO] o [MENTOR].<br/>Enlace para feedback: <a href='[LINK]'>[LINK]</a></p>`
   }
 };
 
 function EmailTemplateEditor({ id, label, value, onChange, onReset }) {
+  const [sendingTest, setSendingTest] = useState(false);
+  const [testMsg, setTestMsg] = useState('');
+  const handleSendTest = async () => {
+    setSendingTest(true);
+    setTestMsg('');
+    // Datos de ejemplo para cada flujo
+    const testData = {
+      mentoriaWelcome: { to: 'test@mailtrap.io', password: 'demo123', dashboardUrl: 'https://skillsforit.com/dashboard' },
+      productDelivery: { to: 'test@mailtrap.io', productName: 'Curso React', downloadUrl: 'https://skillsforit.com/download' },
+      cvAnalysisConfirmation: { to: 'test@mailtrap.io', analysisId: 'A12345' },
+      cvAnalysisResult: { to: 'test@mailtrap.io', analysisId: 'A12345', resultUrl: 'https://skillsforit.com/result' },
+      mentorshipSessionConfirmation: { to: 'test@mailtrap.io', mentorName: 'Ana Mentor', sessionDate: '2026-01-21 18:00', sessionUrl: 'https://skillsforit.com/session', userName: 'Carlos' },
+      cartRecovery: { to: 'test@mailtrap.io', recoveryUrl: 'https://skillsforit.com/cart', productName: 'Curso React' },
+      sessionReminder: { to: 'test@mailtrap.io', mentorName: 'Ana Mentor', sessionDate: '2026-01-22 10:00', sessionUrl: 'https://skillsforit.com/session', userName: 'Carlos' },
+      upsellOffer: { to: 'test@mailtrap.io', userName: 'Carlos', productName: 'Mentoría Premium', discount: '20%', offerUrl: 'https://skillsforit.com/upsell' },
+      feedbackRequest: { to: 'test@mailtrap.io', userName: 'Carlos', productName: 'Curso React', mentorName: 'Ana Mentor', feedbackUrl: 'https://skillsforit.com/feedback' }
+    };
+    try {
+      await fetch('/api/email-templates/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, data: testData[id] })
+      });
+      setTestMsg('Email de prueba enviado (revisa Mailtrap).');
+    } catch {
+      setTestMsg('Error al enviar email de prueba.');
+    }
+    setSendingTest(false);
+  };
   return (
     <div className="border rounded-lg p-4 mb-6 bg-white dark:bg-slate-800">
       <h3 className="font-bold mb-2">{label}</h3>
@@ -50,6 +91,8 @@ function EmailTemplateEditor({ id, label, value, onChange, onReset }) {
       />
       <div className="flex gap-2 mb-2">
         <button className="px-3 py-1 bg-blue-600 text-white rounded" onClick={onReset}>Restaurar default</button>
+        <button className="px-3 py-1 bg-green-600 text-white rounded" onClick={handleSendTest} disabled={sendingTest}>Enviar email de prueba</button>
+        {testMsg && <span className="ml-2 text-green-600 text-sm">{testMsg}</span>}
       </div>
       <div className="border-t pt-2 mt-2">
         <div className="text-xs text-gray-500 mb-1">Vista previa:</div>
@@ -181,7 +224,12 @@ export default function CEOPage() {
       {/* ...existing dashboard content... */}
       <section className="max-w-3xl mx-auto mt-10">
         <h2 className="text-2xl font-bold mb-4">Configuración de Emails</h2>
-        <p className="mb-6 text-gray-600 dark:text-gray-400">Edita el asunto y cuerpo HTML de cada email transaccional. Puedes usar variables entre corchetes como [PRODUCTO], [LINK], [MENTOR], [FECHA], etc.</p>
+        <p className="mb-6 text-gray-600 dark:text-gray-400">
+          Edita el asunto y cuerpo HTML de cada email transaccional.<br/>
+          <b>Variables disponibles:</b> <span className="font-mono">[NOMBRE], [PRODUCTO], [FECHA], [LINK], [MENTOR], [DESCUENTO], [ANALYSIS_ID], [CONTRASENA], [DASHBOARD_URL]</span><br/>
+          Puedes agregar más variables según el flujo.<br/>
+          <span className="text-xs text-blue-600">Ejemplo: "Hola [NOMBRE], tu producto [PRODUCTO] está listo para descargar en [LINK]"</span>
+        </p>
         {loadingTemplates ? <div>Cargando plantillas...</div> : Object.entries(defaultTemplates).map(([id, def]) => (
           <EmailTemplateEditor
             key={id}
