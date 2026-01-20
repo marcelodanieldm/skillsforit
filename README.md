@@ -81,7 +81,7 @@ SkillsForIT es una plataforma SaaS para auditoría de CV, mentoría profesional 
 - Dashboard CEO: https://skillsforit.vercel.app/admin/dashboard
 - Dashboard Usuario IT: https://skillsforit.vercel.app/dashboard
 - Dashboard Mentor: https://skillsforit.vercel.app/mentor/dashboard
-- CV Audit: https://skillsforit.vercel.app/upload
+- CV Audit: https://skillsforit.vercel.app/cv-audit
 - Soft Skills Simulator: https://skillsforit.vercel.app/soft-skills-simulator
 - Soft Skills Guide: https://skillsforit.vercel.app/ebook/soft-skills-guide
 
