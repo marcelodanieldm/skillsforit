@@ -5,6 +5,7 @@ flowchart TD
     A[Landing Page] --> B{¿Qué servicio elige?}
     B -->|Auditoría de CV| C[Formulario CV]
     B -->|Mentoría 1:1| D[Explorar Mentores]
+    B -->|Simulador Soft Skills| SS1[Soft Skills Simulator]
     C --> E[Subir CV y datos]
     E --> F[Carrito de compra]
     F --> G{¿Upsell E-book?}
@@ -26,4 +27,8 @@ flowchart TD
     U --> V{¿Pago exitoso?}
     V -->|Sí| W[Confirmación y Google Meet]
     W --> X[Feedback y Historial]
+    SS1 --> SS2[Seleccionar tipo de simulación]
+    SS2 --> SS3[Simulación interactiva IA]
+    SS3 --> SS4[Feedback inmediato]
+    SS4 --> SS5[Historial en dashboard]
 ```
