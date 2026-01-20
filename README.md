@@ -1,23 +1,336 @@
 # SkillsForIT - SaaS Platform
 
-## � Documentación Completa
+---
+## 📋 Índice
+1. [Overview](#overview)
+2. [Features](#features)
+3. [Dashboards](#dashboards)
+4. [Flujos de Productos](#flujos-de-productos)
+5. [Links de Productos](#links-de-productos)
+6. [Instalación](#instalación)
+7. [Variables de Entorno](#variables-de-entorno)
+8. [Tecnologías](#tecnologías)
+9. [QA y Casos de Prueba](#qa-y-casos-de-prueba)
+10. [DER](#der)
+11. [Arquitectura](#arquitectura)
+12. [Características Técnicas](#características-técnicas)
+13. [Documentación Extendida](#documentación-extendida)
 
-- **[📖 Setup Guide](SETUP.md)** - Guía completa de instalación y configuración
-- **[🔐 Auth System](AUTH_README.md)** - Sistema de autenticación completo (Login, OAuth, Recovery)
-- **[🔄 Flow Diagrams](FLOW.md)** - Diagramas de flujo del servicio y arquitectura
-- **[🚀 User Journey](USER_JOURNEY.md)** - Flujo completo del proceso de usuario (Landing → Compra → Post-Compra)
-- **[📝 Sprint 4 Documentation](SPRINT4.md)** - CEO Dashboard & Analytics
-- **[📊 Sprint 5 Documentation](SPRINT5.md)** - Event Tracking & User Segmentation
-- **[🎯 Sprint 8 Documentation](SPRINT8.md)** - Dashboard CEO con LTV, Proyecciones y Seguridad
-- **[👥 Sprint 31 Documentation](SPRINT31.md)** - Sistema de Autenticación & Experiencia del Alumno
+## 🏁 Overview
+SkillsForIT es una plataforma SaaS para auditoría de CV, mentoría profesional y entrega de productos digitales, con automatización completa de pagos, análisis, email y dashboard ejecutivo. El sistema está diseñado para escalar, ser seguro y personalizable, integrando IA, pagos, y gestión de usuarios en un solo flujo.
 
-## 🔐 Sprint 31: Sistema de Autenticación Completo ✅ COMPLETED
+---
+## ✨ Features
+- Auditoría automática de CV con IA (OpenAI GPT-4, Hugging Face)
+- Mentoría 1:1 con agenda, pagos y feedback
+- Entrega de productos digitales y e-books
+- Dashboard CEO con analíticas, KPIs y filtros por profesión
+- Segmentación automática de usuarios (Junior, Transition, Leadership)
+- Email transaccional con plantillas dinámicas y editor en dashboard
+- Recuperación de carrito y upsell automatizado
+- Sistema de autenticación completo (NextAuth, JWT, Google OAuth)
+- Gestión de usuarios y roles (CEO, Mentor, Usuario IT, Admin)
+- Integración Stripe para pagos y webhooks
+- PDF automático y entrega por email
+- Arquitectura modular y escalable
 
-Sistema completo de autenticación con login/logout, recuperación de contraseña, Google OAuth y gestión de usuarios.
+---
+## 📊 Dashboards
 
-### 🆕 Características de Autenticación
+### 👤 Dashboard User IT
+- Ver historial de análisis de CV y mentorías
+- Descargar reportes PDF
+- Estado de cada análisis y sesión
+- Acceso a productos adquiridos
+- Career Score y recomendaciones personalizadas
 
-#### Login/Logout ✅
+### 🏆 Dashboard CEO
+- KPIs: ingresos, clientes, ticket promedio, proyección mensual
+- Filtros por profesión, país y tipo de servicio
+- Gráficos: bar, pie, línea, podium de profesiones
+- Gestión de usuarios y roles
+- Editor de plantillas de email y prueba de envíos
+- Visualización de embudo de conversión y segmentación
+
+### 🎓 Dashboard Mentor
+- Agenda de sesiones y disponibilidad
+- Historial de mentees y notas de sesiones
+- Gestión de perfil y especialidades
+- Visualización de ratings y feedback
+- Acceso a pagos y balance de mentoría
+- Herramientas para dejar tareas y feedback personalizado
+
+---
+## 🚦 Flujos de Productos
+- Auditoría de CV: Upload → Pago → Análisis IA → PDF → Email → Dashboard
+- Mentoría: Registro → Selección mentor → Agenda → Pago → Google Meet → Feedback → Historial
+- Entrega de productos: Compra → Pago → Email con link de descarga
+- Upsell: Email y dashboard sugieren productos relevantes tras cada compra
+
+---
+## 🔗 Links de Productos
+- Landing: https://skillsforit.com/
+- Dashboard usuario: https://skillsforit.com/dashboard
+- CEO dashboard: https://skillsforit.com/admin/dashboard
+- Mentoría: https://skillsforit.com/mentors
+- Upload CV: https://skillsforit.com/upload
+
+---
+## ⚙️ Instalación
+1. Clona el repositorio:
+       ```bash
+       git clone https://github.com/marcelodanieldm/skillsforit.git
+       cd skillsforit
+       npm install
+       ```
+2. Copia y configura variables de entorno:
+       ```bash
+       cp .env.local.example .env.local
+       # Edita .env.local con tus credenciales
+       ```
+3. Ejecuta el servidor:
+       ```bash
+       npm run dev
+       ```
+
+---
+## 🧩 Variables de Entorno
+- NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+- STRIPE_SECRET_KEY
+- STRIPE_WEBHOOK_SECRET
+- OPENAI_API_KEY
+- HUGGINGFACE_API_KEY
+- EMAIL_HOST, EMAIL_USER, EMAIL_PASSWORD
+- NEXT_PUBLIC_APP_URL
+- PRODUCT_PRICE
+- NEXTAUTH_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+- SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_ANON_KEY
+
+---
+## 🛠️ Tecnologías
+- Next.js 14 (App Router)
+- React, TypeScript, Tailwind CSS, Framer Motion
+- Stripe, Nodemailer, jsPDF
+- OpenAI GPT-4, Hugging Face
+- Supabase (DB y storage)
+- Playwright (E2E), Jest (unit tests)
+- Vercel (deploy), GitHub Actions (CI/CD)
+
+---
+## 🧪 QA y Casos de Prueba
+### Unitarios (Jest)
+- Envío de emails por cada flujo: mentoriaWelcome, productDelivery, cvAnalysisConfirmation, cvAnalysisResult, mentorshipSessionConfirmation, cartRecovery, sessionReminder, upsellOffer, feedbackRequest
+### E2E (Playwright)
+- Prueba de envío de email para cada flujo desde el endpoint `/api/email-templates/test`
+- Validación de respuesta y éxito en Mailtrap
+
+#### Lista de Casos de Prueba
+- Envío de email de bienvenida mentoría
+- Entrega de producto digital
+- Confirmación de análisis de CV
+- Entrega de resultado de análisis de CV
+- Confirmación de sesión de mentoría
+- Recuperación de carrito abandonado
+- Recordatorio de sesión mentoría
+- Oferta de upsell personalizada
+- Solicitud de feedback post-compra/sesión
+
+---
+## 🗂️ DER - Diagrama Entidad Relación
+- users, mentors, mentor_availability, mentor_wallets, mentor_transactions, mentor_payouts, mentor_bookings, mentorship_notes, orders, product_access, user_assets, mentorship_subscriptions, funnel_events
+- [Ver esquema completo](DATABASE_SCHEMA_README.md)
+
+---
+## 🏗️ Arquitectura del Sistema
+- Frontend: Next.js + React + Tailwind
+- Backend: Next.js API Routes, Supabase, Stripe, Nodemailer
+- Almacenamiento: Supabase/PostgreSQL, archivos en S3 (futuro)
+- Autenticación: NextAuth, JWT, Google OAuth
+- Email: Nodemailer, Mailtrap, plantillas en Supabase
+- CI/CD: GitHub Actions, Vercel
+- Seguridad: .env en gitignore, roles, validación de sesión
+- [Diagramas de flujo y arquitectura](FLOW.md)
+
+---
+## ⚡ Características Técnicas
+- Modularidad y escalabilidad
+- Plantillas de email editables desde dashboard CEO
+- Segmentación y personalización de flujos
+- Webhooks Stripe para automatización
+- Integración IA para análisis de CV
+- PDF automático y entrega por email
+- Dashboard CEO con KPIs y filtros avanzados
+- Pruebas unitarias y E2E para todos los flujos
+- Variables de entorno seguras y documentadas
+- Soporte para migración a PostgreSQL y S3
+
+---
+- [Guía de instalación](SETUP.md)
+- [Diagrama de flujo](FLOW.md)
+- [User Journey](USER_JOURNEY.md)
+- [DER y modelo de datos](DATABASE_SCHEMA_README.md)
+- [Sprints y features](SPRINT4.md), [SPRINT5.md], [SPRINT8.md], [SPRINT31.md]
+- [Casos de prueba y QA](tests/email-templates.test.js), [tests/e2e/email-templates.e2e.spec.ts)
+- [Guía de despliegue](DEPLOYMENT.md)
+- [Diagrama visual de flujo de usuario](docs/diagramas-flujo.md)
+- [DER de la base de datos](docs/der-base-datos.md)
+- [Ejemplos de UI de dashboards](docs/ui-ejemplos.md)
+  
+### Diagramas de flujos de usuario por rol
+- [Flujo CEO](docs/flujo-ceo.md)
+- [Flujo Usuario IT](docs/flujo-user-it.md)
+- [Flujo Mentor](docs/flujo-mentor.md)
+
+- [Envío de email transaccional](docs/proceso-interno-email.md)
+- [Pago y webhook Stripe](docs/proceso-interno-pago.md)
+- [Análisis de CV con IA](docs/proceso-interno-analisis-cv.md)
+- [Onboarding de usuario](docs/proceso-interno-onboarding.md)
+- [Seguridad y autenticación](docs/proceso-interno-seguridad.md)
+- [CI/CD y despliegue](docs/proceso-interno-cicd.md)
+
+### Diagramas de integraciones externas
+- [Integración Stripe](docs/integracion-stripe.md)
+- [Integración OpenAI](docs/integracion-openai.md)
+- [Integración Supabase](docs/integracion-supabase.md)
+- [Envío de email transaccional](docs/proceso-interno-email.md)
+- [Pago y webhook Stripe](docs/proceso-interno-pago.md)
+- [Análisis de CV con IA](docs/proceso-interno-analisis-cv.md)
+- [Onboarding de usuario](docs/proceso-interno-onboarding.md)
+- [Seguridad y autenticación](docs/proceso-interno-seguridad.md)
+- [CI/CD y despliegue](docs/proceso-interno-cicd.md)
+- [Guía de instalación](SETUP.md)
+- [Diagrama de flujo](FLOW.md)
+- [User Journey](USER_JOURNEY.md)
+- [DER y modelo de datos](DATABASE_SCHEMA_README.md)
+- [Sprints y features](SPRINT4.md), [SPRINT5.md], [SPRINT8.md], [SPRINT31.md]
+- [Casos de prueba y QA](tests/email-templates.test.js), [tests/e2e/email-templates.e2e.spec.ts)
+- [Guía de despliegue](DEPLOYMENT.md)
+- [Diagrama visual de flujo de usuario](docs/diagramas-flujo.md)
+- [DER de la base de datos](docs/der-base-datos.md)
+- [Ejemplos de UI de dashboards](docs/ui-ejemplos.md)
+# SkillsForIT - SaaS Platform
+
+## 🏁 Overview
+SkillsForIT es una plataforma SaaS para auditoría de CV, mentoría profesional y entrega de productos digitales, con automatización completa de pagos, análisis, email y dashboard ejecutivo. El sistema está diseñado para escalar, ser seguro y personalizable, integrando IA, pagos, y gestión de usuarios en un solo flujo.
+
+## ✨ Features
+- Auditoría automática de CV con IA (OpenAI GPT-4, Hugging Face)
+- Mentoría 1:1 con agenda, pagos y feedback
+- Entrega de productos digitales y e-books
+- Dashboard CEO con analíticas, KPIs y filtros por profesión
+- Segmentación automática de usuarios (Junior, Transition, Leadership)
+- Email transaccional con plantillas dinámicas y editor en dashboard
+- Recuperación de carrito y upsell automatizado
+- Sistema de autenticación completo (NextAuth, JWT, Google OAuth)
+- Gestión de usuarios y roles (CEO, Mentor, Usuario IT, Admin)
+- Integración Stripe para pagos y webhooks
+- PDF automático y entrega por email
+- Arquitectura modular y escalable
+
+## 🚦 Flujos de Productos
+- Auditoría de CV: Upload → Pago → Análisis IA → PDF → Email → Dashboard
+- Mentoría: Registro → Selección mentor → Agenda → Pago → Google Meet → Feedback → Historial
+- Entrega de productos: Compra → Pago → Email con link de descarga
+- Upsell: Email y dashboard sugieren productos relevantes tras cada compra
+
+## 🔗 Links de Productos
+- Landing: https://skillsforit.com/
+- Dashboard usuario: https://skillsforit.com/dashboard
+- CEO dashboard: https://skillsforit.com/admin/dashboard
+- Mentoría: https://skillsforit.com/mentors
+- Upload CV: https://skillsforit.com/upload
+
+## ⚙️ Instalación
+1. Clona el repositorio:
+       ```bash
+       git clone https://github.com/marcelodanieldm/skillsforit.git
+       cd skillsforit
+       npm install
+       ```
+2. Copia y configura variables de entorno:
+       ```bash
+       cp .env.local.example .env.local
+       # Edita .env.local con tus credenciales
+       ```
+3. Ejecuta el servidor:
+       ```bash
+       npm run dev
+       ```
+
+## 🧩 Variables de Entorno
+- NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+- STRIPE_SECRET_KEY
+- STRIPE_WEBHOOK_SECRET
+- OPENAI_API_KEY
+- HUGGINGFACE_API_KEY
+- EMAIL_HOST, EMAIL_USER, EMAIL_PASSWORD
+- NEXT_PUBLIC_APP_URL
+- PRODUCT_PRICE
+- NEXTAUTH_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+- SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_ANON_KEY
+
+## 🛠️ Herramientas y Tecnologías
+- Next.js 14 (App Router)
+- React, TypeScript, Tailwind CSS, Framer Motion
+- Stripe, Nodemailer, jsPDF
+- OpenAI GPT-4, Hugging Face
+- Supabase (DB y storage)
+- Playwright (E2E), Jest (unit tests)
+- Vercel (deploy), GitHub Actions (CI/CD)
+
+## 🧪 QA: Casos de Prueba en Desarrollo
+### Unitarios (Jest)
+- Envío de emails por cada flujo: mentoriaWelcome, productDelivery, cvAnalysisConfirmation, cvAnalysisResult, mentorshipSessionConfirmation, cartRecovery, sessionReminder, upsellOffer, feedbackRequest
+### E2E (Playwright)
+- Prueba de envío de email para cada flujo desde el endpoint `/api/email-templates/test`
+- Validación de respuesta y éxito en Mailtrap
+
+#### Lista de Casos de Prueba
+- Envío de email de bienvenida mentoría
+- Entrega de producto digital
+- Confirmación de análisis de CV
+- Entrega de resultado de análisis de CV
+- Confirmación de sesión de mentoría
+- Recuperación de carrito abandonado
+- Recordatorio de sesión mentoría
+- Oferta de upsell personalizada
+- Solicitud de feedback post-compra/sesión
+
+## 🗂️ DER - Diagrama Entidad Relación
+- users, mentors, mentor_availability, mentor_wallets, mentor_transactions, mentor_payouts, mentor_bookings, mentorship_notes, orders, product_access, user_assets, mentorship_subscriptions, funnel_events
+- [Ver esquema completo](DATABASE_SCHEMA_README.md)
+
+## 🏗️ Arquitectura del Sistema
+- Frontend: Next.js + React + Tailwind
+- Backend: Next.js API Routes, Supabase, Stripe, Nodemailer
+- Almacenamiento: Supabase/PostgreSQL, archivos en S3 (futuro)
+- Autenticación: NextAuth, JWT, Google OAuth
+- Email: Nodemailer, Mailtrap, plantillas en Supabase
+- CI/CD: GitHub Actions, Vercel
+- Seguridad: .env en gitignore, roles, validación de sesión
+- [Diagramas de flujo y arquitectura](FLOW.md)
+
+## ⚡ Características Técnicas
+- Modularidad y escalabilidad
+- Plantillas de email editables desde dashboard CEO
+- Segmentación y personalización de flujos
+- Webhooks Stripe para automatización
+- Integración IA para análisis de CV
+- PDF automático y entrega por email
+- Dashboard CEO con KPIs y filtros avanzados
+- Pruebas unitarias y E2E para todos los flujos
+- Variables de entorno seguras y documentadas
+- Soporte para migración a PostgreSQL y S3
+
+---
+**Documentación extendida:**
+- [Guía de instalación](SETUP.md)
+- [Diagrama de flujo](FLOW.md)
+- [User Journey](USER_JOURNEY.md)
+- [DER y modelo de datos](DATABASE_SCHEMA_README.md)
+- [Sprints y features](SPRINT4.md), [SPRINT5.md], [SPRINT8.md], [SPRINT31.md]
+- [Casos de prueba y QA](tests/email-templates.test.js), [tests/e2e/email-templates.e2e.spec.ts)
+- [Guía de despliegue](DEPLOYMENT.md)
 - **Email/Password**: Autenticación tradicional con validación de roles
 - **Google OAuth**: Inicio de sesión con cuenta de Google (NextAuth.js)
 - **Sesiones JWT**: Tokens seguros con expiración de 24 horas
