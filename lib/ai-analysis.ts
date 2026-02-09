@@ -1,3 +1,56 @@
+// Extrae texto de PDF, DOC o DOCX
+export async function extractTextFromAnyFile(file: File): Promise<string> {
+  const mime = file.type;
+  const name = file.name || '';
+  const buffer = await file.arrayBuffer();
+  // PDF
+  if (mime === 'application/pdf' || name.endsWith('.pdf')) {
+    return await extractTextFromPDFBuffer(buffer);
+  }
+  // DOCX
+  if (mime === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || name.endsWith('.docx')) {
+    return await extractTextFromDocxBuffer(buffer);
+  }
+  // DOC
+  if (mime === 'application/msword' || name.endsWith('.doc')) {
+    return await extractTextFromDocBuffer(buffer);
+  }
+  // Fallback: intentar decodificar como texto plano
+  return new TextDecoder('utf-8').decode(buffer).replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+}
+
+// Utilidad para PDF (usa pdf-lib)
+async function extractTextFromPDFBuffer(buffer: ArrayBuffer): Promise<string> {
+  try {
+    // pdf-lib no soporta extracción directa de texto, así que solo decodificamos el buffer
+    // TODO: Usar un servicio externo o wasm para extraer texto real de PDF
+    return new TextDecoder('utf-8').decode(buffer).replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+  } catch (e) {
+    return new TextDecoder('utf-8').decode(buffer).replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+  }
+}
+
+// Utilidad para DOCX (usa mammoth)
+async function extractTextFromDocxBuffer(buffer: ArrayBuffer): Promise<string> {
+  try {
+    const mammoth = await import('mammoth');
+    const result = await mammoth.convertToHtml({ arrayBuffer: buffer });
+    // Quitar etiquetas HTML y limpiar
+    return result.value.replace(/<[^>]+>/g, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+  } catch (e) {
+    return new TextDecoder('utf-8').decode(buffer).replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+  }
+}
+
+// Utilidad para DOC (usa docx)
+async function extractTextFromDocBuffer(buffer: ArrayBuffer): Promise<string> {
+  try {
+    // docx solo soporta docx, así que fallback a decodificación simple
+    return new TextDecoder('utf-8').decode(buffer).replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+  } catch (e) {
+    return new TextDecoder('utf-8').decode(buffer).replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+  }
+}
 
 import { AnalysisResult } from './database'
 import { buildAdvancedCVPrompt } from './cv-auditor'

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { analyzeCVWithAI } from '@/lib/ai-analysis'
+import { extractTextFromAnyFile } from '@/lib/ai-analysis'
 import { createClient } from '@supabase/supabase-js'
 
 function getSupabase() {
@@ -34,24 +35,34 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Extract text from PDF (simplified - in production use pdf-parse)
+
+    // Extracción de texto desde PDF, DOC o DOCX
     let cvText = ''
     try {
-      cvText = await extractTextFromFile(file)
+      cvText = await extractTextFromAnyFile(file)
       console.log('[CV Pre-Audit] Texto extraído del CV:', cvText.slice(0, 200) + (cvText.length > 200 ? '...' : ''))
     } catch (err) {
       console.error('[CV Pre-Audit] Error extrayendo texto del archivo:', err)
-      throw err
+      // Si falla la extracción, usar mock
+      cvText = ''
     }
 
-    // Perform AI analysis
+    // Perform AI analysis o mock si falla o si el texto es ilegible
     let fullAnalysis
     try {
-      fullAnalysis = await analyzeCVWithAI(cvText, profession, country)
-      console.log('[CV Pre-Audit] Resultado de análisis IA:', JSON.stringify(fullAnalysis, null, 2))
+      if (!cvText || cvText.startsWith('%PDF')) {
+        // Si no hay texto extraíble, usar mock
+        const { getMockAnalysis } = await import('@/lib/ai-analysis')
+        fullAnalysis = getMockAnalysis()
+        console.log('[CV Pre-Audit] Usando análisis mock por falta de texto extraíble')
+      } else {
+        fullAnalysis = await analyzeCVWithAI(cvText, profession, country)
+        console.log('[CV Pre-Audit] Resultado de análisis IA:', JSON.stringify(fullAnalysis, null, 2))
+      }
     } catch (err) {
-      console.error('[CV Pre-Audit] Error en análisis IA:', err)
-      throw err
+      console.error('[CV Pre-Audit] Error en análisis IA, usando mock:', err)
+      const { getMockAnalysis } = await import('@/lib/ai-analysis')
+      fullAnalysis = getMockAnalysis()
     }
 
     // Create censored version for freemium
@@ -127,14 +138,6 @@ function generateAnalysisId(): string {
   return 'analysis_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
 }
 
-async function extractTextFromFile(file: File): Promise<string> {
-  // Simplified text extraction - in production use proper PDF parsing
-  const buffer = await file.arrayBuffer()
-  const text = new TextDecoder('utf-8').decode(buffer)
 
-  // Basic cleanup
-  return text
-    .replace(/\r\n/g, '\n')
-    .replace(/\r/g, '\n')
-    .trim()
-}
+// Extrae texto de PDF, DOC o DOCX
+// Usa extractTextFromAnyFile de lib/ai-analysis

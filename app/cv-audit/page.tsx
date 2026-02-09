@@ -126,6 +126,26 @@ export default function CVAuditPage() {
           </div>
         </motion.div>
 
+        {/* Barra de progreso y mensajes durante el análisis */}
+        {analyzing && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-8">
+            <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden mb-4">
+              <div className="h-4 bg-gradient-to-r from-green-400 to-green-600 animate-pulse w-full"></div>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-green-700 font-bold text-lg flex items-center gap-2">
+                <FaCheck className="text-green-500" /> Simulando filtros ATS...
+              </span>
+              <span className="text-green-700 font-bold text-lg flex items-center gap-2">
+                <FaCheck className="text-green-500" /> {profession ? `Buscando Keywords críticas para ${profession}...` : 'Buscando Keywords críticas...'}
+              </span>
+              <span className="text-green-700 font-bold text-lg flex items-center gap-2">
+                <FaCheck className="text-green-500" /> Analizando tu CV...
+              </span>
+            </div>
+          </motion.div>
+        )}
+
         {/* Upload Form */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
