@@ -1,30 +1,26 @@
-## QA - Casos de Prueba E2E
 
-Esta sección documenta los principales casos de prueba automatizados E2E (Playwright) ubicados en `tests/e2e`. Cada caso incluye: feature, épica, summary, resultado esperado y asserts principales.
+# SkillsForIT
 
-| Caso de Prueba | Feature | Épica | Summary | Resultado Esperado | Asserts |
-|---|---|---|---|---|---|
-| API Endpoints Validation<br/>(api-validation.spec.ts) | API REST, Validación de flujos | Auditoría de CV, Checkout, Analytics | Valida endpoints críticos: upload, checkout, webhook, events, users. | Rechazo de archivos inválidos, creación de sesión de pago, tracking de eventos, segmentación de usuario, validación de errores. | Status HTTP, contenido de respuesta, segmentación correcta, errores controlados |
-| CEO - CRUD Mentor y Acceso<br/>(ceo-crud-mentor-access.spec.ts) | Gestión de Mentores | Dashboard CEO | Crear mentor, validar persistencia, login y acceso de mentor. | Mentor creado, listado, acceso exitoso y logout. | Visibilidad en lista, acceso a dashboard, logout exitoso |
-| CEO - Edición y Eliminación de Mentor<br/>(ceo-crud-mentor-edit-delete.spec.ts) | Gestión de Mentores | Dashboard CEO | Crear, editar y eliminar mentor desde dashboard CEO. | Edición persistente, mentor eliminado de la lista. | Nombre editado visible, mentor no visible tras eliminar |
-| CEO - Seguridad y Acceso<br/>(ceo-security.spec.ts) | Seguridad, Roles | Dashboard CEO | Valida acceso a endpoints y dashboard CEO según rol/token. | Usuarios no autorizados reciben 403, CEO accede correctamente, datos sensibles protegidos. | Status 403/200, estructura de respuesta, visibilidad de dashboard |
-| CEO - Subida y Descarga de PDF<br/>(ceo-upload-download-guide-skills.spec.ts) | Gestión de Assets | Dashboard CEO | Subir y descargar PDF de Guide Skills, validar reemplazo. | PDF subido, descargado, reemplazado correctamente. | Mensaje de éxito, nombre de archivo, reemplazo efectivo |
-| ...otros casos en tests/e2e | Flujos completos | Todas las épicas | Cada archivo cubre un flujo E2E: pagos, login, reservas, emails, etc. | Flujo exitoso, errores controlados, integración real. | Status, contenido, side effects (emails, archivos, dashboard) |
-
-**Cómo ejecutar:**
-
-```bash
-npx playwright test tests/e2e
-```
-
-**Resultado esperado:** Todos los asserts deben cumplirse y los flujos reflejarse en el dashboard y logs del sistema.
-
-
-## 🏁 Overview
-SkillsForIT es una plataforma SaaS para auditoría de CV, mentoría profesional y entrega de productos digitales, con automatización completa de pagos, análisis, email y dashboard ejecutivo. El sistema está diseñado para escalar, ser seguro y personalizable, integrando IA, pagos, y gestión de usuarios en un solo flujo.
+Plataforma SaaS para auditoría de CV, mentoría profesional y entrega de productos digitales, con automatización de pagos, análisis, email y dashboard ejecutivo. Escalable, segura y personalizable, integrando IA, pagos y gestión de usuarios en un solo flujo.
 
 ---
-## ✨ Features
+
+## 📋 Tabla de Contenidos
+
+1. [Características](#características)
+2. [Instalación y Configuración](#instalación-y-configuración)
+3. [Uso Rápido](#uso-rápido)
+4. [Dashboards y Flujos](#dashboards-y-flujos)
+5. [QA y Casos de Prueba](#qa-y-casos-de-prueba)
+6. [Documentación Técnica y Sprints](#documentación-técnica-y-sprints)
+7. [Contribución](#contribución)
+8. [Licencia](#licencia)
+9. [Créditos](#créditos)
+
+---
+
+## ✨ Características
+
 - Auditoría automática de CV con IA (OpenAI GPT-4, Hugging Face)
 - Mentoría 1:1 con agenda, pagos y feedback
 - Entrega de productos digitales y e-books
@@ -44,7 +40,34 @@ SkillsForIT es una plataforma SaaS para auditoría de CV, mentoría profesional 
   - Historial de simulaciones en dashboard
 
 ---
-## 📊 Dashboards
+
+## ⚙️ Instalación y Configuración
+
+1. Clona el repositorio:
+       ```bash
+       git clone https://github.com/marcelodanieldm/skillsforit.git
+       cd skillsforit
+       npm install
+       ```
+2. Copia y configura variables de entorno:
+       ```bash
+       cp .env.local.example .env.local
+       # Edita .env.local con tus credenciales
+       ```
+3. Ejecuta el servidor:
+       ```bash
+       npm run dev
+       ```
+
+---
+
+## 🚀 Uso Rápido
+
+Accede a la app en `http://localhost:3000` tras la instalación. Consulta la guía de instalación completa en [SETUP.md](SETUP.md).
+
+---
+
+## 📊 Dashboards y Flujos
 
 ### 👤 Dashboard User IT
 - Ver historial de análisis de CV y mentorías
@@ -69,8 +92,7 @@ SkillsForIT es una plataforma SaaS para auditoría de CV, mentoría profesional 
 - Acceso a pagos y balance de mentoría
 - Herramientas para dejar tareas y feedback personalizado
 
----
-## 🚦 Flujos de Productos
+### 🚦 Flujos de Productos
 - Auditoría de CV: Upload → Pago → Análisis IA → PDF → Email → Dashboard
 - Mentoría: Registro → Selección mentor → Agenda → Pago → Google Meet → Feedback → Historial
 - Entrega de productos: Compra → Pago → Email con link de descarga
@@ -79,24 +101,77 @@ SkillsForIT es una plataforma SaaS para auditoría de CV, mentoría profesional 
 
 ---
 
+## 🧪 QA y Casos de Prueba
+
+Esta sección documenta los principales casos de prueba automatizados E2E (Playwright) ubicados en `tests/e2e`.
+
+| Caso de Prueba | Feature | Épica | Summary | Resultado Esperado | Asserts |
+|---|---|---|---|---|---|
+| API Endpoints Validation<br/>(api-validation.spec.ts) | API REST, Validación de flujos | Auditoría de CV, Checkout, Analytics | Valida endpoints críticos: upload, checkout, webhook, events, users. | Rechazo de archivos inválidos, creación de sesión de pago, tracking de eventos, segmentación de usuario, validación de errores. | Status HTTP, contenido de respuesta, segmentación correcta, errores controlados |
+| CEO - CRUD Mentor y Acceso<br/>(ceo-crud-mentor-access.spec.ts) | Gestión de Mentores | Dashboard CEO | Crear mentor, validar persistencia, login y acceso de mentor. | Mentor creado, listado, acceso exitoso y logout. | Visibilidad en lista, acceso a dashboard, logout exitoso |
+| CEO - Edición y Eliminación de Mentor<br/>(ceo-crud-mentor-edit-delete.spec.ts) | Gestión de Mentores | Dashboard CEO | Crear, editar y eliminar mentor desde dashboard CEO. | Edición persistente, mentor eliminado de la lista. | Nombre editado visible, mentor no visible tras eliminar |
+| CEO - Seguridad y Acceso<br/>(ceo-security.spec.ts) | Seguridad, Roles | Dashboard CEO | Valida acceso a endpoints y dashboard CEO según rol/token. | Usuarios no autorizados reciben 403, CEO accede correctamente, datos sensibles protegidos. | Status 403/200, estructura de respuesta, visibilidad de dashboard |
+| CEO - Subida y Descarga de PDF<br/>(ceo-upload-download-guide-skills.spec.ts) | Gestión de Assets | Dashboard CEO | Subir y descargar PDF de Guide Skills, validar reemplazo. | PDF subido, descargado, reemplazado correctamente. | Mensaje de éxito, nombre de archivo, reemplazo efectivo |
+| ...otros casos en tests/e2e | Flujos completos | Todas las épicas | Cada archivo cubre un flujo E2E: pagos, login, reservas, emails, etc. | Flujo exitoso, errores controlados, integración real. | Status, contenido, side effects (emails, archivos, dashboard) |
+
+**Cómo ejecutar:**
+
+```bash
+npx playwright test tests/e2e
+```
+
+**Resultado esperado:** Todos los asserts deben cumplirse y los flujos reflejarse en el dashboard y logs del sistema.
 
 ---
-## ⚙️ Instalación
-1. Clona el repositorio:
-       ```bash
-       git clone https://github.com/marcelodanieldm/skillsforit.git
-       cd skillsforit
-       npm install
-       ```
-2. Copia y configura variables de entorno:
-       ```bash
-       cp .env.local.example .env.local
-       # Edita .env.local con tus credenciales
-       ```
-3. Ejecuta el servidor:
-       ## 🔐 Sprint 31: Sistema de Autenticación Completo ✅ COMPLETED
 
-       Sistema completo de autenticación con login/logout, recuperación de contraseña, Google OAuth y gestión de usuarios.
+## 📚 Documentación Técnica y Sprints
+
+- [Guía de instalación](SETUP.md)
+- [Guía de despliegue](DEPLOYMENT.md)
+- [Diagramas de flujo y arquitectura](FLOW.md)
+- [User Journey](USER_JOURNEY.md)
+- [DER y modelo de datos](DATABASE_SCHEMA_README.md)
+- [Casos de prueba y QA](tests/email-templates.test.js), [tests/e2e/email-templates.e2e.spec.ts]
+- [Diagrama visual de flujo de usuario](docs/diagramas-flujo.md)
+- [DER de la base de datos](docs/der-base-datos.md)
+- [Ejemplos de UI de dashboards](docs/ui-ejemplos.md)
+- [Flujo CEO](docs/flujo-ceo.md)
+- [Flujo Usuario IT](docs/flujo-user-it.md)
+- [Flujo Mentor](docs/flujo-mentor.md)
+- [Flujo Simulador de Entrevista](docs/flujo-simulador-entrevista.md)
+- [Envío de email transaccional](docs/proceso-interno-email.md)
+- [Pago y webhook Stripe](docs/proceso-interno-pago.md)
+- [Análisis de CV con IA](docs/proceso-interno-analisis-cv.md)
+- [Onboarding de usuario](docs/proceso-interno-onboarding.md)
+- [Seguridad y autenticación](docs/proceso-interno-seguridad.md)
+- [CI/CD y despliegue](docs/proceso-interno-cicd.md)
+- [Integración Stripe](docs/integracion-stripe.md)
+- [Integración OpenAI](docs/integracion-openai.md)
+- [Integración Supabase](docs/integracion-supabase.md)
+
+### Sprints y Documentación de Releases
+- **[📝 Sprint 4 Documentation](SPRINT4.md)** - CEO Dashboard & Analytics
+- **[📊 Sprint 5 Documentation](SPRINT5.md)** - Event Tracking & User Segmentation
+- **[🎯 Sprint 8 Documentation](SPRINT8.md)** - Dashboard CEO con LTV, Proyecciones y Seguridad
+- **[👥 Sprint 31 Documentation](SPRINT31.md)** - Sistema de Autenticación & Experiencia del Alumno
+
+---
+
+## 🤝 Contribución
+
+¡Las contribuciones son bienvenidas! Por favor, abre un issue o pull request para sugerencias, mejoras o reportar bugs.
+
+---
+
+## 📝 Licencia
+
+Este proyecto está bajo la licencia MIT. Consulta el archivo LICENSE para más detalles.
+
+---
+
+## 👥 Créditos
+
+Desarrollado por Marcelo Daniel y colaboradores. Consulta el historial de commits y la sección de autores para más información.
 
        ### 🆕 Características de Autenticación
 
