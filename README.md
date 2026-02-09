@@ -1,7 +1,239 @@
-# SkillsForIT - SaaS Platform
+## QA - Casos de Prueba E2E
 
-## � Documentación Completa
+Esta sección documenta los principales casos de prueba automatizados E2E (Playwright) ubicados en `tests/e2e`. Cada caso incluye: feature, épica, summary, resultado esperado y asserts principales.
 
+| Caso de Prueba | Feature | Épica | Summary | Resultado Esperado | Asserts |
+|---|---|---|---|---|---|
+| API Endpoints Validation<br/>(api-validation.spec.ts) | API REST, Validación de flujos | Auditoría de CV, Checkout, Analytics | Valida endpoints críticos: upload, checkout, webhook, events, users. | Rechazo de archivos inválidos, creación de sesión de pago, tracking de eventos, segmentación de usuario, validación de errores. | Status HTTP, contenido de respuesta, segmentación correcta, errores controlados |
+| CEO - CRUD Mentor y Acceso<br/>(ceo-crud-mentor-access.spec.ts) | Gestión de Mentores | Dashboard CEO | Crear mentor, validar persistencia, login y acceso de mentor. | Mentor creado, listado, acceso exitoso y logout. | Visibilidad en lista, acceso a dashboard, logout exitoso |
+| CEO - Edición y Eliminación de Mentor<br/>(ceo-crud-mentor-edit-delete.spec.ts) | Gestión de Mentores | Dashboard CEO | Crear, editar y eliminar mentor desde dashboard CEO. | Edición persistente, mentor eliminado de la lista. | Nombre editado visible, mentor no visible tras eliminar |
+| CEO - Seguridad y Acceso<br/>(ceo-security.spec.ts) | Seguridad, Roles | Dashboard CEO | Valida acceso a endpoints y dashboard CEO según rol/token. | Usuarios no autorizados reciben 403, CEO accede correctamente, datos sensibles protegidos. | Status 403/200, estructura de respuesta, visibilidad de dashboard |
+| CEO - Subida y Descarga de PDF<br/>(ceo-upload-download-guide-skills.spec.ts) | Gestión de Assets | Dashboard CEO | Subir y descargar PDF de Guide Skills, validar reemplazo. | PDF subido, descargado, reemplazado correctamente. | Mensaje de éxito, nombre de archivo, reemplazo efectivo |
+| ...otros casos en tests/e2e | Flujos completos | Todas las épicas | Cada archivo cubre un flujo E2E: pagos, login, reservas, emails, etc. | Flujo exitoso, errores controlados, integración real. | Status, contenido, side effects (emails, archivos, dashboard) |
+
+**Cómo ejecutar:**
+
+```bash
+npx playwright test tests/e2e
+```
+
+**Resultado esperado:** Todos los asserts deben cumplirse y los flujos reflejarse en el dashboard y logs del sistema.
+
+
+## 🏁 Overview
+SkillsForIT es una plataforma SaaS para auditoría de CV, mentoría profesional y entrega de productos digitales, con automatización completa de pagos, análisis, email y dashboard ejecutivo. El sistema está diseñado para escalar, ser seguro y personalizable, integrando IA, pagos, y gestión de usuarios en un solo flujo.
+
+---
+## ✨ Features
+- Auditoría automática de CV con IA (OpenAI GPT-4, Hugging Face)
+- Mentoría 1:1 con agenda, pagos y feedback
+- Entrega de productos digitales y e-books
+- Dashboard CEO con analíticas, KPIs y filtros por profesión
+- Segmentación automática de usuarios (Junior, Transition, Leadership)
+- Email transaccional con plantillas dinámicas y editor en dashboard
+- Recuperación de carrito y upsell automatizado
+- Sistema de autenticación completo (NextAuth, JWT, Google OAuth)
+- Gestión de usuarios y roles (CEO, Mentor, Usuario IT, Admin)
+- Integración Stripe para pagos y webhooks
+- PDF automático y entrega por email
+- Arquitectura modular y escalable
+- Simulador de entrevista técnica con IA (OpenAI GPT-4):
+  - Selección de tipo de entrevista (Frontend, Backend, DevOps, QA, Data, Soft Skills)
+  - Preguntas dinámicas y adaptativas
+  - Feedback inmediato y detallado (puntuación, recomendaciones, áreas de mejora)
+  - Historial de simulaciones en dashboard
+
+---
+## 📊 Dashboards
+
+### 👤 Dashboard User IT
+- Ver historial de análisis de CV y mentorías
+- Descargar reportes PDF
+- Estado de cada análisis y sesión
+- Acceso a productos adquiridos
+- Career Score y recomendaciones personalizadas
+
+### 🏆 Dashboard CEO
+- KPIs: ingresos, clientes, ticket promedio, proyección mensual
+- Filtros por profesión, país y tipo de servicio
+- Gráficos: bar, pie, línea, podium de profesiones
+- Gestión de usuarios y roles
+- Editor de plantillas de email y prueba de envíos
+- Visualización de embudo de conversión y segmentación
+
+### 🎓 Dashboard Mentor
+- Agenda de sesiones y disponibilidad
+- Historial de mentees y notas de sesiones
+- Gestión de perfil y especialidades
+- Visualización de ratings y feedback
+- Acceso a pagos y balance de mentoría
+- Herramientas para dejar tareas y feedback personalizado
+
+---
+## 🚦 Flujos de Productos
+- Auditoría de CV: Upload → Pago → Análisis IA → PDF → Email → Dashboard
+- Mentoría: Registro → Selección mentor → Agenda → Pago → Google Meet → Feedback → Historial
+- Entrega de productos: Compra → Pago → Email con link de descarga
+- Upsell: Email y dashboard sugieren productos relevantes tras cada compra
+- Simulador de entrevista: Acceso → Selección de tipo → Simulación con IA → Feedback inmediato (puntuación, recomendaciones, áreas de mejora) → Historial en dashboard
+
+---
+
+
+---
+## ⚙️ Instalación
+1. Clona el repositorio:
+       ```bash
+       git clone https://github.com/marcelodanieldm/skillsforit.git
+       cd skillsforit
+       npm install
+       ```
+2. Copia y configura variables de entorno:
+       ```bash
+       cp .env.local.example .env.local
+       # Edita .env.local con tus credenciales
+       ```
+3. Ejecuta el servidor:
+       ## 🔐 Sprint 31: Sistema de Autenticación Completo ✅ COMPLETED
+
+       Sistema completo de autenticación con login/logout, recuperación de contraseña, Google OAuth y gestión de usuarios.
+
+       ### 🆕 Características de Autenticación
+
+       #### Login/Logout ✅
+       - **Email/Password**: Autenticación tradicional con validación de roles
+       - **Google OAuth**: Inicio de sesión con cuenta de Google (NextAuth.js)
+       - **Sesiones JWT**: Tokens seguros con expiración de 24 horas
+       - **Multi-rol**: Soporte para CEO, Mentor, Usuario IT y Admin
+       - **Página de Login**: `/auth/signin` con diseño moderno
+
+       #### Recuperación de Contraseña ✅
+       - **Request Reset**: Solicitud de recuperación con envío de token
+       - **Token Temporal**: Validez de 1 hora con expiración automática
+       - **Confirm Reset**: Interfaz para establecer nueva contraseña
+       - **Invalidación**: Cierra todas las sesiones activas al cambiar contraseña
+       - **UI Amigable**: Páginas `/auth/forgot-password` y `/reset-password`
+
+       #### Gestión de Usuarios (CEO) ✅
+       - **CRUD Completo**: Create, Read, Update, Delete usuarios
+       - **API Endpoints**: `/api/users/manage` con autenticación por token
+       - **Búsqueda y Filtros**: Filtrado por email, nombre y rol
+       - **Validación de Roles**: Solo CEO puede gestionar usuarios
+       - **UI Moderna**: Componente con modales, animaciones y diseño profesional
+
+       #### Integración en Landing ✅
+       - **Navbar Superior**: Dropdown discreto con accesos rápidos
+       - **Botón Flotante**: Aparece al scroll en móviles (FloatingAuthButton)
+       - **Footer Actualizado**: Enlaces de cuenta y login
+       - **No Invasivo**: Diseño que no interfiere con la experiencia del usuario
+
+       ### 📁 Estructura de Archivos
+
+       ```
+       app/
+              ├── api/auth/
+              │   ├── login/route.ts          - Login endpoint
+              │   ├── logout/route.ts         - Logout endpoint
+              │   ├── password-reset/
+              │   │   ├── request/route.ts    - Solicitar reset
+              │   │   └── confirm/route.ts    - Confirmar reset
+              │   └── [...nextauth]/route.ts  - Google OAuth (NextAuth)
+              ├── api/users/manage/route.ts   - CRUD usuarios (CEO)
+              ├── auth/
+              │   ├── signin/page.tsx         - Página de login
+              │   └── forgot-password/page.tsx - Recuperar contraseña
+              └── reset-password/page.tsx     - Restablecer contraseña
+
+       components/
+              ├── Navbar.tsx                  - Navbar con auth dropdown
+              ├── FloatingAuthButton.tsx      - Botón flotante móvil
+              └── ceo/UserManagement.tsx      - Gestión de usuarios
+
+       lib/
+              └── auth.ts                     - AuthService (lógica completa)
+       ```
+
+       ### 🔑 Configuración Necesaria
+
+       ```bash
+       # .env.local
+       NEXTAUTH_SECRET=your-secret-here
+       GOOGLE_CLIENT_ID=your-google-client-id
+       GOOGLE_CLIENT_SECRET=your-google-client-secret
+       NEXT_PUBLIC_APP_URL=http://localhost:3000
+       ```
+
+       ### 👤 Usuarios de Prueba
+
+       ```
+       CEO: ceo@skillsforit.com / ceo123
+       Mentor: mentor@skillsforit.com / mentor123
+       Usuario IT: user@example.com / user123
+       ```
+
+       ---
+- Seguridad: .env en gitignore, roles, validación de sesión
+- [Diagramas de flujo y arquitectura](FLOW.md)
+
+---
+## ⚡ Características Técnicas
+- Modularidad y escalabilidad
+- Plantillas de email editables desde dashboard CEO
+- Segmentación y personalización de flujos
+- Webhooks Stripe para automatización
+- Integración IA para análisis de CV
+- PDF automático y entrega por email
+- Dashboard CEO con KPIs y filtros avanzados
+- Pruebas unitarias y E2E para todos los flujos
+- Variables de entorno seguras y documentadas
+- Soporte para migración a PostgreSQL y S3
+
+---
+- [Guía de instalación](SETUP.md)
+- [Diagrama de flujo](FLOW.md)
+- [User Journey](USER_JOURNEY.md)
+- [DER y modelo de datos](DATABASE_SCHEMA_README.md)
+- [Casos de prueba y QA](tests/email-templates.test.js), [tests/e2e/email-templates.e2e.spec.ts]
+- [Guía de despliegue](DEPLOYMENT.md)
+- [Diagrama visual de flujo de usuario](docs/diagramas-flujo.md)
+- [DER de la base de datos](docs/der-base-datos.md)
+- [Ejemplos de UI de dashboards](docs/ui-ejemplos.md)
+  
+- [Flujo CEO](docs/flujo-ceo.md)
+- [Flujo Usuario IT](docs/flujo-user-it.md)
+- [Flujo Mentor](docs/flujo-mentor.md)
+
+### Diagrama de flujo del simulador de entrevista
+- [Flujo Simulador de Entrevista](docs/flujo-simulador-entrevista.md)
+
+- [Envío de email transaccional](docs/proceso-interno-email.md)
+- [Pago y webhook Stripe](docs/proceso-interno-pago.md)
+- [Análisis de CV con IA](docs/proceso-interno-analisis-cv.md)
+- [Onboarding de usuario](docs/proceso-interno-onboarding.md)
+- [Seguridad y autenticación](docs/proceso-interno-seguridad.md)
+- [CI/CD y despliegue](docs/proceso-interno-cicd.md)
+
+### Diagramas de integraciones externas
+- [Integración Stripe](docs/integracion-stripe.md)
+- [Integración OpenAI](docs/integracion-openai.md)
+- [Integración Supabase](docs/integracion-supabase.md)
+- [Envío de email transaccional](docs/proceso-interno-email.md)
+- [Pago y webhook Stripe](docs/proceso-interno-pago.md)
+- [Análisis de CV con IA](docs/proceso-interno-analisis-cv.md)
+- [Onboarding de usuario](docs/proceso-interno-onboarding.md)
+- [Seguridad y autenticación](docs/proceso-interno-seguridad.md)
+- [CI/CD y despliegue](docs/proceso-interno-cicd.md)
+- [Guía de instalación](SETUP.md)
+- [Diagrama de flujo](FLOW.md)
+- [User Journey](USER_JOURNEY.md)
+- [DER y modelo de datos](DATABASE_SCHEMA_README.md)
+- [Casos de prueba y QA](tests/email-templates.test.js), [tests/e2e/email-templates.e2e.spec.ts]
+- [Guía de despliegue](DEPLOYMENT.md)
+- [Diagrama visual de flujo de usuario](docs/diagramas-flujo.md)
+- [DER de la base de datos](docs/der-base-datos.md)
+- [Ejemplos de UI de dashboards](docs/ui-ejemplos.md)
+
+<<<<<<< HEAD
 - **[📖 Setup Guide](SETUP.md)** - Guía completa de instalación y configuración
 - **[🔐 Auth System](AUTH_README.md)** - Sistema de autenticación completo (Login, OAuth, Recovery)
 - **[🔄 Flow Diagrams](FLOW.md)** - Diagramas de flujo del servicio y arquitectura
@@ -89,6 +321,8 @@ Usuario IT: user@example.com / user123
 ```
 
 ---
+=======
+>>>>>>> 6fdef37b2622f0e56f15e40bd8ae234a9308454a
 
 ## 🚀 Sprint 5: Arquitectura Base y Analytics Avanzados ✅ COMPLETED
 
@@ -456,7 +690,11 @@ El proyecto escucha estos eventos de Stripe:
 #### 📋 Checklist de Configuración
 
 - [ ] Cuenta de Stripe creada
+<<<<<<< HEAD
 - [ ] Modo de prueba activado en Dashboard
+=======
+- [ ] Modo de prueba activado en Stripe Dashboard
+>>>>>>> 6fdef37b2622f0e56f15e40bd8ae234a9308454a
 - [ ] Claves API copiadas a `.env.local`
 - [ ] Stripe CLI instalado y autenticado
 - [ ] Webhook local configurado y funcionando
@@ -639,11 +877,4 @@ npm run dev
 - **Previous session notes** automatically shown to mentor before new session with same mentee
 - Session notes include: content, topics, action items, next steps
 - All bookings require Stripe payment confirmation
-- Meeting links are generated automatically
-
----
-
-**MVP Status**: ✅ Fully Functional SaaS with Mentorship
-**Revenue Ready**: ✅ Yes - Can process CV analysis ($7) and mentorship payments ($10-$100)
-**Automated**: ✅ Complete automation from payment to delivery
-**Mentorship Ready**: ✅ Full booking, payment, and session notes system
+- Meeting links are generated automáticamente

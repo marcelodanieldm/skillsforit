@@ -126,6 +126,7 @@ export default function CVAuditPage() {
           </div>
         </motion.div>
 
+<<<<<<< HEAD
         {/* Barra de progreso y mensajes durante el análisis */}
         {analyzing && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-8">
@@ -146,6 +147,8 @@ export default function CVAuditPage() {
           </motion.div>
         )}
 
+=======
+>>>>>>> 6fdef37b2622f0e56f15e40bd8ae234a9308454a
         {/* Upload Form */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

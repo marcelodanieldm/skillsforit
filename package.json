@@ -26,14 +26,25 @@
     "@tanstack/react-query": "^5.90.16",
     "canvas-confetti": "^1.9.4",
     "chart.js": "^4.5.1",
+<<<<<<< HEAD
+=======
+    "dotenv": "^17.2.3",
+>>>>>>> 6fdef37b2622f0e56f15e40bd8ae234a9308454a
     "formidable": "^3.5.4",
     "framer-motion": "^11.0.3",
     "jspdf": "^4.0.0",
     "lucide-react": "^0.562.0",
+<<<<<<< HEAD
     "mammoth": "^1.11.0",
     "next": "^15.1.6",
     "next-auth": "^4.24.13",
     "nodemailer": "^7.0.12",
+=======
+    "next": "^15.1.6",
+    "next-auth": "^4.24.13",
+    "nodemailer": "^7.0.12",
+    "node-fetch": "^3.3.2",
+>>>>>>> 6fdef37b2622f0e56f15e40bd8ae234a9308454a
     "pdf-lib": "^1.17.1",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.3.1",

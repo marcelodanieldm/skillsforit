@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // Extrae texto de PDF, DOC o DOCX
 export async function extractTextFromAnyFile(file: File): Promise<string> {
   const mime = file.type;
@@ -51,6 +52,8 @@ async function extractTextFromDocBuffer(buffer: ArrayBuffer): Promise<string> {
     return new TextDecoder('utf-8').decode(buffer).replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
   }
 }
+=======
+>>>>>>> 6fdef37b2622f0e56f15e40bd8ae234a9308454a
 
 import { AnalysisResult } from './database'
 import { buildAdvancedCVPrompt } from './cv-auditor'

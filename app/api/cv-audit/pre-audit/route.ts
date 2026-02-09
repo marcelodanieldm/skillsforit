@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { analyzeCVWithAI } from '@/lib/ai-analysis'
+<<<<<<< HEAD
 import { extractTextFromAnyFile } from '@/lib/ai-analysis'
+=======
+>>>>>>> 6fdef37b2622f0e56f15e40bd8ae234a9308454a
 import { createClient } from '@supabase/supabase-js'
 
 function getSupabase() {
@@ -35,6 +38,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
+<<<<<<< HEAD
 
     // Extracción de texto desde PDF, DOC o DOCX
     let cvText = ''
@@ -63,6 +67,26 @@ export async function POST(request: NextRequest) {
       console.error('[CV Pre-Audit] Error en análisis IA, usando mock:', err)
       const { getMockAnalysis } = await import('@/lib/ai-analysis')
       fullAnalysis = getMockAnalysis()
+=======
+    // Extract text from PDF (simplified - in production use pdf-parse)
+    let cvText = ''
+    try {
+      cvText = await extractTextFromFile(file)
+      console.log('[CV Pre-Audit] Texto extraído del CV:', cvText.slice(0, 200) + (cvText.length > 200 ? '...' : ''))
+    } catch (err) {
+      console.error('[CV Pre-Audit] Error extrayendo texto del archivo:', err)
+      throw err
+    }
+
+    // Perform AI analysis
+    let fullAnalysis
+    try {
+      fullAnalysis = await analyzeCVWithAI(cvText, profession, country)
+      console.log('[CV Pre-Audit] Resultado de análisis IA:', JSON.stringify(fullAnalysis, null, 2))
+    } catch (err) {
+      console.error('[CV Pre-Audit] Error en análisis IA:', err)
+      throw err
+>>>>>>> 6fdef37b2622f0e56f15e40bd8ae234a9308454a
     }
 
     // Create censored version for freemium
@@ -138,6 +162,20 @@ function generateAnalysisId(): string {
   return 'analysis_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
 }
 
+<<<<<<< HEAD
 
 // Extrae texto de PDF, DOC o DOCX
 // Usa extractTextFromAnyFile de lib/ai-analysis
+=======
+async function extractTextFromFile(file: File): Promise<string> {
+  // Simplified text extraction - in production use proper PDF parsing
+  const buffer = await file.arrayBuffer()
+  const text = new TextDecoder('utf-8').decode(buffer)
+
+  // Basic cleanup
+  return text
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .trim()
+}
+>>>>>>> 6fdef37b2622f0e56f15e40bd8ae234a9308454a

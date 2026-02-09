@@ -92,6 +92,7 @@ export default function PreAuditReport({ result, onUnlock }: PreAuditReportProps
 
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-8">
+<<<<<<< HEAD
       {/* Score General Grande */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center">
         <div className={`text-7xl font-extrabold ${getScoreColor(result.score)} mb-2`}>{result.score}/100</div>
@@ -144,6 +145,9 @@ export default function PreAuditReport({ result, onUnlock }: PreAuditReportProps
         </div>
         <div className="absolute top-4 right-4 flex items-center gap-2 text-gray-400"><FaLock /> <span className="font-semibold">Bloqueado</span></div>
       </motion.div>
+=======
+      {/* ...existing code... */}
+>>>>>>> 6fdef37b2622f0e56f15e40bd8ae234a9308454a
 
       {/* CTA para desbloquear o upsell mentoría */}
       {isUnlocked ? (
