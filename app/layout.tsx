@@ -1,31 +1,44 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Geist, Geist_Mono } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
-import { NotificationInitializer } from '@/components/NotificationInitializer'
 
-const inter = Inter({ subsets: ['latin'] })
+const _geist = Geist({ subsets: ["latin"] });
+const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'SkillsForIT - Optimiza tu CV Tech con IA | USD 7',
-  description: 'Transforma tu CV de IT en minutos con análisis de IA. Destaca tus skills técnicas y consigue más entrevistas. Solo USD 7.',
-  keywords: 'CV IT, curriculum desarrollador, optimizar CV tech, análisis CV IA, CV programador',
-  openGraph: {
-    title: 'SkillsForIT - Optimiza tu CV Tech con IA',
-    description: 'Transforma tu CV de IT en minutos. Solo USD 7.',
-    type: 'website',
-  }
+  title: 'DestinoSmart - Gestión Inteligente de Destinos Turísticos',
+  description: 'Plataforma de gestión inteligente para destinos turísticos con precios dinámicos, paquetes colaborativos y predicciones IA',
+  generator: 'v0.app',
+  icons: {
+    icon: [
+      {
+        url: '/icon-light-32x32.png',
+        media: '(prefers-color-scheme: light)',
+      },
+      {
+        url: '/icon-dark-32x32.png',
+        media: '(prefers-color-scheme: dark)',
+      },
+      {
+        url: '/icon.svg',
+        type: 'image/svg+xml',
+      },
+    ],
+    apple: '/apple-icon.png',
+  },
 }
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode
-}) {
+}>) {
   return (
-    <html lang="es">
-      <body className={inter.className}>
-        <NotificationInitializer />
+    <html lang="en" className="bg-background">
+      <body className="font-sans antialiased">
         {children}
+        {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
   )
